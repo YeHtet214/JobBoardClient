@@ -1,19 +1,24 @@
-import prisma from '../prisma/client.js';
+import { NextFunction, Request, Response } from 'express';
+import { fetchUserById, fetchUsers } from '../services/users.service.js';
 
-export const getAllUsers = async (req: Request, res: any) => {
+export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const newUser = await prisma.user.create({
-      data: {
-        firstName: 'Alice',
-        lastName: 'Doe',
-        email: 'bLs3o@example.com',
-        passwordHash: 'password123',
-        role: 'EMPLOYER'
-      }
-    });
+    const users = await fetchUsers();
 
-    res.status(200).json(newUser);
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    res.status(200).json({ success: true, message: "Successfully fetched all users", data: users });
+  } catch (error) {
+    next(error);
   }
 };
+
+export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const user = await fetchUserById(id);
+
+    res.status(200).json({ success: true, message: "Successfully fetched user by id", data: user });
+  } catch (error) {
+    next(error);
+  }
+};
+

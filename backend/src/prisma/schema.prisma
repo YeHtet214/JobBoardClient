@@ -22,6 +22,9 @@ model User {
   role            UserRole
   phone           String?
   profileImage    String?
+  isEmailVerified Boolean          @default(false)
+  emailVerificationToken String?
+  refreshTokens   RefreshToken[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   companies       Company[]
@@ -119,4 +122,24 @@ model SavedJob {
 
   @@unique([jobId, userId])
   @@index([userId])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([token])
+}
+
+model BlacklistedToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  expiresAt DateTime
+
+  @@index([token])
 }
