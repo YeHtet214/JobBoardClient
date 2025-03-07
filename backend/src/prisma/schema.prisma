@@ -22,8 +22,11 @@ model User {
   role            UserRole
   phone           String?
   profileImage    String?
+  googleId        String?
   isEmailVerified Boolean          @default(false)
   emailVerificationToken String?
+  resetPasswordToken String?
+  resetPasswordExpiry DateTime?
   refreshTokens   RefreshToken[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
@@ -50,19 +53,19 @@ model Company {
   website     String?
   location    String?
   industry    String?
+  jobs        Job[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  jobs        Job[]
 
   @@index([ownerId])
 }
 
 model Job {
   id              String           @id @default(uuid())
-  company         Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId       String
   postedBy        User             @relation("PostedJobs", fields: [postedById], references: [id], onDelete: Cascade)
   postedById      String
+  company         Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId       String
   title           String
   description     String
   location        String?
@@ -78,8 +81,8 @@ model Job {
   applications    JobApplication[]
   savedBy         SavedJob[]
 
-  @@index([companyId])
   @@index([postedById])
+  @@index([companyId])
 }
 
 enum JobType {

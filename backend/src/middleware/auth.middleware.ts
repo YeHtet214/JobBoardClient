@@ -18,7 +18,7 @@ const authorize = async (req: RequestWithUser, res: Response, next: NextFunction
     }
 
     const isBlacklistedToken = await prisma.blacklistedToken.findUnique({
-      where: { token }
+      where: { token: token }
     })
 
     const decoded = jwt.decode(token);

@@ -11,14 +11,16 @@
     "resolveJsonModule": true,           // Allows importing JSON files
     "forceConsistentCasingInFileNames": true, // Ensures consistent file casing
     "allowJs": true,                    // Allows JavaScript files to be compiled
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },                // Allows default imports from modules with no default export
   "ts-node": {
     "esm": true
   },
   "include": [
     "src/**/*",                          // Include all files inside the 'src' folder
-    "src/index.ts"                           // Also include the main 'index.ts' file
+    "src/index.ts",                           // Also include the main 'index.ts' file
+    "types/**/*"                          // Include all files inside the 'types' folder
   ],
   "exclude": [
     "node_modules"                       // Exclude the 'node_modules' folder from the compilation

@@ -1,19 +1,47 @@
 import express from 'express';
 import cors from 'cors';
+import passport from 'passport';
+import session from 'express-session';
 
+import bodyParser from 'body-parser';
 import userRouter from './routes/users.route.js';
 import authRouter from './routes/auth.route.js';
-import bodyParser from 'body-parser';
+import companyRouter from './routes/company.route.js';
+import jobRouter from './routes/job.route.js';
+
 import errorHandler from './middleware/error.middleware.js';
+
+// Import Passport config
+import './config/passport.config.js';
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true
+}));
+
+// Initialize session
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/api/users', userRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/companies', companyRouter);
+app.use('/api/jobs', jobRouter);
 
 app.use(errorHandler);
 

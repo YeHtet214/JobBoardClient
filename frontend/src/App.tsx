@@ -1,9 +1,11 @@
 import './App.css'
+import Auth from './pages/Auth.tsx';
 
 const App = () => {
   return (
-      <h1 className="text-red-500 text-3xl text-center">
+      <h1 className="">
         Hello, Vite + React + TypeScript + Tailwind CSS!
+        <Auth />
       </h1>
   );
 }
