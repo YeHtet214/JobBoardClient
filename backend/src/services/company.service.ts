@@ -36,3 +36,4 @@ export const deleteExistingCompany = async (id: string) => {
     const company = await prisma.company.delete({ where: { id } });
     return company;
 }
+

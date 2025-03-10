@@ -62,15 +62,6 @@ export type UpdateJobDto = Partial<Omit<CreateJobDto, 'companyId'>> & {
  * Validates and processes job data before creation
  */
 export const createJob = async (jobData: Partial<CreateJobDto> & { postedById: string }) => {
-
-    const userRole = (await fetchUserById(jobData.postedById))?.role;
-
-    if (userRole !== 'EMPLOYER') {
-        const error = new Error('You don\'t have permission to update this job') as CustomError;
-        error.status = 403;
-        throw error;
-    }
-
     // Validate required fields
     if (!jobData.title || !jobData.description || !jobData.companyId || !jobData.type) {
         const error = new Error('Missing required fields: title, description, companyId, and type are required') as CustomError;
