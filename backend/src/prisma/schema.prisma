@@ -21,7 +21,7 @@ model User {
   lastName        String
   role            UserRole
   phone           String?
-  profileImage    String?
+  profile         Profile?
   googleId        String?
   isEmailVerified Boolean          @default(false)
   emailVerificationToken String?
@@ -38,6 +38,21 @@ model User {
   @@index([email])
 }
 
+model Profile {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String   @unique  // @unique ensures one-to-one relationship
+  bio         String?
+  address     String?
+  education   String?
+  experience  String?
+  skills      String[]
+  socialLinks Json?    // For storing multiple social media links
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
 enum UserRole {
   EMPLOYER
   JOBSEEKER

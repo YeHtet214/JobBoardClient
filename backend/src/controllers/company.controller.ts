@@ -1,17 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import { RequestWithUser } from '../types/users.type.js';
 import { 
-  getAllCompanies,
+  fetchAllCompanies,
   getExistingCompany, 
   createNewCompany, 
   updateExistingCompany, 
   deleteExistingCompany 
 } from '../services/company.service.js';
-import prisma from '../prisma/client.js';
 
 export const getAllCompanies = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const companies = await getAllCompanies();
+    const companies = await fetchAllCompanies();
 
     return res.status(200).json({ success: true, message: 'Companies fetched successfully', data: companies });
   } catch (error) {

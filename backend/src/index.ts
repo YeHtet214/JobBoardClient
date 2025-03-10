@@ -2,10 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import passport from 'passport';
 import session from 'express-session';
+import { rateLimit } from 'express-rate-limit';
 
 import bodyParser from 'body-parser';
 import userRouter from './routes/users.route.js';
 import authRouter from './routes/auth.route.js';
+import profileRouter from './routes/profile.route.js';
 import companyRouter from './routes/company.route.js';
 import jobRouter from './routes/job.route.js';
 
@@ -22,6 +24,14 @@ app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true
 }));
+
+// Initialize rate limiter
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 15 minutes
+  limit: 10 // limit each IP to 100 requests per windowMs
+});
+
+app.use(limiter);
 
 // Initialize session
 app.use(session({
@@ -40,6 +50,7 @@ app.use(passport.session());
 
 app.use('/api/users', userRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/profiles', profileRouter);
 app.use('/api/companies', companyRouter);
 app.use('/api/jobs', jobRouter);
 

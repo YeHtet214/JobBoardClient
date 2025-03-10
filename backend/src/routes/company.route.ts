@@ -3,7 +3,8 @@ import {
     getCompanyById, 
     createCompany, 
     updateCompany, 
-    deleteCompany
+    deleteCompany,
+    getAllCompanies
 } from "../controllers/company.controller.js";
 import authorize from "../middleware/auth.middleware.js";
 import { employerOnly } from "../middleware/role.middleware.js";
@@ -11,6 +12,7 @@ import { employerOnly } from "../middleware/role.middleware.js";
 const companyRouter = Router();
 
 // Public route - anyone can view company details
+companyRouter.get('/', getAllCompanies);
 companyRouter.get('/:id', getCompanyById);
 
 // Protected routes - only authenticated employers can perform these actions
