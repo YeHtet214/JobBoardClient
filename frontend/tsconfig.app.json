@@ -1,5 +1,4 @@
 {
-  "extends": "@tsconfig/vite-react",
   "compilerOptions": {
     "incremental": true,
     "tsBuildInfoFile": "./tsconfig.app.tsbuildinfo",
@@ -26,7 +25,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
   },
-  "include": ["src/**/*"]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }

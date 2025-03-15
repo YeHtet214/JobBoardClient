@@ -1,12 +1,15 @@
-import './App.css'
-import Auth from './pages/Auth.tsx';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { AuthProvider } from './contexts/authContext';
+import AppRoutes from './routes';
+import './App.css';
 
 const App = () => {
   return (
-      <h1 className="">
-        Hello, Vite + React + TypeScript + Tailwind CSS!
-        <Auth />
-      </h1>
+    <AuthProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </AuthProvider>
   );
 }
 
