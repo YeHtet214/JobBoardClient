@@ -1,8 +1,10 @@
 import React, { Suspense } from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { routes, RouteConfig } from './RouteConfig';
-import MainLayout from '../components/layout/MainLayout';
+import MainLayout from '../components/layouts/MainLayout';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import ErrorBoundary from '../components/ErrorBoundary';
+import RouteErrorBoundary from '../components/RouteErrorBoundary';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = false; // TODO: Replace with useAuth() hook
@@ -21,9 +23,11 @@ const AppRoutes = () => {
     return routes.map((route) => {
       // Create the element with proper authentication wrapper if needed
       const element = (
-        <Suspense fallback={<LoadingSpinner />}>
-          <route.element />
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingSpinner />}>
+            <route.element />
+          </Suspense>
+        </ErrorBoundary>
       );
 
       // Return protected or regular route
@@ -36,6 +40,7 @@ const AppRoutes = () => {
               {element}
             </ProtectedRoute>
           ) : element}
+          errorElement={<RouteErrorBoundary />}
         >
           {route.children && renderRoutes(route.children)}
         </Route>
@@ -45,7 +50,15 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<MainLayout />}>
+      <Route 
+        path="/" 
+        element={
+          <ErrorBoundary>
+            <MainLayout />
+          </ErrorBoundary>
+        }
+        errorElement={<RouteErrorBoundary />}
+      >
         {renderRoutes(routes)}
       </Route>
     </Routes>

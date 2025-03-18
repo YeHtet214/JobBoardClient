@@ -9,6 +9,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (userData: any) => Promise<void>;
   logout: () => Promise<void>;
+  verifyEmail: (token: string) => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -66,6 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       const user = await authService.register(userData);
+      alert("Register Function Called")
       setCurrentUser(user);
       setIsAuthenticated(true);
     } finally {
@@ -84,13 +86,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const verifyEmail = async (token: string) => {
+    setIsLoading(true);
+    try {
+      const response = await authService.verifyEmail(token);
+      return response;
+    } finally {
+        setIsLoading(false);
+    }
+  }
+
   const value = {
     currentUser,
     isAuthenticated,
     isLoading,
     login,
     register,
-    logout
+    logout,
+    verifyEmail
   };
 
   return (

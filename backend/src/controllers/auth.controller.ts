@@ -83,6 +83,8 @@ export const verifyEmailToken = async (req: Request, res: Response, next: NextFu
   try {
     const { token } = req.params;
 
+    console.log("Verify Token: ", token);
+
     if (!token) {
       const error = new Error("Verification token is required") as CustomError;
       error.status = 400;
@@ -102,15 +104,18 @@ export const verifyEmailToken = async (req: Request, res: Response, next: NextFu
 
 export const logout = async (req: RequestWithUser, res: Response, next: NextFunction) => {
   try {
+    // Get token from authorization header
     const token = req.headers['authorization']?.split(' ')[1];
+    console.log("req user: ", req.user, "headers: ", req.headers);
+    console.log("Logout Token", token);
 
     if (!token) {
       const error = new Error("Token required") as CustomError;
       error.status = 400;
-      next(error);
+      return next(error);
     }
 
-    const result = await userLogout(token as string);
+    const result = await userLogout(token);
     res.status(200).json({ success: true, message: result.message });
   } catch (error) {
     next(error);

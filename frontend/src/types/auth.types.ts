@@ -1,4 +1,4 @@
-export type UserRole = 'JOB_SEEKER' | 'EMPLOYER' | 'ADMIN';
+export type UserRole = 'JOBSEEKER' | 'EMPLOYER' | 'ADMIN';
 
 export interface User {
   id: string;
@@ -25,5 +25,13 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   user: User;
-  token: string;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface VerifiedEmailResponse {
+  success: boolean;
+  message: string;
+  verified?: boolean;
+  user?: User;
 }

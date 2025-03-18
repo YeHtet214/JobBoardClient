@@ -48,7 +48,7 @@ const storeRefreshToken = async (userId: string, refreshToken: string) => {
 }
 
 const sendVerificationEmail = async (email: string, token: string) => {
-  const verificationLink = `${FRONTEND_URL}/api/auth/verify-email/${token}`;
+  const verificationLink = `${FRONTEND_URL}/verify-email/${token}`;
   
   await transporter.sendMail({
     from: SMTP_FROM_EMAIL,
@@ -103,7 +103,7 @@ export const userSignIn = async (email: string, password: string) => {
   const user = await checkUserExists(email);
 
   if (!user) {
-    const error = new Error('Invalid credentials') as CustomError;
+    const error = new Error('Email not Found') as CustomError;
     error.status = 401;
     throw error;
   }
@@ -111,13 +111,13 @@ export const userSignIn = async (email: string, password: string) => {
   const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
 
   if (!isPasswordValid) {
-    const error = new Error('Invalid credentials') as CustomError;
+    const error = new Error('Invalid Password') as CustomError;
     error.status = 401;
     throw error;
   }
 
   if (!user.isEmailVerified) {
-    const error = new Error('Please verify your email before signing in') as CustomError;
+    const error = new Error('Please verify your email before signing in. Or use another email address') as CustomError;
     error.status = 403;
     throw error;
   }
@@ -167,6 +167,7 @@ export const refreshAccessToken = async (refreshToken: string) => {
 
 export const userLogout = async (token: string) => {
   if (!token) {
+    console.log("Logout Token not inlcude")
     const error = new Error('Token required') as CustomError;
     error.status = 400;
     throw error;

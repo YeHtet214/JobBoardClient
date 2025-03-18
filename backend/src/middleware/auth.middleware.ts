@@ -1,4 +1,4 @@
-import { NextFunction } from "express";
+import { NextFunction, Response } from "express";
 import jwt from "jsonwebtoken";
 import { CustomError, RequestWithUser } from "../types/users.type.js";
 import { JWT_SECRET } from "../config/env.config.js";
@@ -14,14 +14,14 @@ const authorize = async (req: RequestWithUser, res: Response, next: NextFunction
     if (!token) {
       const error = new Error("Token required") as CustomError;
       error.status = 400;
-      next(error);
+      return next(error);
     }
 
     const isBlacklistedToken = await prisma.blacklistedToken.findUnique({
       where: { token: token }
     })
 
-    const decoded = jwt.decode(token);
+    const decoded = jwt.decode(token as string);
 
     if (typeof decoded === 'object' && decoded !== null) {
       if (!decoded || (decoded.exp && decoded.exp < Date.now().valueOf() / 1000) || isBlacklistedToken) {

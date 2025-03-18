@@ -1,9 +1,20 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/authContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { RegisterRequest, UserRole } from '../types/auth.types';
+import { UserRole } from '../types/auth.types';
 import * as Yup from 'yup';
-import { useFormik, FormikHelpers } from 'formik';
+import { Formik, FormikHelpers, Field, ErrorMessage } from 'formik';
+import { Form } from '../components/forms/components';
+import AuthLayout from '../components/layouts/AuthLayout';
+
+// Shadcn UI components
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Checkbox } from "../components/ui/checkbox";
+import { Select } from "../components/ui/select";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
+import { AlertCircle } from "lucide-react";
 
 // Password regex pattern
 // At least 8 characters, 1 uppercase, 1 lowercase, 1 number, and 1 special character
@@ -29,7 +40,7 @@ const registerSchema = Yup.object({
         .required('Last name is required')
         .min(2, 'Last name must be at least 2 characters'),
     role: Yup.string()
-        .oneOf(['JOB_SEEKER', 'EMPLOYER'], 'Please select a valid role')
+        .oneOf(['JOBSEEKER', 'EMPLOYER'], 'Please select a valid role')
         .required('Please select your role')
 });
 
@@ -38,218 +49,192 @@ const RegisterPage: React.FC = () => {
     const { register } = useAuth();
     const navigate = useNavigate();
 
-    const formik = useFormik<RegisterRequest & { confirmPassword: string }>({
-        initialValues: {
-            email: '',
-            password: '',
-            confirmPassword: '',
-            firstName: '',
-            lastName: '',
-            role: 'JOB_SEEKER' as UserRole
-        },
-        validationSchema: registerSchema,
-        onSubmit: async (values, { setSubmitting }: FormikHelpers<RegisterRequest & { confirmPassword: string }>) => {
-            setError(null);
-            
-            try {
-                // Remove confirmPassword as it's not part of the RegisterRequest type
-                const { confirmPassword, ...registerData } = values;
-                await register(registerData);
-                navigate('/login', { state: { message: 'Registration successful! Please log in.' } });
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'An error occurred during registration');
-            } finally {
-                setSubmitting(false);
-            }
+    const initialValues = {
+        email: '',
+        password: '',
+        confirmPassword: '',
+        firstName: '',
+        lastName: '',
+        role: 'JOBSEEKER' as UserRole,
+        terms: false
+    };
+
+    const handleSubmit = async (
+        values: typeof initialValues, 
+        { setSubmitting }: FormikHelpers<typeof initialValues>
+    ) => {
+        setError(null);
+        
+        try {
+            // Remove confirmPassword as it's not part of the RegisterRequest type
+            const { confirmPassword, terms, ...registerData } = values;
+            await register(registerData);
+            navigate('/login', { state: { message: 'Registration successful! Please log in.' } });
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occurred during registration');
+        } finally {
+            setSubmitting(false);
         }
-    });
+    };
+
+    const roleOptions = [
+        { value: 'JOBSEEKER', label: 'Job Seeker' },
+        { value: 'EMPLOYER', label: 'Employer' }
+    ];
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
-            <div className="w-full max-w-lg m-auto bg-white rounded-lg shadow-md p-8">
-                <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">Create Your Account</h2>
+        <AuthLayout 
+            title="Join Our Job Board" 
+            subtitle="Connect with employers and find your perfect career match"
+            imageSrc="/auth-background.svg"
+            imageAlt="Job Board Registration"
+            imagePosition="left"
+        >
+            <Card className="border-border/40 shadow-lg">
+                <CardHeader className="space-y-1">
+                    <CardTitle className="text-2xl font-bold text-center">Create Your Account</CardTitle>
+                    <CardDescription className="text-center text-muted-foreground">
+                        Enter your information to create an account
+                    </CardDescription>
+                </CardHeader>
                 
-                {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
-                        <span className="block sm:inline">{error}</span>
-                    </div>
-                )}
-                
-                <form onSubmit={formik.handleSubmit} className="space-y-6">
-                    <div className="flex flex-col md:flex-row md:space-x-4 space-y-6 md:space-y-0">
-                        <div className="flex-1">
-                            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                                First Name
-                            </label>
-                            <input
-                                id="firstName"
-                                name="firstName"
-                                type="text"
-                                autoComplete="given-name"
-                                value={formik.values.firstName}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                className={`mt-1 block w-full px-3 py-2 border ${
-                                    formik.touched.firstName && formik.errors.firstName 
-                                        ? 'border-red-500' 
-                                        : 'border-gray-300'
-                                } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                            />
-                            {formik.touched.firstName && formik.errors.firstName && (
-                                <p className="mt-1 text-sm text-red-600">{formik.errors.firstName}</p>
-                            )}
+                <CardContent className="space-y-4">
+                    {error && (
+                        <div className="bg-destructive/15 text-destructive flex items-center p-3 rounded-md text-sm" role="alert">
+                            <AlertCircle className="h-4 w-4 mr-2" />
+                            <span>{error}</span>
                         </div>
-                        
-                        <div className="flex-1">
-                            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                                Last Name
-                            </label>
-                            <input
-                                id="lastName"
-                                name="lastName"
-                                type="text"
-                                autoComplete="family-name"
-                                value={formik.values.lastName}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                className={`mt-1 block w-full px-3 py-2 border ${
-                                    formik.touched.lastName && formik.errors.lastName 
-                                        ? 'border-red-500' 
-                                        : 'border-gray-300'
-                                } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                            />
-                            {formik.touched.lastName && formik.errors.lastName && (
-                                <p className="mt-1 text-sm text-red-600">{formik.errors.lastName}</p>
-                            )}
-                        </div>
-                    </div>
+                    )}
+                    
+                    <Formik
+                        initialValues={initialValues}
+                        validationSchema={registerSchema}
+                        onSubmit={handleSubmit}
+                    >
+                        {({ isSubmitting, touched, errors }) => (
+                            <Form className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="firstName">First Name</Label>
+                                        <Field
+                                            as={Input}
+                                            id="firstName"
+                                            name="firstName"
+                                            type="text"
+                                            placeholder="John"
+                                            autoComplete="given-name"
+                                            className={touched.firstName && errors.firstName ? "border-destructive" : ""}
+                                        />
+                                        <ErrorMessage name="firstName" component="div" className="text-sm text-destructive" />
+                                    </div>
+                                    
+                                    <div className="space-y-2">
+                                        <Label htmlFor="lastName">Last Name</Label>
+                                        <Field
+                                            as={Input}
+                                            id="lastName"
+                                            name="lastName"
+                                            type="text"
+                                            placeholder="Doe"
+                                            autoComplete="family-name"
+                                            className={touched.lastName && errors.lastName ? "border-destructive" : ""}
+                                        />
+                                        <ErrorMessage name="lastName" component="div" className="text-sm text-destructive" />
+                                    </div>
+                                </div>
 
-                    <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                            Email
-                        </label>
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            autoComplete="email"
-                            value={formik.values.email}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            className={`mt-1 block w-full px-3 py-2 border ${
-                                formik.touched.email && formik.errors.email 
-                                    ? 'border-red-500' 
-                                    : 'border-gray-300'
-                            } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                        />
-                        {formik.touched.email && formik.errors.email && (
-                            <p className="mt-1 text-sm text-red-600">{formik.errors.email}</p>
+                                <div className="space-y-2">
+                                    <Label htmlFor="email">Email</Label>
+                                    <Field
+                                        as={Input}
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        placeholder="name@example.com"
+                                        autoComplete="email"
+                                        className={touched.email && errors.email ? "border-destructive" : ""}
+                                    />
+                                    <ErrorMessage name="email" component="div" className="text-sm text-destructive" />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="password">Password</Label>
+                                    <Field
+                                        as={Input}
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        placeholder="••••••••"
+                                        autoComplete="new-password"
+                                        className={touched.password && errors.password ? "border-destructive" : ""}
+                                    />
+                                    <ErrorMessage name="password" component="div" className="text-sm text-destructive" />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                                    <Field
+                                        as={Input}
+                                        id="confirmPassword"
+                                        name="confirmPassword"
+                                        type="password"
+                                        placeholder="••••••••"
+                                        autoComplete="new-password"
+                                        className={touched.confirmPassword && errors.confirmPassword ? "border-destructive" : ""}
+                                    />
+                                    <ErrorMessage name="confirmPassword" component="div" className="text-sm text-destructive" />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="role">I am a</Label>
+                                    <Field
+                                        as={Select}
+                                        id="role"
+                                        name="role"
+                                        className={touched.role && errors.role ? "border-destructive" : ""}
+                                    >
+                                        {roleOptions.map((option) => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </Field>
+                                    <ErrorMessage name="role" component="div" className="text-sm text-destructive" />
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                    <Field
+                                        as={Checkbox}
+                                        id="terms"
+                                        name="terms"
+                                    />
+                                    <Label htmlFor="terms" className="text-sm font-normal">
+                                        I agree to the <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+                                    </Label>
+                                </div>
+
+                                <Button 
+                                    type="submit" 
+                                    className="w-full" 
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? "Creating account..." : "Create Account"}
+                                </Button>
+                            </Form>
                         )}
-                    </div>
-
-                    <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                            Password
-                        </label>
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            autoComplete="new-password"
-                            value={formik.values.password}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            className={`mt-1 block w-full px-3 py-2 border ${
-                                formik.touched.password && formik.errors.password 
-                                    ? 'border-red-500' 
-                                    : 'border-gray-300'
-                            } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                        />
-                        {formik.touched.password && formik.errors.password && (
-                            <p className="mt-1 text-sm text-red-600">{formik.errors.password}</p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                            Confirm Password
-                        </label>
-                        <input
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            type="password"
-                            autoComplete="new-password"
-                            value={formik.values.confirmPassword}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            className={`mt-1 block w-full px-3 py-2 border ${
-                                formik.touched.confirmPassword && formik.errors.confirmPassword 
-                                    ? 'border-red-500' 
-                                    : 'border-gray-300'
-                            } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                        />
-                        {formik.touched.confirmPassword && formik.errors.confirmPassword && (
-                            <p className="mt-1 text-sm text-red-600">{formik.errors.confirmPassword}</p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                            I am a
-                        </label>
-                        <select
-                            id="role"
-                            name="role"
-                            value={formik.values.role}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            className={`mt-1 block w-full px-3 py-2 border ${
-                                formik.touched.role && formik.errors.role 
-                                    ? 'border-red-500' 
-                                    : 'border-gray-300'
-                            } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
-                        >
-                            <option value="JOB_SEEKER">Job Seeker</option>
-                            <option value="EMPLOYER">Employer</option>
-                        </select>
-                        {formik.touched.role && formik.errors.role && (
-                            <p className="mt-1 text-sm text-red-600">{formik.errors.role}</p>
-                        )}
-                    </div>
-
-                    <div className="flex items-center">
-                        <input
-                            id="terms"
-                            name="terms"
-                            type="checkbox"
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
-                            I agree to the <a href="/terms" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>
-                        </label>
-                    </div>
-
-                    <div>
-                        <button
-                            type="submit"
-                            disabled={formik.isSubmitting}
-                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                        >
-                            {formik.isSubmitting ? 'Creating Account...' : 'Create Account'}
-                        </button>
-                    </div>
-                </form>
+                    </Formik>
+                </CardContent>
                 
-                <div className="mt-6 text-center">
-                    <p className="text-sm text-gray-600">
+                <CardFooter className="flex justify-center border-t p-4">
+                    <p className="text-sm text-muted-foreground">
                         Already have an account?{' '}
-                        <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
+                        <Link to="/login" className="font-medium text-primary hover:underline">
                             Sign in
                         </Link>
                     </p>
-                </div>
-            </div>
-        </div>
+                </CardFooter>
+            </Card>
+        </AuthLayout>
     );
 };
 

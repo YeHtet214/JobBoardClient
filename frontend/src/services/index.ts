@@ -1,9 +1,12 @@
 import axios from 'axios';
 
 axios.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+    const accessToken = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('accessToken');
+    console.log("Access Token", accessToken);
+    console.log("refresh Token", refreshToken);
+    if (accessToken && refreshToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
 });
@@ -11,6 +14,10 @@ axios.interceptors.request.use((config) => {
 axios.interceptors.response.use((response) => {
     return response;
 }, (error) => {
+    // Extract the specific error message from the backend response if available
+    if (error.response && error.response.data && error.response.data.message) {
+        error.message = error.response.data.message;
+    }
     return Promise.reject(error);
 });
 

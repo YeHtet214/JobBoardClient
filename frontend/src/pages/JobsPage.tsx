@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import MainLayout from '../components/layout/MainLayout';
-import Sidebar from '../components/layout/Sidebar';
+import MainLayout from '../components/layouts/MainLayout';
+import Sidebar from '../components/layouts/Sidebar';
 import { Job } from '../types/job.types';
 import jobService from '../services/job.service';
 
@@ -49,7 +49,7 @@ const JobsPage: React.FC = () => {
   };
 
   return (
-    <MainLayout>
+    <section>
       <div className="bg-gray-50 py-8">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl font-bold text-gray-800 mb-8">Browse Jobs</h1>
@@ -147,7 +147,7 @@ const JobsPage: React.FC = () => {
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
                   {error}
                 </div>
-              ) : jobs.length === 0 ? (
+              ) : jobs?.length === 0 ? (
                 <div className="bg-white rounded-lg shadow-md p-6 text-center">
                   <h3 className="text-lg font-semibold mb-2">No jobs found</h3>
                   <p className="text-gray-600">Try adjusting your search filters or check back later for new opportunities.</p>
@@ -205,7 +205,7 @@ const JobsPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </MainLayout>
+    </section>
   );
 };
 

@@ -1,27 +1,28 @@
 import { ApiService } from './api.service';
-import { User, LoginRequest, RegisterRequest, AuthResponse } from '../types/auth.types';
+import { User, LoginRequest, RegisterRequest, AuthResponse, VerifiedEmailResponse } from '../types/auth.types';
 
 class AuthService extends ApiService {
-  private baseUrl = '/api/auth';
-  private tokenKey = 'token';
+  private baseUrl = 'http://localhost:3000/api/auth';
 
   public async login(credentials: LoginRequest): Promise<User> {
-    const response = await this.post<AuthResponse>(`${this.baseUrl}/login`, credentials);
+    const response = await this.post<AuthResponse>(`${this.baseUrl}/signin`, credentials);
     const data = response.data.data;
-    
-    if (data.token) {
-      localStorage.setItem(this.tokenKey, data.token);
+
+    if (data.accessToken && data.refreshToken) {
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
     }
     
     return data.user;
   }
 
   public async register(userData: RegisterRequest): Promise<User> {
-    const response = await this.post<AuthResponse>(`${this.baseUrl}/register`, userData);
+    const response = await this.post<AuthResponse>(`${this.baseUrl}/signup`, userData);
     const data = response.data.data;
     
-    if (data.token) {
-      localStorage.setItem(this.tokenKey, data.token);
+    if (data.accessToken && data.refreshToken) {
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
     }
     
     return data.user;
@@ -29,6 +30,8 @@ class AuthService extends ApiService {
 
   public async logout(): Promise<void> {
     try {
+      // The token will be automatically included in the Authorization header
+      // by the axios interceptor in index.ts
       await this.post<void>(`${this.baseUrl}/logout`, {});
     } catch (error) {
       console.error('Logout error:', error);
@@ -48,6 +51,11 @@ class AuthService extends ApiService {
 
   public isAuthenticated(): boolean {
     return !!this.getToken();
+  }
+
+  public async verifyEmail(token: string): Promise<VerifiedEmailResponse> {
+    const response = await this.get<VerifiedEmailResponse>(`${this.baseUrl}/verify-email/${token}`);
+    return response.data.data;
   }
 }
 

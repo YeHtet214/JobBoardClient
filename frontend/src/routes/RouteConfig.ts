@@ -15,10 +15,13 @@ export interface RouteConfig {
 // Lazy load page components
 const LoginPage = lazy(() => import('../pages/LoginPage'));
 const RegisterPage = lazy(() => import('../pages/RegisterPage'));
+const VerifyEmailPage = lazy(() => import('../pages/VerifyEmailPage'));
 const HomePage = lazy(() => import('../pages/HomePage'));
 const AboutPage = lazy(() => import('../pages/AboutPage'));
 const DashboardPage = lazy(() => import('../pages/DashboardPage'));
+const ApplicationPage = lazy(() => import('../pages/ApplicationPage'))
 const ProfilePage = lazy(() => import('../pages/ProfilePage')); 
+const JobsPage = lazy(() => import('../pages/JobsPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 
 // Define routes
@@ -39,9 +42,24 @@ export const routes: RouteConfig[] = [
     meta: { title: 'Home', description: 'Welcome to our app' }
   },
   {
+    path: '/verify-email/:token',
+    element: VerifyEmailPage,
+    meta: { title: 'Email Verification', description: 'Verify your email to continue your account registration.'}
+  },
+  {
+    path: '/application',
+    element: ApplicationPage,
+    meta: { title: 'Application', description: 'Apply for a job' }
+  },
+  {
     path: '/about',
     element: AboutPage,
     meta: { title: 'About Us' }
+  },
+  {
+    path: '/jobs',
+    element: JobsPage,
+    meta: { title: 'Jobs' }
   },
   {
     path: '/dashboard',
