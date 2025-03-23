@@ -10,6 +10,8 @@ interface AuthContextType {
   register: (userData: any) => Promise<void>;
   logout: () => Promise<void>;
   verifyEmail: (token: string) => Promise<any>;
+  googleLogin: () => Promise<void>;
+  handleGoogleCallback: (code: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -75,6 +77,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const googleLogin = async (): Promise<void> => {
+    setIsLoading(true);
+    try {
+      await authService.googleLogin();
+      // The page will be redirected to Google's OAuth page
+    } catch (error) {
+      console.error('Google login error:', error);
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleCallback = async (code: string): Promise<void> => {
+    setIsLoading(true);
+    try {
+      const user = await authService.handleGoogleCallback(code);
+      setCurrentUser(user);
+      setIsAuthenticated(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = async () => {
     setIsLoading(true);
     try {
@@ -103,7 +127,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     register,
     logout,
-    verifyEmail
+    verifyEmail,
+    googleLogin,
+    handleGoogleCallback
   };
 
   return (

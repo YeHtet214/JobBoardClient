@@ -17,46 +17,46 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link to="/" className="text-2xl font-bold text-blue-600">
+          <Link to="/" className="text-2xl font-bold text-jobboard-purple">
             JobBoard
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link to="/" className="text-gray-600 hover:text-blue-600 transition">
+          <nav className="hidden md:!flex items-center space-x-6">
+            <Link to="/" className="text-gray-600 hover:text-jobboard-purple transition">
               Home
             </Link>
-            <Link to="/jobs" className="text-gray-600 hover:text-blue-600 transition">
+            <Link to="/jobs" className="text-gray-600 hover:text-jobboard-purple transition">
               Jobs
             </Link>
-            <Link to="/companies" className="text-gray-600 hover:text-blue-600 transition">
+            <Link to="/companies" className="text-gray-600 hover:text-jobboard-purple transition">
               Companies
             </Link>
             
             {isAuthenticated ? (
               <>
                 {currentUser?.role === 'EMPLOYER' && (
-                  <Link to="/employer/dashboard" className="text-gray-600 hover:text-blue-600 transition">
+                  <Link to="/employer/dashboard" className="text-gray-600 hover:text-jobboard-purple transition">
                     Dashboard
                   </Link>
                 )}
                 <div className="relative group">
-                  <button className="flex items-center text-gray-600 hover:text-blue-600 transition">
+                  <button className="flex items-center text-gray-600 hover:text-jobboard-purple transition">
                     <span className="mr-1">Account</span>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
-                    <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-jobboard-light hover:text-jobboard-darkblue">
                       Profile
                     </Link>
-                    <Link to="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <Link to="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-jobboard-light hover:text-jobboard-darkblue">
                       Settings
                     </Link>
                     <button 
                       onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-jobboard-light hover:text-jobboard-darkblue"
                     >
                       Logout
                     </button>
@@ -65,12 +65,12 @@ const Header: React.FC = () => {
               </>
             ) : (
               <div className="flex items-center space-x-4">
-                <Link to="/login" className="text-gray-600 hover:text-blue-600 transition">
+                <Link to="/login" className="text-gray-600 hover:text-jobboard-purple transition">
                   Login
                 </Link>
                 <Link 
                   to="/register" 
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                  className="bg-jobboard-purple text-white px-4 py-2 rounded hover:bg-jobboard-purple/90 transition"
                 >
                   Register
                 </Link>
@@ -100,21 +100,21 @@ const Header: React.FC = () => {
           <nav className="mt-4 md:hidden space-y-3 pb-3">
             <Link 
               to="/" 
-              className="block text-gray-600 hover:text-blue-600 transition"
+              className="block text-gray-600 hover:text-jobboard-purple transition"
               onClick={() => setMobileMenuOpen(false)}
             >
               Home
             </Link>
             <Link 
               to="/jobs" 
-              className="block text-gray-600 hover:text-blue-600 transition"
+              className="block text-gray-600 hover:text-jobboard-purple transition"
               onClick={() => setMobileMenuOpen(false)}
             >
               Jobs
             </Link>
             <Link 
               to="/companies" 
-              className="block text-gray-600 hover:text-blue-600 transition"
+              className="block text-gray-600 hover:text-jobboard-purple transition"
               onClick={() => setMobileMenuOpen(false)}
             >
               Companies
@@ -125,7 +125,7 @@ const Header: React.FC = () => {
                 {currentUser?.role === 'EMPLOYER' && (
                   <Link 
                     to="/employer/dashboard" 
-                    className="block text-gray-600 hover:text-blue-600 transition"
+                    className="block text-gray-600 hover:text-jobboard-purple transition"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Dashboard
@@ -133,14 +133,14 @@ const Header: React.FC = () => {
                 )}
                 <Link 
                   to="/profile" 
-                  className="block text-gray-600 hover:text-blue-600 transition"
+                  className="block text-gray-600 hover:text-jobboard-purple transition"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Profile
                 </Link>
                 <Link 
                   to="/settings" 
-                  className="block text-gray-600 hover:text-blue-600 transition"
+                  className="block text-gray-600 hover:text-jobboard-purple transition"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Settings
@@ -150,7 +150,7 @@ const Header: React.FC = () => {
                     handleLogout();
                     setMobileMenuOpen(false);
                   }}
-                  className="block text-gray-600 hover:text-blue-600 transition"
+                  className="block text-gray-600 hover:text-jobboard-purple transition"
                 >
                   Logout
                 </button>
@@ -159,14 +159,14 @@ const Header: React.FC = () => {
               <div className="flex flex-col space-y-2">
                 <Link 
                   to="/login" 
-                  className="block text-gray-600 hover:text-blue-600 transition"
+                  className="block text-gray-600 hover:text-jobboard-purple transition"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Login
                 </Link>
                 <Link 
                   to="/register" 
-                  className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                  className="inline-block bg-jobboard-purple text-white px-4 py-2 rounded hover:bg-jobboard-purple/90 transition"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Register

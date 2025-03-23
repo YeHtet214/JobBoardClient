@@ -28,6 +28,23 @@ class AuthService extends ApiService {
     return data.user;
   }
 
+  public async googleLogin(): Promise<void> {
+    // Redirect to Google OAuth endpoint
+    window.location.href = `${this.baseUrl}/google`;
+  }
+
+  public async handleGoogleCallback(code: string): Promise<User> {
+    const response = await this.post<AuthResponse>(`${this.baseUrl}/google/callback`, { code });
+    const data = response.data.data;
+    
+    if (data.accessToken && data.refreshToken) {
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+    }
+    
+    return data.user;
+  }
+
   public async logout(): Promise<void> {
     try {
       // The token will be automatically included in the Authorization header
@@ -36,7 +53,8 @@ class AuthService extends ApiService {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      localStorage.removeItem(this.tokenKey);
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
     }
   }
 
@@ -46,7 +64,7 @@ class AuthService extends ApiService {
   }
 
   public getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    return localStorage.getItem('accessToken');
   }
 
   public isAuthenticated(): boolean {

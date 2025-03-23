@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { RequestWithUser, CustomError } from '../types/users.type.js';
 import { UserRole } from '@prisma/client';
 import prisma from '../prisma/client.js';
@@ -13,31 +13,31 @@ export const checkRole = (roles: UserRole[]) => {
     try {
       // User should already be authenticated at this point
       const { userId } = req.user;
-      
+
       if (!userId) {
         const error = new Error('Authentication required') as CustomError;
         error.status = 401;
         throw error;
       }
-      
+
       // Fetch the user from the database to get their role
       const user = await prisma.user.findUnique({
         where: { id: userId },
         select: { role: true }
       });
-      
+
       if (!user) {
         const error = new Error('User not found') as CustomError;
         error.status = 404;
         throw error;
       }
-      
+
       if (!roles.includes(user.role)) {
         const error = new Error('You do not have permission to perform this action') as CustomError;
         error.status = 403;
         throw error;
       }
-      
+
       next();
     } catch (error) {
       next(error);

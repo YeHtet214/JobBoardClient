@@ -2,7 +2,7 @@ import { ApiService } from './api.service';
 import { Job, CreateJobDto, UpdateJobDto } from '../types/job.types';
 
 class JobService extends ApiService {
-  private baseUrl = '/api/jobs';
+  private baseUrl = 'http://localhost:3000/api/jobs';
 
   public async getAllJobs(): Promise<Job[]> {
     const response = await this.get<Job[]>(this.baseUrl);

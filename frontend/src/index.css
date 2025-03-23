@@ -2,77 +2,169 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tailwind plugins */
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Custom colors */
+:root {
+  /* CSS variables */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 255 68% 22%;
+  --primary-foreground: 240 100% 94%;
+  --secondary: 252 100% 72%;
+  --secondary-foreground: 255 68% 22%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 164 91% 52%;
+  --accent-foreground: 255 68% 22%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 252 100% 72%;
+  --radius: 0.5rem;
+  
+  /* Additional variables from App.css */
+  --chart-1: 25 84% 60%;
+  --chart-2: 200 84% 60%;
+  --chart-3: 270 84% 60%;
+  --chart-4: 45 84% 60%;
+  --chart-5: 330 84% 60%;
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 222.2 84% 4.9%;
+  --sidebar-primary: 255 68% 22%;
+  --sidebar-primary-foreground: 240 100% 94%;
+  --sidebar-accent: 0 0% 100%;
+  --sidebar-accent-foreground: 255 68% 22%;
+  --sidebar-border: 214.3 31.8% 91.4%;
+  --sidebar-ring: 252 100% 72%;
+}
+
+.dark {
+  --background: 255 68% 22%;
+  --foreground: 240 100% 94%;
+  --card: 255 68% 22%;
+  --card-foreground: 240 100% 94%;
+  --popover: 255 68% 22%;
+  --popover-foreground: 240 100% 94%;
+  --primary: 252 100% 72%;
+  --primary-foreground: 255 68% 22%;
+  --secondary: 164 91% 52%;
+  --secondary-foreground: 255 68% 22%;
+  --muted: 255 68% 22%;
+  --muted-foreground: 240 100% 94%;
+  --accent: 252 100% 72%;
+  --accent-foreground: 255 68% 22%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 240 100% 94%;
+  --input: 240 100% 94%;
+  --ring: 252 100% 72%;
+  
+  /* Additional variables from App.css */
+  --chart-1: 270 84% 60%;
+  --chart-2: 180 84% 60%;
+  --chart-3: 45 84% 60%;
+  --chart-4: 300 84% 60%;
+  --chart-5: 15 84% 60%;
+  --sidebar: 255 68% 22%;
+  --sidebar-foreground: 240 100% 94%;
+  --sidebar-primary: 270 84% 60%;
+  --sidebar-primary-foreground: 240 100% 94%;
+  --sidebar-accent: 255 68% 22%;
+  --sidebar-accent-foreground: 240 100% 94%;
+  --sidebar-border: 0 0% 100% / 10%;
+  --sidebar-ring: 215.4 16.3% 46.9%;
+}
+
+/* Radius and theme variables */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* Base layer styles */
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-
-    --radius: 0.5rem;
+  * {
+    @apply border-border outline-ring/50;
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
-@layer base {
-  * {
-    border-color: hsl(var(--border));
+/* Additional custom styles */
+@layer components {
+  .bg-jobboard-darkblue {
+    background-color: #211951;
   }
-  body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    font-feature-settings: "rlig" 1, "calt" 1;
+  
+  .bg-jobboard-purple {
+    background-color: #836FFF;
+  }
+  
+  .bg-jobboard-teal {
+    background-color: #15F5BA;
+  }
+  
+  .bg-jobboard-light {
+    background-color: #F0F3FF;
+  }
+  
+  .text-jobboard-darkblue {
+    color: #211951;
+  }
+  
+  .text-jobboard-purple {
+    color: #836FFF;
+  }
+  
+  .text-jobboard-teal {
+    color: #15F5BA;
+  }
+  
+  .text-jobboard-light {
+    color: #F0F3FF;
   }
 }
