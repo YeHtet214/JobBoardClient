@@ -47,6 +47,7 @@ model Profile {
   education   String?
   experience  String?
   skills      String[]
+  resumeUrl   String?  // URL to the user's uploaded resume
   socialLinks Json?    // For storing multiple social media links
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

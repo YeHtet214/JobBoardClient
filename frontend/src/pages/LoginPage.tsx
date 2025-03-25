@@ -37,7 +37,7 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = async (values: LoginRequest, { setSubmitting }: FormikHelpers<LoginRequest>) => {
     setError(null);
-    
+
     try {
       await login(values.email, values.password);
       navigate('/');
@@ -59,8 +59,8 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <AuthLayout 
-      title="Welcome to Job Board" 
+    <AuthLayout
+      title="Welcome to Job Board"
       subtitle="Find your dream job or the perfect candidate"
       imageSrc="/auth-background-alt.svg"
       imagePosition="right"
@@ -72,7 +72,7 @@ const LoginPage: React.FC = () => {
             Enter your credentials to sign in to your account
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="space-y-4">
           {error && (
             <div className="bg-destructive/15 text-destructive flex items-center p-3 rounded-md text-sm" role="alert">
@@ -80,7 +80,7 @@ const LoginPage: React.FC = () => {
               <span>{error}</span>
             </div>
           )}
-          
+
           <Formik
             initialValues={initialValues}
             validationSchema={loginSchema}
@@ -130,9 +130,9 @@ const LoginPage: React.FC = () => {
                   <Label htmlFor="remember" className="text-sm font-normal">Remember me</Label>
                 </div>
 
-                <Button 
-                  type="submit" 
-                  className="w-full" 
+                <Button
+                  type="submit"
+                  className="w-full"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? "Signing in..." : "Sign in"}
@@ -151,9 +151,9 @@ const LoginPage: React.FC = () => {
             </div>
           </div>
 
-          <Button 
-            type="button" 
-            variant="outline" 
+          <Button
+            type="button"
+            variant="outline"
             className="w-full flex items-center justify-center gap-2"
             onClick={handleGoogleLogin}
           >
@@ -166,7 +166,7 @@ const LoginPage: React.FC = () => {
             Sign in with Google
           </Button>
         </CardContent>
-        
+
         <CardFooter className="flex justify-center border-t p-4">
           <p className="text-sm text-muted-foreground">
             Don't have an account?{' '}

@@ -6,6 +6,7 @@ export interface CreateProfileDto {
   experience?: string;
   skills?: string[];
   socialLinks?: Record<string, string>;
+  resumeUrl?: string;
 }
 
 export interface UpdateProfileDto {
@@ -15,6 +16,7 @@ export interface UpdateProfileDto {
   experience?: string;
   skills?: string[];
   socialLinks?: Record<string, string>;
+  resumeUrl?: string;
 }
 
 export interface ProfileResponse {
@@ -26,6 +28,7 @@ export interface ProfileResponse {
   experience?: string;
   skills: string[];
   socialLinks?: Record<string, string>;
+  resumeUrl?: string;
   createdAt: Date;
   updatedAt: Date;
   user?: {

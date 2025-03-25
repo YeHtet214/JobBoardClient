@@ -2,10 +2,10 @@ import { ApiService } from './api.service';
 import { User, LoginRequest, RegisterRequest, AuthResponse, VerifiedEmailResponse } from '../types/auth.types';
 
 class AuthService extends ApiService {
-  private baseUrl = 'http://localhost:3000/api/auth';
+  private baseUrl = 'http://localhost:3000/api';
 
   public async login(credentials: LoginRequest): Promise<User> {
-    const response = await this.post<AuthResponse>(`${this.baseUrl}/signin`, credentials);
+    const response = await this.post<AuthResponse>(`${this.baseUrl}/auth/signin`, credentials);
     const data = response.data.data;
 
     if (data.accessToken && data.refreshToken) {
@@ -17,7 +17,7 @@ class AuthService extends ApiService {
   }
 
   public async register(userData: RegisterRequest): Promise<User> {
-    const response = await this.post<AuthResponse>(`${this.baseUrl}/signup`, userData);
+    const response = await this.post<AuthResponse>(`${this.baseUrl}/auth/signup`, userData);
     const data = response.data.data;
     
     if (data.accessToken && data.refreshToken) {
@@ -30,11 +30,11 @@ class AuthService extends ApiService {
 
   public async googleLogin(): Promise<void> {
     // Redirect to Google OAuth endpoint
-    window.location.href = `${this.baseUrl}/google`;
+    window.location.href = `${this.baseUrl}/auth/google`;
   }
 
   public async handleGoogleCallback(code: string): Promise<User> {
-    const response = await this.post<AuthResponse>(`${this.baseUrl}/google/callback`, { code });
+    const response = await this.post<AuthResponse>(`${this.baseUrl}/auth/google/callback`, { code });
     const data = response.data.data;
     
     if (data.accessToken && data.refreshToken) {
@@ -49,7 +49,7 @@ class AuthService extends ApiService {
     try {
       // The token will be automatically included in the Authorization header
       // by the axios interceptor in index.ts
-      await this.post<void>(`${this.baseUrl}/logout`, {});
+      await this.post<void>(`${this.baseUrl}/auht/logout`, {});
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -59,7 +59,9 @@ class AuthService extends ApiService {
   }
 
   public async getCurrentUser(): Promise<User> {
-    const response = await this.get<User>(`${this.baseUrl}/me`);
+    console.log("Get current user is running");
+    const response = await this.get<User>(`${this.baseUrl}/profiles/me`);
+    console.log("Get user response: ", response)
     return response.data.data;
   }
 
@@ -72,7 +74,7 @@ class AuthService extends ApiService {
   }
 
   public async verifyEmail(token: string): Promise<VerifiedEmailResponse> {
-    const response = await this.get<VerifiedEmailResponse>(`${this.baseUrl}/verify-email/${token}`);
+    const response = await this.get<VerifiedEmailResponse>(`${this.baseUrl}/auth/verify-email/${token}`);
     return response.data.data;
   }
 }

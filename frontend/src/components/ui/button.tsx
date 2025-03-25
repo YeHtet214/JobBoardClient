@@ -20,6 +20,11 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
+        // Custom job board theme variants
+        teal: 
+          "bg-jobboard-teal text-jobboard-darkblue shadow-xs hover:bg-jobboard-teal/90 font-semibold",
+        tealOutline:
+          "border-2 border-jobboard-teal bg-transparent text-jobboard-darkblue shadow-xs hover:bg-jobboard-teal/20 font-semibold transition-colors duration-200",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

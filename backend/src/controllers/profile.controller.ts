@@ -1,5 +1,5 @@
 import { NextFunction, Response } from "express";
-import { createNewProfile, deleteExistingProfile, fetchProfile, updateExistingProfile } from "../services/profile.service.js";
+import { createNewProfile, deleteExistingProfile, fetchProfile, updateExistingProfile, uploadResume } from "../services/profile.service.js";
 import { RequestWithUser } from "../types/users.type.js";
 
 export const getProfile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
@@ -59,6 +59,28 @@ export const deleteProfile = async (req: RequestWithUser, res: Response, next: N
             success: true,
             message: "Profile deleted successfully",
             data: profile
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const uploadResumeFile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: "No file uploaded"
+            });
+        }
+
+        const userId = req.user.userId;
+        const resumeUrl = await uploadResume(userId, req.file);
+        
+        res.status(200).json({
+            success: true,
+            message: "Resume uploaded successfully",
+            data: { url: resumeUrl }
         });
     } catch (error) {
         next(error);

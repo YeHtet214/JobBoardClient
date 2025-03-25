@@ -24,15 +24,14 @@ const HomePage: React.FC = () => {
               <Button
                 asChild
                 size="lg"
-                className="bg-jobboard-teal hover:bg-jobboard-teal/90 text-jobboard-light font-semibold w-auto"
+                variant="teal"
               >
                 <Link to="/jobs">Find Jobs</Link>
               </Button>
               <Button
                 asChild
                 size="lg"
-                variant="outline"
-                className="border-jobboard-light text-jobboard-light hover:bg-jobboard-purple/20 w-auto"
+                variant="tealOutline"
               >
                 <Link to="/post-job">Post a Job</Link>
               </Button>

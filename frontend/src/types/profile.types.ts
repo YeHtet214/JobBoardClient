@@ -2,7 +2,7 @@ export interface Profile {
   id: string;
   userId: string;
   bio: string;
-  skills: string[];
+  skills?: string[];
   education: Education[];
   experience: Experience[];
   resumeUrl?: string;

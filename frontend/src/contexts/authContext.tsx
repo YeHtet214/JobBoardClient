@@ -16,14 +16,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
-
 interface AuthProviderProps {
   children: ReactNode;
 }
@@ -36,16 +28,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // Check if user is already logged in
     const checkAuthStatus = async () => {
+      setIsLoading(true);
       try {
-        if (authService.isAuthenticated()) {
-          const user = await authService.getCurrentUser();
-          setCurrentUser(user);
-          setIsAuthenticated(true);
+        // Check if token exists in localStorage
+        const token = localStorage.getItem('accessToken');
+        console.log("Access Token", token);
+        
+        if (token && authService.isAuthenticated()) {
+          try {
+            const user = await authService.getCurrentUser();
+            setCurrentUser(user);
+            setIsAuthenticated(true);
+          } catch (error: any) {
+            console.error('Failed to get current user:', error);
+            // Only clear tokens if there's an authentication error
+            // This prevents logout on network errors
+            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+              authService.logout();
+              setCurrentUser(null);
+              setIsAuthenticated(false);
+            }
+          }
+        } else {
+          setCurrentUser(null);
+          setIsAuthenticated(false);
         }
-      } catch (error) {
-        console.error('Failed to get current user:', error);
-        // Clear any invalid tokens
-        authService.logout();
+      } catch (error: any) {
+        console.error('Auth check error:', error);
       } finally {
         setIsLoading(false);
       }
@@ -82,7 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       await authService.googleLogin();
       // The page will be redirected to Google's OAuth page
-    } catch (error) {
+    } catch (error: any) {
       console.error('Google login error:', error);
       setIsLoading(false);
     }
@@ -137,6 +146,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };
 
 export default AuthProvider;

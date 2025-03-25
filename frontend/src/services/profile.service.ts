@@ -15,7 +15,7 @@ class ProfileService extends ApiService {
   }
 
   public async createProfile(profileData: CreateProfileDto): Promise<Profile> {
-    const response = await this.post<Profile>(this.baseUrl, profileData);
+    const response = await this.post<Profile>(`${this.baseUrl}/me`, profileData);
     return response.data.data;
   }
 
@@ -28,9 +28,11 @@ class ProfileService extends ApiService {
     const formData = new FormData();
     formData.append('resume', file);
     
+    // Set the content type to undefined to let the browser set the correct multipart boundary
     const response = await this.post<{ url: string }>(`${this.baseUrl}/upload-resume`, formData);
+    
     return response.data.data.url;
   }
 }
 
-export default new ProfileService();
+export const profileService = new ProfileService();

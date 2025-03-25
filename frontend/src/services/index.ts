@@ -2,9 +2,7 @@ import axios from 'axios';
 
 axios.interceptors.request.use((config) => {
     const accessToken = localStorage.getItem('accessToken');
-    const refreshToken = localStorage.getItem('accessToken');
-    console.log("Access Token", accessToken);
-    console.log("refresh Token", refreshToken);
+    const refreshToken = localStorage.getItem('refreshToken');
     if (accessToken && refreshToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;
     }
