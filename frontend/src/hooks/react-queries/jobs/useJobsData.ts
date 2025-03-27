@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Job } from '../types/job.types';
-import jobService from '../services/job.service';
+import { Job } from '../../types/job.types';
+import jobService from '../../services/job.service';
 
 interface UseJobsDataReturn {
   jobs: Job[];

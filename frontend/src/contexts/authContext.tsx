@@ -1,6 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {
+  useCurrentUser,
+  useLogin as useLoginQuery,
+  useRegister as useRegisterQuery,
+  useLogout as useLogoutQuery,
+  useGoogleLogin as useGoogleLoginQuery,
+  useGoogleCallback as useGoogleCallbackQuery
+} from '../hooks/react-queries/auth';
 import authService from '../services/auth.service';
 import { User } from '../types/auth.types';
+import { isTokenExpired } from '../utils/jwt';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -12,6 +21,8 @@ interface AuthContextType {
   verifyEmail: (token: string) => Promise<any>;
   googleLogin: () => Promise<void>;
   handleGoogleCallback: (code: string) => Promise<void>;
+  showSessionExpiredDialog: boolean;
+  dismissSessionExpiredDialog: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,116 +32,158 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    // Initialize authentication state based on token validity
+    const accessToken = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
+    return !!(accessToken && refreshToken && !isTokenExpired(accessToken));
+  });
+  const [showSessionExpiredDialog, setShowSessionExpiredDialog] = useState(false);
 
+  // Use React Query hooks
+  const {
+    data: currentUser,
+    isLoading: isUserLoading,
+    isError,
+    refetch: refetchUser
+  } = useCurrentUser();
+
+  const loginMutation = useLoginQuery();
+  const registerMutation = useRegisterQuery();
+  const logoutMutation = useLogoutQuery();
+  const googleLoginMutation = useGoogleLoginQuery();
+  const googleCallbackMutation = useGoogleCallbackQuery();
+
+  // Handle session expiration events
   useEffect(() => {
-    // Check if user is already logged in
-    const checkAuthStatus = async () => {
-      setIsLoading(true);
-      try {
-        // Check if token exists in localStorage
-        const token = localStorage.getItem('accessToken');
-        console.log("Access Token", token);
-        
-        if (token && authService.isAuthenticated()) {
-          try {
-            const user = await authService.getCurrentUser();
-            setCurrentUser(user);
-            setIsAuthenticated(true);
-          } catch (error: any) {
-            console.error('Failed to get current user:', error);
-            // Only clear tokens if there's an authentication error
-            // This prevents logout on network errors
-            if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-              authService.logout();
-              setCurrentUser(null);
-              setIsAuthenticated(false);
-            }
-          }
-        } else {
-          setCurrentUser(null);
-          setIsAuthenticated(false);
-        }
-      } catch (error: any) {
-        console.error('Auth check error:', error);
-      } finally {
-        setIsLoading(false);
-      }
+    const handleSessionExpired = () => {
+      console.log('Session expired event received');
+      setIsAuthenticated(false);
+      setShowSessionExpiredDialog(true);
     };
 
-    checkAuthStatus();
+    window.addEventListener('auth:sessionExpired', handleSessionExpired);
+
+    return () => {
+      window.removeEventListener('auth:sessionExpired', handleSessionExpired);
+    };
   }, []);
 
-  const login = async (email: string, password: string): Promise<void> => {
-    setIsLoading(true);
-    try {
-      const user = await authService.login({ email, password });
-      setCurrentUser(user);
+  // Update authentication state based on tokens and user data
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
+    
+    // Check if tokens exist and are valid
+    const tokensValid = accessToken && refreshToken && 
+                        !isTokenExpired(accessToken) && 
+                        !isTokenExpired(refreshToken);
+    
+    console.log('Tokens valid:', tokensValid);
+    console.log('Current user in context:', currentUser);
+    
+    if (tokensValid) {
       setIsAuthenticated(true);
-    } finally {
-      setIsLoading(false);
+      
+      // If we have valid tokens but no user data, refetch the user
+      if (!currentUser && !isUserLoading) {
+        console.log('Refetching user data...');
+        refetchUser();
+      }
+    } else if (!tokensValid) {
+      // If tokens are invalid, ensure we're logged out
+      setIsAuthenticated(false);
+      // Only show expired dialog if we previously had a valid session
+      if (accessToken || refreshToken) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+      }
+    }
+
+    // If the user query failed due to auth error, ensure we're logged out
+    if (isError) {
+      console.log('User query error, logging out');
+      setIsAuthenticated(false);
+    }
+  }, [currentUser, isError, isUserLoading, refetchUser]);
+
+  const login = async (email: string, password: string): Promise<void> => {
+    try {
+      await loginMutation.mutateAsync({ email, password });
+      setIsAuthenticated(true);
+      refetchUser(); // Refresh user data after login
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
     }
   };
 
   const register = async (userData: any): Promise<void> => {
-    setIsLoading(true);
     try {
-      const user = await authService.register(userData);
-      alert("Register Function Called")
-      setCurrentUser(user);
+      await registerMutation.mutateAsync(userData);
       setIsAuthenticated(true);
-    } finally {
-      setIsLoading(false);
+      refetchUser(); // Refresh user data after registration
+    } catch (error) {
+      console.error('Registration failed:', error);
+      throw error;
     }
   };
 
   const googleLogin = async (): Promise<void> => {
-    setIsLoading(true);
     try {
-      await authService.googleLogin();
+      await googleLoginMutation.mutateAsync();
       // The page will be redirected to Google's OAuth page
-    } catch (error: any) {
+    } catch (error) {
       console.error('Google login error:', error);
-      setIsLoading(false);
     }
   };
 
   const handleGoogleCallback = async (code: string): Promise<void> => {
-    setIsLoading(true);
     try {
-      const user = await authService.handleGoogleCallback(code);
-      setCurrentUser(user);
+      await googleCallbackMutation.mutateAsync(code);
       setIsAuthenticated(true);
-    } finally {
-      setIsLoading(false);
+      refetchUser(); // Refresh user data after Google login
+    } catch (error) {
+      console.error('Google callback error:', error);
+      throw error;
     }
   };
 
   const logout = async () => {
-    setIsLoading(true);
     try {
-      await authService.logout();
-      setCurrentUser(null);
+      await logoutMutation.mutateAsync();
       setIsAuthenticated(false);
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Even if the API call fails, we should log out locally
+      setIsAuthenticated(false);
     }
   };
 
   const verifyEmail = async (token: string) => {
-    setIsLoading(true);
     try {
+      // We can't call a hook inside a function, so use the service directly
       const response = await authService.verifyEmail(token);
       return response;
-    } finally {
-        setIsLoading(false);
+    } catch (error) {
+      console.error('Email verification error:', error);
+      throw error;
     }
-  }
+  };
+
+  const dismissSessionExpiredDialog = () => {
+    setShowSessionExpiredDialog(false);
+  };
+
+  const isLoading = isUserLoading ||
+    loginMutation.isPending ||
+    registerMutation.isPending ||
+    logoutMutation.isPending ||
+    googleLoginMutation.isPending ||
+    googleCallbackMutation.isPending;
 
   const value = {
-    currentUser,
+    currentUser: currentUser || null,
     isAuthenticated,
     isLoading,
     login,
@@ -138,7 +191,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     verifyEmail,
     googleLogin,
-    handleGoogleCallback
+    handleGoogleCallback,
+    showSessionExpiredDialog,
+    dismissSessionExpiredDialog
   };
 
   return (

@@ -237,7 +237,7 @@ const DashboardPage = () => {
   }
 
   return (
-    <div className="container max-w-6xl py-10">
+    <div className="container mx-auto max-w-5xl py-10 px-4 sm:px-6">
       <h1 className="text-3xl font-bold mb-8 text-jobboard-darkblue">Dashboard</h1>
 
       <div className="grid grid-cols-2 md:!grid-cols-4 gap-4 mb-8">

@@ -1,5 +1,6 @@
 import { ApiService } from './api.service';
 import { User, LoginRequest, RegisterRequest, AuthResponse, VerifiedEmailResponse } from '../types/auth.types';
+import { isTokenExpired } from '../utils/jwt';
 
 class AuthService extends ApiService {
   private baseUrl = 'http://localhost:3000/api';
@@ -49,7 +50,7 @@ class AuthService extends ApiService {
     try {
       // The token will be automatically included in the Authorization header
       // by the axios interceptor in index.ts
-      await this.post<void>(`${this.baseUrl}/auht/logout`, {});
+      await this.post<void>(`${this.baseUrl}/auth/logout`, {});
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -59,18 +60,38 @@ class AuthService extends ApiService {
   }
 
   public async getCurrentUser(): Promise<User> {
-    console.log("Get current user is running");
-    const response = await this.get<User>(`${this.baseUrl}/profiles/me`);
-    console.log("Get user response: ", response)
+    // Use the new user endpoint instead of the profile endpoint
+    const response = await this.get<User>(`${this.baseUrl}/user/me`);
     return response.data.data;
+  }
+
+  public async refreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
+    const response = await this.post<AuthResponse>(`${this.baseUrl}/auth/refresh-token`, { refreshToken });
+    const data = response.data.data;
+    
+    if (data.accessToken && data.refreshToken) {
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+      return {
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken
+      };
+    }
+    
+    throw new Error('Failed to refresh token');
   }
 
   public getToken(): string | null {
     return localStorage.getItem('accessToken');
   }
 
+  public getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken');
+  }
+
   public isAuthenticated(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    return !!token && !isTokenExpired(token);
   }
 
   public async verifyEmail(token: string): Promise<VerifiedEmailResponse> {

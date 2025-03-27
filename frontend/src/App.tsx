@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/authContext';
 import AppRoutes from './routes';
 import ErrorBoundary from './components/ErrorBoundary';
+import SessionExpiredModal from './components/auth/SessionExpiredModal';
 import './App.css';
 
 // Create a client
@@ -21,6 +22,7 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <Router>
+            <SessionExpiredModal />
             <AppRoutes />
           </Router>
         </AuthProvider>

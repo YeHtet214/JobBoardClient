@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useJob } from '../hooks/useJobQueries';
+import { useJob } from '../hooks/react-queries/jobs/useJobQueries';
 import { JobsProvider, useJobsContext } from '../contexts/JobsContext';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';

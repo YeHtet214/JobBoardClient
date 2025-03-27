@@ -11,6 +11,7 @@ import profileRouter from './routes/profile.route.js';
 import companyRouter from './routes/company.route.js';
 import jobRouter from './routes/job.route.js';
 import applicationRouter from './routes/application.route.js';
+import currentUserRouter from './routes/user.route.js';
 
 import errorHandler from './middleware/error.middleware.js';
 
@@ -55,6 +56,7 @@ app.use('/api/profiles', profileRouter);
 app.use('/api/companies', companyRouter);
 app.use('/api/jobs', jobRouter);
 app.use('/api/applications', applicationRouter);
+app.use('/api/user', currentUserRouter);
 
 app.use(errorHandler);
 

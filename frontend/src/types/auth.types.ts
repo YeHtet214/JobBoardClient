@@ -23,6 +23,10 @@ export interface RegisterRequest {
   role: UserRole;
 }
 
+export interface RefreshTokenRequest {
+  refreshToken: string;
+}
+
 export interface AuthResponse {
   user: User;
   accessToken: string;

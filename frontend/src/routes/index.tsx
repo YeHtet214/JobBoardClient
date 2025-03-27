@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { routes, RouteConfig } from './RouteConfig';
 import MainLayout from '../components/layouts/MainLayout';
@@ -6,6 +6,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorBoundary from '../components/ErrorBoundary';
 import RouteErrorBoundary from '../components/RouteErrorBoundary';
 import { useAuth } from '../contexts/authContext';
+import authService from '../services/auth.service';
 
 interface ProtectedRouteProps {
   children?: React.ReactNode;
@@ -15,8 +16,15 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const { isAuthenticated, currentUser, isLoading } = useAuth();
 
-  // Show loading spinner while checking authentication
-  if (isLoading) {
+  console.log('currentUser', currentUser);
+  console.log('isAuthenticated', isAuthenticated);
+  console.log('isLoading', isLoading);
+
+  // Check if tokens exist but we're still waiting for user data
+  const hasValidTokens = authService.isAuthenticated();
+
+  // Show loading spinner while checking authentication or if we have valid tokens but user data is still loading
+  if (isLoading || (hasValidTokens && !currentUser)) {
     return <LoadingSpinner />;
   }
 
@@ -25,17 +33,16 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Check if route requires specific roles and if user has the required role
+  // If roles are specified, check if user has required role
   if (allowedRoles && allowedRoles.length > 0 && currentUser) {
     const hasRequiredRole = allowedRoles.includes(currentUser.role);
     if (!hasRequiredRole) {
-      // Redirect to dashboard if user doesn't have the required role
-      return <Navigate to="/" replace />;
+      // Redirect to unauthorized page or dashboard based on user role
+      return <Navigate to="/home" replace />;
     }
   }
 
-  // Return children or outlet for nested routes
-  return children ? <>{children}</> : <Outlet />;
+  return <>{children || <Outlet />}</>;
 };
 
 // Check if a route is an auth route (login, register, verify-email)

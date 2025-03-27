@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import jobService from '../services/job.service';
-import type { Job, CreateJobDto, UpdateJobDto } from '../types/job.types';
+import jobService from '../../../services/job.service';
+import type { CreateJobDto, UpdateJobDto } from '../../../types/job.types';
 
 // Query keys
 export const jobKeys = {
