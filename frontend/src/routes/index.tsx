@@ -25,7 +25,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
 
   // Show loading spinner while checking authentication or if we have valid tokens but user data is still loading
   if (isLoading || (hasValidTokens && !currentUser)) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner fullScreen />;
   }
 
   // Redirect to login if user is not authenticated
@@ -56,13 +56,13 @@ const AppRoutes = () => {
   const { isLoading } = useAuth();
 
   if (isLoading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner fullScreen />;
   }
 
   // Helper function to create route elements
   const createRouteElement = (route: RouteConfig) => (
     <ErrorBoundary>
-      <Suspense fallback={<LoadingSpinner />}>
+      <Suspense fallback={<LoadingSpinner fullScreen />}>
         <route.element />
       </Suspense>
     </ErrorBoundary>

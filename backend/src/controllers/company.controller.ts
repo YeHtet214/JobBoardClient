@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { RequestWithUser } from '../types/users.type.js';
-import { 
+import {
   fetchAllCompanies,
-  getExistingCompany, 
-  createNewCompany, 
-  updateExistingCompany, 
-  deleteExistingCompany 
+  getExistingCompany,
+  createNewCompany,
+  updateExistingCompany,
+  deleteExistingCompany,
+  getCompanyByOwnerId
 } from '../services/company.service.js';
 
 export const getAllCompanies = async (req: Request, res: Response, next: NextFunction) => {
@@ -29,19 +30,48 @@ export const getCompanyById = async (req: Request, res: Response, next: NextFunc
   }
 };
 
+
+export const getCurrentCompany = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user.userId;
+    
+    try {
+      const company = await getCompanyByOwnerId(userId);
+      return res.status(200).json({ 
+        success: true, 
+        message: 'Company fetched successfully', 
+        data: company 
+      });
+    } catch (error: any) {
+      // If company not found, return 404 with appropriate message
+      if (error.status === 404) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'No company profile found for this user',
+          data: null
+        });
+      }
+      // For other errors, pass to the error middleware
+      throw error;
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const createCompany = async (req: RequestWithUser, res: Response, next: NextFunction) => {
   try {
     const { name, description, logo, website, location, industry } = req.body;
     const company = await createNewCompany({
-      name, 
-      description, 
-      logo, 
-      website, 
+      name,
+      description,
+      logo,
+      website,
       location,
       industry,
       ownerId: req.user.userId
     });
-    
+
     res.status(201).json({ success: true, message: 'Company created successfully', data: company });
   } catch (error) {
     next(error);
@@ -52,26 +82,26 @@ export const updateCompany = async (req: RequestWithUser, res: Response, next: N
   try {
     const { id } = req.params;
     const { name, description, logo, website, location, industry } = req.body;
-    
+
     // First check if the company exists and if the user is the owner
     const existingCompany = await getExistingCompany(id);
-    
+
     if (existingCompany.ownerId !== req.user.userId) {
-      return res.status(403).json({ 
-        success: false, 
-        message: "You don't have permission to update this company" 
+      return res.status(403).json({
+        success: false,
+        message: "You don't have permission to update this company"
       });
     }
-    
-    const company = await updateExistingCompany(id, { 
-      name, 
-      description, 
-      logo, 
-      website, 
-      location, 
-      industry 
+
+    const company = await updateExistingCompany(id, {
+      name,
+      description,
+      logo,
+      website,
+      location,
+      industry
     });
-    
+
     res.status(200).json({ success: true, message: 'Company updated successfully', data: company });
   } catch (error) {
     next(error);
@@ -81,19 +111,19 @@ export const updateCompany = async (req: RequestWithUser, res: Response, next: N
 export const deleteCompany = async (req: RequestWithUser, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    
+
     // First check if the company exists and if the user is the owner
     const existingCompany = await getExistingCompany(id);
-    
+
     if (existingCompany.ownerId !== req.user.userId) {
-      return res.status(403).json({ 
-        success: false, 
-        message: "You don't have permission to delete this company" 
+      return res.status(403).json({
+        success: false,
+        message: "You don't have permission to delete this company"
       });
     }
-    
+
     const company = await deleteExistingCompany(id);
-    
+
     res.status(200).json({ success: true, message: 'Company deleted successfully', data: company });
   } catch (error) {
     next(error);

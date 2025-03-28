@@ -17,19 +17,21 @@ const checkUserExists = async (email: string) => {
   const user = await prisma.user.findUnique({
     where: { email }
   });
+
+  console.log("user", user);
   return user;
 }
 
 const generateTokens = (userId: string) => {
   const accessToken = jwt.sign(
-    { userId }, 
-    JWT_SECRET as string, 
+    { userId },
+    JWT_SECRET as string,
     { expiresIn: ACCESS_TOKEN_EXPIRY }
   );
-  
+
   const refreshToken = jwt.sign(
-    { userId }, 
-    REFRESH_TOKEN_SECRET as string, 
+    { userId },
+    REFRESH_TOKEN_SECRET as string,
     { expiresIn: REFRESH_TOKEN_EXPIRY }
   );
 
@@ -49,7 +51,7 @@ const storeRefreshToken = async (userId: string, refreshToken: string) => {
 
 const sendVerificationEmail = async (email: string, token: string) => {
   const verificationLink = `${FRONTEND_URL}/verify-email/${token}`;
-  
+
   await transporter.sendMail({
     from: SMTP_FROM_EMAIL,
     to: email,
@@ -63,10 +65,10 @@ const sendVerificationEmail = async (email: string, token: string) => {
 }
 
 export const userSignUp = async (
-  firstName: string, 
-  lastName: string, 
-  email: string, 
-  password: string, 
+  firstName: string,
+  lastName: string,
+  email: string,
+  password: string,
   role: UserRole
 ) => {
   const existingUser = await checkUserExists(email);
@@ -76,7 +78,7 @@ export const userSignUp = async (
     error.status = 409;
     throw error;
   }
-  
+
   const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
   const emailVerificationToken = crypto.randomBytes(32).toString('hex');
 
@@ -152,8 +154,8 @@ export const refreshAccessToken = async (refreshToken: string) => {
 
     // Generate new access token
     const accessToken = jwt.sign(
-      { userId: decoded.userId }, 
-      JWT_SECRET as string, 
+      { userId: decoded.userId },
+      JWT_SECRET as string,
       { expiresIn: ACCESS_TOKEN_EXPIRY }
     );
 
@@ -175,7 +177,7 @@ export const userLogout = async (token: string) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET as string) as { userId: string };
-    
+
     // Delete all refresh tokens for the user
     await prisma.refreshToken.deleteMany({
       where: { userId: decoded.userId }
@@ -221,7 +223,7 @@ export const verifyEmail = async (token: string) => {
 
 export const requestPasswordReset = async (email: string) => {
   const user = await checkUserExists(email);
-  
+
   if (!user) {
     const error = new Error('User not found') as CustomError;
     error.status = 404;
@@ -240,7 +242,7 @@ export const requestPasswordReset = async (email: string) => {
   });
 
   const resetLink = `${FRONTEND_URL}/reset-password/${resetToken}`;
-  
+
   await transporter.sendMail({
     from: SMTP_FROM_EMAIL,
     to: email,

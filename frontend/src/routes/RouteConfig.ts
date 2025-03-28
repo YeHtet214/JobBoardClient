@@ -26,6 +26,7 @@ const ApplicationsPage = lazy(() => import('../pages/ApplicationsPage'))
 const ProfilePage = lazy(() => import('../pages/ProfilePage'));
 const JobsPage = lazy(() => import('../pages/JobsPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
+const CompanyProfilePage = lazy(() => import('../pages/CompanyProfilePage'));
 
 // Define routes
 export const routes: RouteConfig[] = [
@@ -77,6 +78,13 @@ export const routes: RouteConfig[] = [
     requiresAuth: true,
     allowedRoles: ['JOBSEEKER', 'EMPLOYER', 'ADMIN'],
     meta: { title: 'Profile', description: 'Manage your profile' }
+  },
+  {
+    path: '/company/profile',
+    element: CompanyProfilePage,
+    requiresAuth: true,
+    allowedRoles: ['EMPLOYER'],
+    meta: { title: 'Company Profile', description: 'Manage your company profile' }
   },
   {
     path: '/applications',

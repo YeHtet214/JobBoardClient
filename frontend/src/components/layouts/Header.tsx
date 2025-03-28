@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/authContext';
+import { LogOut, Home, Briefcase, Building, User, Settings, Menu, X } from 'lucide-react';
 
 const Header: React.FC = () => {
   const { currentUser, logout, isAuthenticated, isLoading } = useAuth();
@@ -23,13 +24,16 @@ const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:!flex items-center space-x-6">
-            <Link to="/" className="text-gray-600 hover:text-jobboard-purple transition">
+            <Link to="/" className="text-gray-600 hover:text-jobboard-purple transition flex items-center">
+              <Home className="h-4 w-4 mr-2" />
               Home
             </Link>
-            <Link to="/jobs" className="text-gray-600 hover:text-jobboard-purple transition">
+            <Link to="/jobs" className="text-gray-600 hover:text-jobboard-purple transition flex items-center">
+              <Briefcase className="h-4 w-4 mr-2" />
               Jobs
             </Link>
-            <Link to="/companies" className="text-gray-600 hover:text-jobboard-purple transition">
+            <Link to="/companies" className="text-gray-600 hover:text-jobboard-purple transition flex items-center">
+              <Building className="h-4 w-4 mr-2" />
               Companies
             </Link>
 
@@ -37,12 +41,29 @@ const Header: React.FC = () => {
             {!isLoading && (
               isAuthenticated ? (
                 <>
-                  <Link to="/dashboard" className="text-gray-600 hover:text-jobboard-purple transition">
+                  <Link to="/dashboard" className="text-gray-600 hover:text-jobboard-purple transition flex items-center">
+                    <User className="h-4 w-4 mr-2" />
                     Dashboard
                   </Link>
-                  <Link to="/profile" className="text-gray-600 hover:text-jobboard-purple transition">
-                    Profile
-                  </Link>
+                  {currentUser?.role === 'EMPLOYER' && (
+                    <Link to="/company/profile" className="text-gray-600 hover:text-jobboard-purple transition flex items-center">
+                      <Building className="h-4 w-4 mr-2" />
+                      Company Profile
+                    </Link>
+                  )}
+                  {currentUser?.role !== 'EMPLOYER' && (
+                    <Link to="/profile" className="text-gray-600 hover:text-jobboard-purple transition flex items-center">
+                      <User className="h-4 w-4 mr-2" />
+                      Profile
+                    </Link>
+                  )}
+                  <button 
+                    onClick={handleLogout}
+                    className="text-gray-600 hover:text-jobboard-purple transition flex items-center"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </button>
                 </>
               ) : (
                 <div className="flex items-center space-x-4">
@@ -66,13 +87,9 @@ const Header: React.FC = () => {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X className="h-6 w-6" />
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              <Menu className="h-6 w-6" />
             )}
           </button>
         </div>
@@ -82,23 +99,26 @@ const Header: React.FC = () => {
           <nav className="mt-4 md:hidden space-y-3 pb-3">
             <Link 
               to="/" 
-              className="block text-gray-600 hover:text-jobboard-purple transition"
+              className="block text-gray-600 hover:text-jobboard-purple transition flex items-center py-2"
               onClick={() => setMobileMenuOpen(false)}
             >
+              <Home className="h-4 w-4 mr-2" />
               Home
             </Link>
             <Link 
               to="/jobs" 
-              className="block text-gray-600 hover:text-jobboard-purple transition"
+              className="block text-gray-600 hover:text-jobboard-purple transition flex items-center py-2"
               onClick={() => setMobileMenuOpen(false)}
             >
+              <Briefcase className="h-4 w-4 mr-2" />
               Jobs
             </Link>
             <Link 
               to="/companies" 
-              className="block text-gray-600 hover:text-jobboard-purple transition"
+              className="block text-gray-600 hover:text-jobboard-purple transition flex items-center py-2"
               onClick={() => setMobileMenuOpen(false)}
             >
+              <Building className="h-4 w-4 mr-2" />
               Companies
             </Link>
             
@@ -106,27 +126,40 @@ const Header: React.FC = () => {
             {!isLoading && (
               isAuthenticated ? (
                 <>
+                  <Link 
+                    to="/dashboard" 
+                    className="block text-gray-600 hover:text-jobboard-purple transition flex items-center py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    Dashboard
+                  </Link>
                   {currentUser?.role === 'EMPLOYER' && (
                     <Link 
-                      to="/employer/dashboard" 
-                      className="block text-gray-600 hover:text-jobboard-purple transition"
+                      to="/company/profile" 
+                      className="block text-gray-600 hover:text-jobboard-purple transition flex items-center py-2"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Dashboard
+                      <Building className="h-4 w-4 mr-2" />
+                      Company Profile
+                    </Link>
+                  )}
+                  {currentUser?.role !== 'EMPLOYER' && (
+                    <Link 
+                      to="/profile" 
+                      className="block text-gray-600 hover:text-jobboard-purple transition flex items-center py-2"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <User className="h-4 w-4 mr-2" />
+                      Profile
                     </Link>
                   )}
                   <Link 
-                    to="/profile" 
-                    className="block text-gray-600 hover:text-jobboard-purple transition"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Profile
-                  </Link>
-                  <Link 
                     to="/settings" 
-                    className="block text-gray-600 hover:text-jobboard-purple transition"
+                    className="block text-gray-600 hover:text-jobboard-purple transition flex items-center py-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
+                    <Settings className="h-4 w-4 mr-2" />
                     Settings
                   </Link>
                   <button 
@@ -134,8 +167,9 @@ const Header: React.FC = () => {
                       handleLogout();
                       setMobileMenuOpen(false);
                     }}
-                    className="block text-gray-600 hover:text-jobboard-purple transition"
+                    className="block text-gray-600 hover:text-jobboard-purple transition flex items-center py-2 w-full text-left"
                   >
+                    <LogOut className="h-4 w-4 mr-2" />
                     Logout
                   </button>
                 </>
@@ -143,7 +177,7 @@ const Header: React.FC = () => {
                 <div className="flex flex-col space-y-2">
                   <Link 
                     to="/login" 
-                    className="block text-gray-600 hover:text-jobboard-purple transition"
+                    className="block text-gray-600 hover:text-jobboard-purple transition py-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Login
