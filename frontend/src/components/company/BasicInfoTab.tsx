@@ -77,9 +77,6 @@ const BasicInfoTab = () => {
         <Field as="select"
           id="industry"
           name="industry"
-          className={({ form, field }: any) => `w-full rounded-md border p-2 ${
-            form.errors.industry && form.touched.industry ? "border-red-500" : "border-gray-300"
-          }`}
         >
           <option value="">Select industry</option>
           {industryOptions.map((industry) => (

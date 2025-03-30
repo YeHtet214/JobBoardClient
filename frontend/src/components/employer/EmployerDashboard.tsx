@@ -7,19 +7,17 @@ import {
   CardFooter, 
   CardHeader, 
   CardTitle 
-} from '../ui/card';
-import { Button } from '../ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { Badge } from '../ui/badge';
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from '@/components/ui/badge';
 import { 
   Briefcase, 
   CheckCircle, 
   Clock, 
   Calendar, 
   FileText, 
-  Building, 
-  ListChecks,
-  Mail,
+  Building,
   User,
   Plus,
   Eye,
@@ -221,7 +219,7 @@ const EmployerDashboard: React.FC<EmployerDashboardProps> = ({
                   </div>
                   <Button 
                     className="bg-jobboard-darkblue hover:bg-jobboard-darkblue/90"
-                    onClick={() => navigate('/jobs/create')}
+                    onClick={() => navigate('/employer/jobs/create')}
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Post Job

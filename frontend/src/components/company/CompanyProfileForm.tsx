@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Formik, Form } from 'formik';
+import { Formik, Form, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   Card,
   CardContent,
   CardDescription,
@@ -17,10 +17,11 @@ import CompanyDetailsTab from './CompanyDetailsTab';
 import BrandingTab from './BrandingTab';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import { CreateCompanyDto, Company, UpdateCompanyDto } from '../../types/company.types';
-import { 
-  useCreateCompany, 
-  useUpdateCompany 
+import {
+  useCreateCompany,
+  useUpdateCompany
 } from '../../hooks/react-queries/company';
+import { useToast } from '../ui/use-toast';
 
 // Set up validation schema using Yup
 const CompanySchema = Yup.object().shape({
@@ -58,7 +59,8 @@ interface CompanyProfileFormProps {
 const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('basic-info');
-  
+  const { toast } = useToast();
+
   // Get mutation hooks
   const createCompany = useCreateCompany();
   const updateCompany = useUpdateCompany();
@@ -76,13 +78,65 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
   };
 
   // Handle form submission
-  const handleSubmit = async (values: CreateCompanyDto | UpdateCompanyDto) => {
-    if (company) {
-      // Update existing company
-      updateCompany.mutate({ id: company.id, data: values as UpdateCompanyDto });
-    } else {
-      // Create new company
-      createCompany.mutate(values as CreateCompanyDto);
+  const handleSubmit = async (
+    values: CreateCompanyDto | UpdateCompanyDto, 
+    formikHelpers: FormikHelpers<CreateCompanyDto>
+  ) => {
+    const { setSubmitting, validateForm } = formikHelpers;
+    
+    try {
+      // Explicitly validate the form
+      const errors = await validateForm();
+      
+      // If there are validation errors, show a toast and highlight the fields
+      if (Object.keys(errors).length > 0) {
+        // Set the active tab to the one containing the first error
+        if (errors.name || errors.description || errors.industry) {
+          setActiveTab('basic-info');
+        } else if (errors.location || errors.website || errors.foundedYear || errors.size) {
+          setActiveTab('details');
+        } else if (errors.logo) {
+          setActiveTab('branding');
+        }
+        
+        toast({
+          title: "Validation Error",
+          description: "Please fill in all required fields correctly.",
+          variant: "destructive"
+        });
+        
+        return;
+      }
+      
+      if (company) {
+        // Update existing company
+        await updateCompany.mutateAsync({ id: company.id, data: values as UpdateCompanyDto });
+        toast({
+          title: "Success",
+          description: "Company profile has been updated successfully."
+        });
+        navigate('/employer/dashboard');
+      } else {
+        // Create new company
+        await createCompany.mutateAsync(values as CreateCompanyDto);
+        toast({
+          title: "Success",
+          description: "Company profile has been created successfully."
+        });
+        navigate('/employer/dashboard');
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'An error occurred while saving the company profile';
+      
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -93,8 +147,8 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
       <CardHeader>
         <CardTitle>{isNewCompany ? 'New Company Profile' : 'Company Profile'}</CardTitle>
         <CardDescription>
-          {isNewCompany 
-            ? 'Fill in your company details to get started' 
+          {isNewCompany
+            ? 'Fill in your company details to get started'
             : 'Update your company information visible to job seekers'
           }
         </CardDescription>
@@ -105,8 +159,10 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
           validationSchema={CompanySchema}
           onSubmit={handleSubmit}
           enableReinitialize
+          validateOnChange={false}
+          validateOnBlur={true}
         >
-          {({ isSubmitting: formikSubmitting }) => (
+          {({ isSubmitting: formikSubmitting, errors, submitForm }) => (
             <Form>
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid grid-cols-3 mb-8">
@@ -114,16 +170,25 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
                     <Info className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Basic Info</span>
                     <span className="sm:hidden">Basic</span>
+                    {(errors.name || errors.description || errors.industry) && (
+                      <span className="ml-2 h-2 w-2 rounded-full bg-red-500"></span>
+                    )}
                   </TabsTrigger>
                   <TabsTrigger value="details" className="text-base">
                     <Building className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Company Details</span>
                     <span className="sm:hidden">Details</span>
+                    {(errors.location || errors.website || errors.foundedYear || errors.size) && (
+                      <span className="ml-2 h-2 w-2 rounded-full bg-red-500"></span>
+                    )}
                   </TabsTrigger>
                   <TabsTrigger value="branding" className="text-base">
                     <Image className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Branding</span>
                     <span className="sm:hidden">Brand</span>
+                    {errors.logo && (
+                      <span className="ml-2 h-2 w-2 rounded-full bg-red-500"></span>
+                    )}
                   </TabsTrigger>
                 </TabsList>
 
@@ -151,7 +216,7 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-jobboard-darkblue hover:bg-jobboard-darkblue/90"
+                  className="bg-red-500 hover:bg-jobboard-darkblue/90"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (

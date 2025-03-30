@@ -2,7 +2,7 @@ import { ApiService } from './api.service';
 import { Company, CreateCompanyDto, UpdateCompanyDto } from '../types/company.types';
 
 class CompanyService extends ApiService {
-  private baseUrl = '/api/companies';
+  private baseUrl = '/companies';
 
   public async getAllCompanies(): Promise<Company[]> {
     const response = await this.get<Company[]>(this.baseUrl);

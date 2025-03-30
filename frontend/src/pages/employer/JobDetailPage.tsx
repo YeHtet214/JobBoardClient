@@ -1,13 +1,13 @@
 import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useJob } from '../hooks/react-queries/jobs/useJobQueries';
-import { JobsProvider, useJobsContext } from '../contexts/JobsContext';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../components/ui/card';
-import { Separator } from '../components/ui/separator';
-import { useAuth } from '../contexts/authContext';
-import { getCompanyInitials, formatSalaryRange, formatDate } from '../lib/formatters';
+import { useJob } from '../../hooks/react-queries/jobs/useJobQueries';
+import { JobsProvider, useJobsContext } from '../../contexts/JobsContext';
+import { Button } from '../../components/ui/button';
+import { Badge } from '../../components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../../components/ui/card';
+import { Separator } from '../../components/ui/separator';
+import { useAuth } from '../../contexts/authContext';
+import { getCompanyInitials, formatSalaryRange, formatDate } from '../../lib/formatters';
 
 const JobDetailContent: React.FC = () => {
     const { id } = useParams<{ id: string }>();

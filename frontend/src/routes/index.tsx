@@ -1,12 +1,12 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense } from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { routes, RouteConfig } from './RouteConfig';
-import MainLayout from '../components/layouts/MainLayout';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
-import ErrorBoundary from '../components/ErrorBoundary';
-import RouteErrorBoundary from '../components/RouteErrorBoundary';
-import { useAuth } from '../contexts/authContext';
-import authService from '../services/auth.service';
+import { routes, RouteConfig } from '@/routes/RouteConfig';
+import MainLayout from '@/components/layouts/MainLayout';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import RouteErrorBoundary from '@/components/RouteErrorBoundary';
+import { useAuth } from '@/contexts/authContext';
+import authService from '@/services/auth.service';
 
 interface ProtectedRouteProps {
   children?: React.ReactNode;
@@ -15,10 +15,6 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const { isAuthenticated, currentUser, isLoading } = useAuth();
-
-  console.log('currentUser', currentUser);
-  console.log('isAuthenticated', isAuthenticated);
-  console.log('isLoading', isLoading);
 
   // Check if tokens exist but we're still waiting for user data
   const hasValidTokens = authService.isAuthenticated();

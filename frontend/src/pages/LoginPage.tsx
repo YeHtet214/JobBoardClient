@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { FormEvent, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/authContext';
 import { LoginRequest } from '../types/auth.types';
 import * as Yup from 'yup';
-import { Formik, FormikHelpers, Field, ErrorMessage } from 'formik';
+import { Formik, FormikHelpers, Field, ErrorMessage, FormikProps } from 'formik';
 import { Form } from '../components/forms/components';
 import AuthLayout from '../components/layouts/AuthLayout';
 
@@ -15,6 +15,8 @@ import { Checkbox } from "../components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { Separator } from "../components/ui/separator";
+import { useToast } from "../components/ui/use-toast";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 // Login validation schema
 const loginSchema = Yup.object({
@@ -26,35 +28,81 @@ const loginSchema = Yup.object({
 });
 
 const LoginPage: React.FC = () => {
-  const [error, setError] = React.useState<string | null>(null);
+  const [formError, setFormError] = React.useState<{
+    email?: string;
+    password?: string;
+    general?: string;
+  }>({});
+  
+  // Add a separate local loading state to handle form submission
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  
   const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const initialValues: LoginRequest = {
     email: '',
     password: '',
   };
 
-  const handleSubmit = async (values: LoginRequest, { setSubmitting }: FormikHelpers<LoginRequest>) => {
-    setError(null);
+  const handleSubmit = async (values: LoginRequest, { setSubmitting, setFieldError }: FormikHelpers<LoginRequest>) => {
+    // Clear previous errors
+    setFormError({});
+    
+    // Set our local loading state
+    setIsLoggingIn(true);
 
     try {
       await login(values.email, values.password);
       navigate('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred during login');
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred during login';
+      console.log("Login error:", errorMessage); // Add logging for debugging
+
+      // More comprehensive error handling with better pattern matching
+      if (errorMessage.toLowerCase().includes('email not found')) {
+        setFieldError('email', 'Email not found');
+      } else if (errorMessage.toLowerCase().includes('password') ||
+                 errorMessage.toLowerCase().includes('incorrect') ||
+                 errorMessage.toLowerCase().includes('invalid') ||
+                 errorMessage.toLowerCase().includes('wrong') ||
+                 errorMessage.toLowerCase().includes('credentials')) {
+        // Ensure password errors are properly caught and displayed
+        setFieldError('password', 'Invalid Password');
+        setFormError(prev => ({ ...prev, password: 'Invalid Password' }));
+      } else {
+        // For other general errors
+        setFormError({ general: errorMessage });
+        
+        // Also show a toast for these errors
+        toast({
+          title: "Login Failed",
+          description: errorMessage,
+          variant: "destructive"
+        });
+      }
     } finally {
+      // Make sure to set both loading states to false
       setSubmitting(false);
+      setIsLoggingIn(false);
     }
   };
 
   const handleGoogleLogin = async () => {
-    setError(null);
+    setFormError({});
     try {
       await googleLogin();
       // The page will be redirected to Google's OAuth page
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred during Google login');
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred during Google login';
+      setFormError({ general: errorMessage });
+      
+      toast({
+        title: "Google Login Failed",
+        description: errorMessage,
+        variant: "destructive"
+      });
     }
   };
 
@@ -74,10 +122,10 @@ const LoginPage: React.FC = () => {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {error && (
+          {formError.general && (
             <div className="bg-destructive/15 text-destructive flex items-center p-3 rounded-md text-sm" role="alert">
               <AlertCircle className="h-4 w-4 mr-2" />
-              <span>{error}</span>
+              <span>{formError.general}</span>
             </div>
           )}
 
@@ -85,9 +133,22 @@ const LoginPage: React.FC = () => {
             initialValues={initialValues}
             validationSchema={loginSchema}
             onSubmit={handleSubmit}
+            validateOnBlur={true}
           >
-            {({ isSubmitting, touched, errors }) => (
-              <Form className="space-y-4">
+            {({ isSubmitting, touched, errors, submitForm, setFieldTouched }: FormikProps<LoginRequest>) => (
+              <Form className="space-y-4" onSubmit={(e?: FormEvent<HTMLFormElement>) => {
+                if (e) {
+                  // Prevent default form submission to avoid page reload
+                  e.preventDefault();
+                  
+                  // Touch all fields before submission to ensure validation runs
+                  setFieldTouched('email', true, false);
+                  setFieldTouched('password', true, false);
+                  
+                  // Use Formik's submitForm to handle the submission properly
+                  submitForm();
+                }
+              }}>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Field
@@ -97,9 +158,11 @@ const LoginPage: React.FC = () => {
                     type="email"
                     placeholder="name@example.com"
                     autoComplete="email"
-                    className={touched.email && errors.email ? "border-destructive" : ""}
+                    className={(touched.email && errors.email) || formError.email ? "border-destructive" : ""}
+                    disabled={isLoggingIn}
                   />
                   <ErrorMessage name="email" component="div" className="text-sm text-destructive" />
+                  {formError.email && <div className="text-sm text-destructive">{formError.email}</div>}
                 </div>
 
                 <div className="space-y-2">
@@ -116,9 +179,11 @@ const LoginPage: React.FC = () => {
                     type="password"
                     placeholder="••••••••"
                     autoComplete="current-password"
-                    className={touched.password && errors.password ? "border-destructive" : ""}
+                    className={(touched.password && errors.password) || formError.password ? "border-destructive" : ""}
+                    disabled={isLoggingIn}
                   />
                   <ErrorMessage name="password" component="div" className="text-sm text-destructive" />
+                  {formError.password && <div className="text-sm text-destructive">{formError.password}</div>}
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -126,6 +191,7 @@ const LoginPage: React.FC = () => {
                     as={Checkbox}
                     id="remember"
                     name="remember"
+                    disabled={isLoggingIn}
                   />
                   <Label htmlFor="remember" className="text-sm font-normal">Remember me</Label>
                 </div>
@@ -133,9 +199,15 @@ const LoginPage: React.FC = () => {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isSubmitting}
+                  disabled={isLoggingIn}
                 >
-                  {isSubmitting ? "Signing in..." : "Sign in"}
+                  {isLoggingIn ? (
+                    <span className="flex items-center justify-center">
+                      <LoadingSpinner size="sm" className="mr-2" /> Signing in...
+                    </span>
+                  ) : (
+                    "Sign in"
+                  )}
                 </Button>
               </Form>
             )}
@@ -156,6 +228,7 @@ const LoginPage: React.FC = () => {
             variant="outline"
             className="w-full flex items-center justify-center gap-2"
             onClick={handleGoogleLogin}
+            disabled={isLoggingIn}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="w-5 h-5">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />

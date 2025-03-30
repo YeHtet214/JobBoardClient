@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { 
-    getCompanyById, 
-    createCompany, 
-    updateCompany, 
+import {
+    getCompanyById,
+    createCompany,
+    updateCompany,
     deleteCompany,
     getAllCompanies,
     getCurrentCompany
@@ -14,11 +14,11 @@ const companyRouter = Router();
 
 // Public route - anyone can view company details
 companyRouter.get('/', getAllCompanies);
-companyRouter.get('/:id', getCompanyById);
-
 // Important: Route order matters - specific routes before parameterized routes
 // @ts-ignore - The authorize middleware adds the user property to the request
 companyRouter.get('/my-company', authorize, getCurrentCompany as any);
+
+companyRouter.get('/:id', getCompanyById);
 
 // Protected routes - only authenticated employers can perform these actions
 companyRouter.post('/', authorize, employerOnly, createCompany);

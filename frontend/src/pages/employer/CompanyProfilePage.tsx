@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/authContext';
-import { Card, CardContent } from '../components/ui/card';
+import { useAuth } from "@/contexts/authContext";
+import { Card, CardContent } from '@/components/ui/card';
 import { Info } from 'lucide-react';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
-import { CompanyProfileForm } from '../components/company';
-import { useMyCompany } from '../hooks/react-queries/company';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { CompanyProfileForm } from '@/components/company';
+import { useMyCompany } from '@/hooks/react-queries/company';
 
 const CompanyProfilePage = () => {
   const { currentUser } = useAuth();

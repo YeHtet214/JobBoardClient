@@ -2,7 +2,7 @@ import { ApiService } from './api.service';
 import { User } from '../types/auth.types';
 
 class UserService extends ApiService {
-  private baseUrl = '/api/users';
+  private baseUrl = '/users';
 
   public async getUserById(id: string): Promise<User> {
     const response = await this.get<User>(`${this.baseUrl}/${id}`);

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../contexts/authContext';
+import { useAuth } from '../../contexts/authContext';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
@@ -10,18 +10,18 @@ import {
     CardFooter,
     CardHeader,
     CardTitle
-} from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Separator } from '../components/ui/separator';
-import { profileService } from '../services/profile.service';
-import { Profile, Education, Experience, UpdateProfileDto } from '../types/profile.types';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { Textarea } from '../components/ui/textarea';
-import { Badge } from '../components/ui/badge';
+} from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { Separator } from '../../components/ui/separator';
+import { profileService } from '../../services/profile.service';
+import { Profile, Education, Experience, UpdateProfileDto } from '../../types/profile.types';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import { Textarea } from '../../components/ui/textarea';
+import { Badge } from '../../components/ui/badge';
 import { X, Plus, Briefcase, GraduationCap, FileText, Github, Linkedin, Globe, Upload, AlertCircle, User, BookOpen, Building, Link } from 'lucide-react';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 const initialProfile: Profile = {
     id: '',

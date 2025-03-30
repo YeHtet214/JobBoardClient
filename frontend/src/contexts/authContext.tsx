@@ -79,9 +79,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                         !isTokenExpired(accessToken) && 
                         !isTokenExpired(refreshToken);
     
-    console.log('Tokens valid:', tokensValid);
-    console.log('Current user in context:', currentUser);
-    
     if (tokensValid) {
       setIsAuthenticated(true);
       
