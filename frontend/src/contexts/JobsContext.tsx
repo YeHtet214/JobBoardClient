@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Job } from '../types/job.types';
-import jobService from '../services/job.service';
+import { Job, JobsResponse } from '../types/job.types';
+import jobService, { JobSearchParams } from '../services/job.service';
+import { useSearchParams } from 'react-router-dom';
 
 interface JobsContextType {
   jobs: Job[];
@@ -9,6 +10,7 @@ interface JobsContextType {
   error: unknown;
   currentPage: number;
   totalPages: number;
+  totalCount: number;
   recentlyViewedJobs: Job[];
   // Filter states
   keyword: string;
@@ -23,6 +25,7 @@ interface JobsContextType {
   handleSearch: (e: React.FormEvent) => void;
   handleJobView: (job: Job) => void;
   handlePageChange: (page: number) => void;
+  resetFilters: () => void;
 }
 
 const JobsContext = createContext<JobsContextType | undefined>(undefined);
@@ -32,38 +35,70 @@ interface JobsProviderProps {
 }
 
 export const JobsProvider: React.FC<JobsProviderProps> = ({ children }) => {
-  // Filter states
-  const [keyword, setKeyword] = useState<string>('');
-  const [location, setLocation] = useState<string>('');
-  const [jobTypes, setJobTypes] = useState<string[]>([]);
-  const [experienceLevel, setExperienceLevel] = useState<string>('');
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Filter states - initialize from URL params if available
+  const [keyword, setKeyword] = useState<string>(searchParams.get('keyword') || '');
+  const [location, setLocation] = useState<string>(searchParams.get('location') || '');
+  const [jobTypes, setJobTypes] = useState<string[]>(
+    searchParams.getAll('jobTypes') || []
+  );
+  const [experienceLevel, setExperienceLevel] = useState<string>(
+    searchParams.get('experienceLevel') || 'ANY'
+  );
+  const [currentPage, setCurrentPage] = useState<number>(
+    parseInt(searchParams.get('page') || '1', 10)
+  );
   const [recentlyViewedJobs, setRecentlyViewedJobs] = useState<Job[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+
+  // Limit per page
+  const ITEMS_PER_PAGE = 10;
+
+  // Update URL when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (keyword) params.append('keyword', keyword);
+    if (location) params.append('location', location);
+    if (experienceLevel && experienceLevel !== 'ANY') params.append('experienceLevel', experienceLevel);
+    if (currentPage > 1) params.append('page', currentPage.toString());
+
+    jobTypes.forEach(type => params.append('jobTypes', type));
+
+    setSearchParams(params, { replace: true });
+  }, [keyword, location, jobTypes, experienceLevel, currentPage, setSearchParams]);
 
   // Use React Query to fetch jobs
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery<JobsResponse>({
     queryKey: ['jobs', { keyword, location, jobTypes, experienceLevel, page: currentPage }],
     queryFn: async () => {
       try {
-        // In a real app, you would pass filters to the API
-        const jobs = await jobService.getAllJobs();
-        console.log("Fetched Jobs", jobs);
-        return jobs || []; // Ensure we always return an array, even if the API returns undefined
+        const searchParams: JobSearchParams = {
+          keyword,
+          location,
+          jobTypes,
+          experienceLevel: experienceLevel === 'ANY' ? '' : experienceLevel,
+          page: currentPage,
+          limit: ITEMS_PER_PAGE
+        };
+        
+        const result = await jobService.getAllJobs(searchParams);
+        setTotalCount(result.totalCount);
+        return result;
       } catch (error) {
         console.error('Error fetching jobs:', error);
-        return []; // Return empty array on error instead of letting the error propagate
+        return { jobs: [], totalPages: 0, totalCount: 0, currentPage: 1 }; // Return empty data on error
       }
     }
   });
 
-  // Ensure jobs is always an array
-  const jobs = Array.isArray(data) ? data : [];
-
-  // Mock pagination data - in a real app, this would come from the API
-  const totalPages = 5;
+  // Extract values from the response
+  const jobs = data?.jobs || [];
+  const totalPages = data?.totalPages || 0;
 
   // Load recently viewed jobs from localStorage
-  React.useEffect(() => {
+  useEffect(() => {
     const recentlyViewed = localStorage.getItem('recentlyViewedJobs');
     if (recentlyViewed) {
       try {
@@ -84,15 +119,17 @@ export const JobsProvider: React.FC<JobsProviderProps> = ({ children }) => {
         return [...prev, type];
       }
     });
+    // Reset to first page when changing filters
+    setCurrentPage(1);
   }, []);
 
   const handleSearch = useCallback((e: React.FormEvent) => {
     e.preventDefault();
-    // In a real application with React Query, this would trigger a refetch
-    // with the updated filters. React Query will handle this automatically
-    // when the query parameters change.
-    console.log('Searching with filters:', { keyword, location, jobTypes, experienceLevel });
-  }, [keyword, location, jobTypes, experienceLevel]);
+    // Reset to first page when searching
+    setCurrentPage(1);
+    // Trigger refetch with the updated filters
+    refetch();
+  }, [refetch]);
 
   const handleJobView = useCallback((job: Job) => {
     setRecentlyViewedJobs(prev => {
@@ -108,12 +145,21 @@ export const JobsProvider: React.FC<JobsProviderProps> = ({ children }) => {
     window.scrollTo(0, 0);
   }, []);
 
+  const resetFilters = useCallback(() => {
+    setKeyword('');
+    setLocation('');
+    setJobTypes([]);
+    setExperienceLevel('ANY');
+    setCurrentPage(1);
+  }, []);
+
   const value = {
     jobs,
     isLoading,
     error,
     currentPage,
     totalPages,
+    totalCount,
     recentlyViewedJobs,
     keyword,
     location,
@@ -126,6 +172,7 @@ export const JobsProvider: React.FC<JobsProviderProps> = ({ children }) => {
     handleSearch,
     handleJobView,
     handlePageChange,
+    resetFilters,
   };
 
   return <JobsContext.Provider value={value}>{children}</JobsContext.Provider>;

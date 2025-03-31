@@ -16,8 +16,23 @@ export interface Job {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  company?: any;
-  postedBy?: any;
+  company?: {
+    name: string;
+    logo?: string;
+    industry?: string;
+  };
+  postedBy?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+}
+
+export interface JobsResponse {
+  jobs: Job[];
+  totalPages: number;
+  totalCount: number;
+  currentPage: number;
 }
 
 export interface CreateJobDto {

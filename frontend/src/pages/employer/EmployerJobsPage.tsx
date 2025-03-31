@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CompanyRequiredCheck } from '../../components/company';
-import { useCompanyJobs, useDeleteJob } from '../../hooks/react-queries/jobs/useJobQueries';
+import { useCompanyJobs, useDeleteJob } from '../../hooks/react-queries/job/useJobQueries';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import { Button } from '../../components/ui/button';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
 } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import {
@@ -20,15 +20,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../components/ui/dialog';
-import { 
-  Briefcase, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  Clock, 
-  Calendar, 
-  Users 
+import {
+  Briefcase,
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  Clock,
+  Calendar,
+  Users
 } from 'lucide-react';
 import { Job } from '../../types/job.types';
 import { useMyCompany } from '../../hooks/react-queries/company/useCompanyQueries';
@@ -38,14 +38,14 @@ const EmployerJobsPage: React.FC = () => {
   const { data: company, isLoading: isCompanyLoading } = useMyCompany();
   const { data: jobs, isLoading: isJobsLoading } = useCompanyJobs(company?.id || '');
   const deleteJob = useDeleteJob();
-  
+
   const [jobToDelete, setJobToDelete] = useState<Job | null>(null);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
 
   // Handle job deletion
   const handleDeleteJob = async () => {
     if (!jobToDelete) return;
-    
+
     try {
       await deleteJob.mutateAsync(jobToDelete.id);
       // Show success message
@@ -77,15 +77,15 @@ const EmployerJobsPage: React.FC = () => {
   const getStatusBadge = (job: Job) => {
     const now = new Date();
     const expiryDate = job.expiresAt ? new Date(job.expiresAt) : null;
-    
+
     if (!job.isActive) {
       return <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">Inactive</Badge>;
     }
-    
+
     if (expiryDate && expiryDate < now) {
       return <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">Expired</Badge>;
     }
-    
+
     return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Active</Badge>;
   };
 
@@ -103,7 +103,7 @@ const EmployerJobsPage: React.FC = () => {
     <div className="container mx-auto max-w-6xl py-10 px-4 sm:px-6">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-jobboard-darkblue">Your Job Postings</h1>
-        <Button 
+        <Button
           onClick={() => navigate('/employer/jobs/create')}
           className="bg-jobboard-darkblue hover:bg-jobboard-darkblue/90"
         >
@@ -111,7 +111,7 @@ const EmployerJobsPage: React.FC = () => {
           Post New Job
         </Button>
       </div>
-      
+
       <CompanyRequiredCheck>
         <Card>
           <CardHeader>
@@ -139,24 +139,24 @@ const EmployerJobsPage: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="icon"
                           onClick={() => navigate(`/jobs/${job.id}`)}
                           title="View Job"
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="icon"
                           onClick={() => navigate(`/employer/jobs/edit/${job.id}`)}
                           title="Edit Job"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="icon"
                           className="text-red-500 hover:text-red-600"
                           onClick={() => openDeleteConfirmDialog(job)}
@@ -195,7 +195,7 @@ const EmployerJobsPage: React.FC = () => {
                 <p className="text-gray-500 mb-6">
                   Start posting jobs and find the perfect candidates for your positions.
                 </p>
-                <Button 
+                <Button
                   onClick={() => navigate('/employer/jobs/create')}
                   className="bg-jobboard-darkblue hover:bg-jobboard-darkblue/90"
                 >
@@ -214,13 +214,13 @@ const EmployerJobsPage: React.FC = () => {
           <DialogHeader>
             <DialogTitle>Are you sure?</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will permanently delete the job posting 
+              This action cannot be undone. This will permanently delete the job posting
               and remove it from our servers.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end space-x-2">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 setJobToDelete(null);
                 setConfirmDialogOpen(false);
@@ -228,7 +228,7 @@ const EmployerJobsPage: React.FC = () => {
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleDeleteJob}
               className="bg-red-500 hover:bg-red-600 text-white"
               disabled={deleteJob.isPending}
