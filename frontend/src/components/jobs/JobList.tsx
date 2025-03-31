@@ -5,6 +5,7 @@ import Pagination from './Pagination';
 import { Job } from '@/types/job.types';
 import { AlertCircle, Search } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import JobSorting from './JobSorting';
 
 const JobList: React.FC = () => {
   const { jobs, isLoading, error, keyword, location, jobTypes, experienceLevel, totalCount } = useJobsContext();
@@ -57,16 +58,24 @@ const JobList: React.FC = () => {
 
   return (
     <div>
-      {/* Search results summary */}
-      {hasFilters && (
-        <div className="mb-4 text-sm text-gray-600">
-          <p>
-            Found <span className="font-semibold">{totalCount}</span> job{totalCount !== 1 ? 's' : ''} matching your search
-            {keyword && <span> for <span className="font-semibold">"{keyword}"</span></span>}
-            {location && <span> in <span className="font-semibold">{location}</span></span>}
-          </p>
+      {/* Search results and sorting controls */}
+      <div className="mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          {/* Search results summary */}
+          <div className="text-sm text-gray-600">
+            {hasFilters && (
+              <p>
+                Found <span className="font-semibold">{totalCount}</span> job{totalCount !== 1 ? 's' : ''} matching your search
+                {keyword && <span> for <span className="font-semibold">"{keyword}"</span></span>}
+                {location && <span> in <span className="font-semibold">{location}</span></span>}
+              </p>
+            )}
+          </div>
+          
+          {/* Sorting controls */}
+          <JobSorting />
         </div>
-      )}
+      </div>
 
       {/* Job listings */}
       <div className="space-y-4 mb-8">

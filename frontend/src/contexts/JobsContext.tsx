@@ -3,6 +3,16 @@ import { useQuery } from '@tanstack/react-query';
 import { Job, JobsResponse } from '../types/job.types';
 import jobService, { JobSearchParams } from '../services/job.service';
 import { useSearchParams } from 'react-router-dom';
+import useDebounce from '@/hooks/useDebounce';
+
+// Define sorting options with enum for type safety
+export enum SortOption {
+  NEWEST = 'date_desc',
+  OLDEST = 'date_asc',
+  SALARY_HIGH = 'salary_desc',
+  SALARY_LOW = 'salary_asc',
+  RELEVANCE = 'relevance' // Default - most relevant to search terms
+}
 
 interface JobsContextType {
   jobs: Job[];
@@ -17,11 +27,14 @@ interface JobsContextType {
   location: string;
   jobTypes: string[];
   experienceLevel: string;
+  // Sort state
+  sortBy: SortOption;
   // Methods
   setKeyword: (keyword: string) => void;
   setLocation: (location: string) => void;
   handleJobTypeChange: (type: string) => void;
   setExperienceLevel: (level: string) => void;
+  setSortBy: (option: SortOption) => void;
   handleSearch: (e: React.FormEvent) => void;
   handleJobView: (job: Job) => void;
   handlePageChange: (page: number) => void;
@@ -49,8 +62,16 @@ export const JobsProvider: React.FC<JobsProviderProps> = ({ children }) => {
   const [currentPage, setCurrentPage] = useState<number>(
     parseInt(searchParams.get('page') || '1', 10)
   );
+  // Get sort option from URL or default to NEWEST
+  const [sortBy, setSortBy] = useState<SortOption>(
+    (searchParams.get('sortBy') as SortOption) || SortOption.NEWEST
+  );
   const [recentlyViewedJobs, setRecentlyViewedJobs] = useState<Job[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
+
+  // Debounced versions of the filter states for smoother search experience
+  const debouncedKeyword = useDebounce(keyword, 500);
+  const debouncedLocation = useDebounce(location, 500);
 
   // Limit per page
   const ITEMS_PER_PAGE = 10;
@@ -59,30 +80,45 @@ export const JobsProvider: React.FC<JobsProviderProps> = ({ children }) => {
   useEffect(() => {
     const params = new URLSearchParams();
 
-    if (keyword) params.append('keyword', keyword);
-    if (location) params.append('location', location);
+    if (debouncedKeyword) params.append('keyword', debouncedKeyword);
+    if (debouncedLocation) params.append('location', debouncedLocation);
     if (experienceLevel && experienceLevel !== 'ANY') params.append('experienceLevel', experienceLevel);
     if (currentPage > 1) params.append('page', currentPage.toString());
+    if (sortBy !== SortOption.NEWEST) params.append('sortBy', sortBy);
 
     jobTypes.forEach(type => params.append('jobTypes', type));
 
     setSearchParams(params, { replace: true });
-  }, [keyword, location, jobTypes, experienceLevel, currentPage, setSearchParams]);
+
+    // Auto-search when debounced values change
+    if ((debouncedKeyword !== searchParams.get('keyword')) || 
+        (debouncedLocation !== searchParams.get('location'))) {
+      refetch();
+    }
+  }, [debouncedKeyword, debouncedLocation, jobTypes, experienceLevel, currentPage, sortBy, setSearchParams]);
 
   // Use React Query to fetch jobs
   const { data, isLoading, error, refetch } = useQuery<JobsResponse>({
-    queryKey: ['jobs', { keyword, location, jobTypes, experienceLevel, page: currentPage }],
+    queryKey: ['jobs', { 
+      keyword: debouncedKeyword, 
+      location: debouncedLocation, 
+      jobTypes, 
+      experienceLevel, 
+      page: currentPage,
+      sortBy 
+    }],
     queryFn: async () => {
       try {
         const searchParams: JobSearchParams = {
-          keyword,
-          location,
+          keyword: debouncedKeyword,
+          location: debouncedLocation,
           jobTypes,
           experienceLevel: experienceLevel === 'ANY' ? '' : experienceLevel,
           page: currentPage,
-          limit: ITEMS_PER_PAGE
+          limit: ITEMS_PER_PAGE,
+          sortBy
         };
-        
+
         const result = await jobService.getAllJobs(searchParams);
         setTotalCount(result.totalCount);
         return result;
@@ -150,6 +186,7 @@ export const JobsProvider: React.FC<JobsProviderProps> = ({ children }) => {
     setLocation('');
     setJobTypes([]);
     setExperienceLevel('ANY');
+    setSortBy(SortOption.NEWEST);
     setCurrentPage(1);
   }, []);
 
@@ -165,10 +202,12 @@ export const JobsProvider: React.FC<JobsProviderProps> = ({ children }) => {
     location,
     jobTypes,
     experienceLevel,
+    sortBy,
     setKeyword,
     setLocation,
     handleJobTypeChange,
     setExperienceLevel,
+    setSortBy,
     handleSearch,
     handleJobView,
     handlePageChange,
