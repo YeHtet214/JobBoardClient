@@ -9,24 +9,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { useCompany } from '@/hooks/react-queries/company/useCompanyQueries';
-import { useQuery } from '@tanstack/react-query';
-import jobService from '@/services/job.service';
+import { useCompany, useCompanyJobs } from '@/hooks/react-queries/company/useCompanyQueries';
 import { Job } from '@/types/job.types';
 
 // Add a custom hook for company jobs
-const useCompanyJobs = (companyId: string | undefined) => {
-  return useQuery({
-    queryKey: ['companyJobs', companyId],
-    queryFn: async () => {
-      if (!companyId) throw new Error('Company ID is required');
-      const response = await jobService.getJobsByCompany(companyId);
-      // Ensure we return an array of jobs
-      return Array.isArray(response.jobs) ? response.jobs : [];
-    },
-    enabled: !!companyId
-  });
-};
 
 const CompanyDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

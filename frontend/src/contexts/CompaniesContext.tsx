@@ -50,9 +50,9 @@ export const CompaniesProvider: React.FC<CompaniesProviderProps> = ({ children }
     // Apply search filter
     if (searchTerm) {
       result = result.filter(company => 
-        company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        company.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        company.location.toLowerCase().includes(searchTerm.toLowerCase())
+        company.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        company.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        company.location?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
