@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import companyService from '../../../services/company.service';
-import type { CreateCompanyDto, UpdateCompanyDto } from '../../../types/company.types';
+import companyService from '@/services/company.service';
+import type { CreateCompanyDto, UpdateCompanyDto } from '@/types/company.types';
 import { toast } from 'react-hot-toast';
+import jobService from '@/services/job.service';
 
 // Query keys
 export const companyKeys = {
@@ -66,6 +67,21 @@ export const useMyCompany = () => {
     }
   });
 };
+
+// getting company related jobs
+export const useCompanyJobs = (companyId: string | undefined) => {
+  return useQuery({
+    queryKey: ['companyJobs', companyId],
+    queryFn: async () => {
+      if (!companyId) throw new Error('Company ID is required');
+      const response = await jobService.getJobsByCompany(companyId);
+      // Ensure we return an array of jobs
+      return Array.isArray(response.jobs) ? response.jobs : [];
+    },
+    enabled: !!companyId
+  });
+};
+
 
 // Mutations
 export const useCreateCompany = () => {

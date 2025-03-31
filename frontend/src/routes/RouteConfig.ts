@@ -27,6 +27,8 @@ const ProfilePage = lazy(() => import('@/pages/jobseeker/ProfilePage'));
 const JobsPage = lazy(() => import('@/pages/employer/JobsPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const CompanyProfilePage = lazy(() => import('@/pages/employer/CompanyProfilePage'));
+const CompaniesPage = lazy(() => import('@/pages/CompaniesPage'));
+const CompanyDetailPage = lazy(() => import('@/pages/CompanyDetailPage'));
 
 // Employer pages
 const CreateJobPage = lazy(() => import('@/pages/employer/CreateJobPage'));
@@ -69,6 +71,16 @@ export const routes: RouteConfig[] = [
     path: '/jobs/:id',
     element: JobDetailPage,
     meta: { title: 'Job Details' }
+  },
+  {
+    path: '/companies',
+    element: CompaniesPage,
+    meta: { title: 'Companies', description: 'Browse companies and explore job opportunities' }
+  },
+  {
+    path: '/companies/:id',
+    element: CompanyDetailPage,
+    meta: { title: 'Company Details', description: 'View company profile and job openings' }
   },
   {
     path: '/dashboard',

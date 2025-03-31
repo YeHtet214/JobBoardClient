@@ -1,10 +1,10 @@
 import React from 'react';
-import { JobsProvider } from '../../contexts/JobsContext';
-import JobFilters from '../../components/jobs/JobFilters';
-import JobList from '../../components/jobs/JobList';
-import RecentlyViewedJobs from '../../components/jobs/RecentlyViewedJobs';
+import { JobsProvider } from '@/contexts/JobsContext';
+import JobFilters from '@/components/jobs/JobFilters';
+import JobList from '@/components/jobs/JobList';
+import RecentlyViewedJobs from '@/components/jobs/RecentlyViewedJobs';
 import { Link } from 'react-router-dom';
-import { Button } from '../../components/ui/button';
+import { Button } from '@/components/ui/button';
 
 const JobsPage: React.FC = () => {
   return (
@@ -24,7 +24,11 @@ const JobsPage: React.FC = () => {
                   <p className="text-jobboard-light opacity-75 mb-6 max-w-2xl mx-auto">
                     Post your job openings and connect with qualified candidates who are ready to bring value to your company.
                   </p>
-                  { currentUser}
+                  <Link to="/post-job">
+                    <Button className="bg-jobboard-teal hover:bg-jobboard-teal/90 text-jobboard-darkblue cursor-pointer font-semibold px-6 py-3 text-lg">
+                      Post a Job
+                    </Button>
+                  </Link>
                 </div>
               </div>
 

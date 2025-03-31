@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   Card,
   CardContent,
   CardDescription,
@@ -24,7 +24,7 @@ import {
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { useToast } from '@/components/ui/use-toast';
 import { Job, CreateJobDto, JobType } from '@/types/job.types';
-import { useCreateJob, useUpdateJob } from '@/hooks/react-queries/jobs/useJobQueries';
+import { useCreateJob, useUpdateJob } from '@/hooks/react-queries/job/useJobQueries';
 
 // Job form validation schema
 const JobSchema = Yup.object().shape({
@@ -96,8 +96,8 @@ const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
     salaryMax: job?.salaryMax || 0,
     requiredSkills: job?.requiredSkills || [],
     experienceLevel: job?.experienceLevel || 'ENTRY_LEVEL',
-    expiresAt: job?.expiresAt ? new Date(job.expiresAt).toISOString().split('T')[0] : 
-               new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Default to 30 days from now
+    expiresAt: job?.expiresAt ? new Date(job.expiresAt).toISOString().split('T')[0] :
+      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Default to 30 days from now
   };
 
   // Handle skill input
@@ -273,9 +273,9 @@ const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
                       }
                     }}
                   />
-                  <Button 
-                    type="button" 
-                    variant="outline" 
+                  <Button
+                    type="button"
+                    variant="outline"
                     onClick={handleAddSkill}
                   >
                     Add
@@ -283,8 +283,8 @@ const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {skills.map((skill, index) => (
-                    <div 
-                      key={index} 
+                    <div
+                      key={index}
                       className="bg-jobboard-purple/10 text-jobboard-purple rounded-full px-3 py-1 text-sm flex items-center gap-1"
                     >
                       {skill}
@@ -342,15 +342,15 @@ const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => navigate('/employer/jobs')}
               >
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="bg-jobboard-darkblue hover:bg-jobboard-darkblue/90"
                 disabled={isSubmitting}
               >
