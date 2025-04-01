@@ -5,19 +5,49 @@ import {
     fetchJobsByCompanyId, 
     createJob, 
     updateJob, 
-    deleteExistingJob
+    deleteExistingJob,
+    JobSearchParams,
+    getSearchSuggestions
 } from '../services/job.service.js';
 import { RequestWithUser } from '../types/users.type.js';
 import prisma from '../prisma/client.js';
 
+// Public controllers - no authentication required
 export const getAllJobs = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const jobs = await fetchAllJobs();
+        // Extract search parameters from query
+        const { 
+            keyword, 
+            location, 
+            jobTypes, 
+            experienceLevel, 
+            page, 
+            limit, 
+            sortBy 
+        } = req.query;
+        
+        // Parse and prepare search params
+        const searchParams: JobSearchParams = {
+            keyword: keyword as string,
+            location: location as string,
+            jobTypes: Array.isArray(jobTypes) 
+                ? jobTypes as string[] 
+                : jobTypes 
+                    ? [jobTypes as string] 
+                    : [],
+            experienceLevel: experienceLevel as string,
+            page: page ? parseInt(page as string, 10) : 1,
+            limit: limit ? parseInt(limit as string, 10) : 10,
+            sortBy: sortBy as string
+        };
+        
+        // Fetch jobs with search parameters
+        const jobsData = await fetchAllJobs(searchParams);
         
         res.status(200).json({
             success: true,
             message: "Jobs fetched successfully",
-            data: jobs
+            data: jobsData
         });
     } catch (error) {
         next(error);
@@ -42,18 +72,58 @@ export const getJobById = async (req: Request, res: Response, next: NextFunction
 export const getJobsByCompanyId = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const companyId = req.params.companyId;
-        const jobs = await fetchJobsByCompanyId(companyId);
+        
+        // Extract pagination and sorting parameters
+        const { page, limit, sortBy } = req.query;
+        
+        // Parse and prepare search params
+        const searchParams: JobSearchParams = {
+            page: page ? parseInt(page as string, 10) : 1,
+            limit: limit ? parseInt(limit as string, 10) : 10,
+            sortBy: sortBy as string
+        };
+        
+        const jobsData = await fetchJobsByCompanyId(companyId, searchParams);
         
         res.status(200).json({
             success: true,
             message: "Jobs fetched successfully",
-            data: jobs
+            data: jobsData
         });
     } catch (error) {
         next(error);
     }
 }
 
+export const getSearchSuggestionsHandler = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { term, type, limit } = req.query;
+        
+        if (!term) {
+            return res.status(400).json({
+                success: false,
+                message: "Search term is required",
+                data: []
+            });
+        }
+        
+        const suggestions = await getSearchSuggestions(
+            term as string,
+            (type as 'keyword' | 'location' | 'all') || 'all',
+            limit ? parseInt(limit as string, 10) : 5
+        );
+        
+        res.status(200).json({
+            success: true,
+            message: "Search suggestions fetched successfully",
+            data: suggestions
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// Protected controllers - authentication required
 export const createJobHandler = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
         const userId = req.user.userId;
@@ -118,7 +188,7 @@ export const deleteJobHandler = async (req: RequestWithUser, res: Response, next
             success: true,
             message: "Job deleted successfully",
             data: deletedJob
-        })
+        });
     } catch (error) {
         next(error);
     }

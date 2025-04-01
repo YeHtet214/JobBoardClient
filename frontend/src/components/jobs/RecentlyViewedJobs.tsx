@@ -1,30 +1,46 @@
 import React from 'react';
-import { useJobsContext } from '../../contexts/JobsContext';
+import { useJobsContext } from '@/contexts/JobsContext';
 import JobCard from './JobCard';
-import { Job } from '../../types/job.types';
+import { Job } from '@/types/job.types';
+import { History, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const RecentlyViewedJobs: React.FC = () => {
   const { recentlyViewedJobs } = useJobsContext();
 
   if (recentlyViewedJobs.length === 0) {
     return (
-      <div className="mt-12">
-        <h2 className="text-2xl font-bold text-jobboard-darkblue mb-6">Recently Viewed Jobs</h2>
-        <div className="bg-white rounded-lg shadow-md p-6 text-center">
-          <p className="text-gray-600">No recently viewed jobs. Start exploring jobs above!</p>
-        </div>
+      <div className="text-center py-6">
+        <History className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+        <p className="text-gray-500">No recently viewed jobs</p>
+        <p className="text-gray-400 text-sm">Jobs you view will appear here</p>
       </div>
     );
   }
 
+  // Only show up to 4 recently viewed jobs
+  const displayJobs = recentlyViewedJobs.slice(0, 4);
+  const hasMoreJobs = recentlyViewedJobs.length > 4;
+
   return (
-    <div className="mt-12">
-      <h2 className="text-2xl font-bold text-jobboard-darkblue mb-6">Recently Viewed Jobs</h2>
+    <div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {recentlyViewedJobs.map((job: Job, index: number) => (
-          <JobCard key={index} job={job} isCompact={true} />
+        {displayJobs.map((job: Job, index: number) => (
+          <JobCard key={`recent-${job.id}-${index}`} job={job} isCompact={true} />
         ))}
       </div>
+      
+      {hasMoreJobs && (
+        <div className="mt-4 text-center">
+          <Link 
+            to="/jobs/history" 
+            className="inline-flex items-center text-jobboard-purple hover:text-jobboard-purple/80 text-sm font-medium"
+          >
+            View all {recentlyViewedJobs.length} recently viewed jobs
+            <ArrowRight className="ml-1 w-4 h-4" />
+          </Link>
+        </div>
+      )}
     </div>
   );
 };

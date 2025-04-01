@@ -3,20 +3,145 @@ import { CustomError } from "../types/users.type.js";
 import { CreateJobDto, JobType } from "../types/job.type.js";
 import { fetchUserById } from "./users.service.js";
 
+// Define search params interface to match frontend
+export interface JobSearchParams {
+  keyword?: string;
+  location?: string;
+  jobTypes?: string[];
+  experienceLevel?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+}
+
 // Basic data access functions
-export const fetchAllJobs = async () => {
-    const jobs = await prisma.job.findMany();
-    if (!jobs || jobs.length === 0) {
-        const error = new Error('Jobs not found') as CustomError;
-        error.status = 404;
-        throw error;
+export const fetchAllJobs = async (params?: JobSearchParams) => {
+    const {
+        keyword = '',
+        location = '',
+        jobTypes = [],
+        experienceLevel = '',
+        page = 1,
+        limit = 10,
+        sortBy = 'date_desc' // Default to newest first
+    } = params || {};
+
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+    
+    // Build the where clause for filtering
+    const where: any = {
+        isActive: true,
+    };
+    
+    // Add keyword search (search in title and description)
+    if (keyword) {
+        where.OR = [
+            { title: { contains: keyword, mode: 'insensitive' } },
+            { description: { contains: keyword, mode: 'insensitive' } },
+        ];
+    }
+    
+    // Add location filter
+    if (location) {
+        where.location = { contains: location, mode: 'insensitive' };
+    }
+    
+    // Add job types filter
+    if (jobTypes.length > 0) {
+        where.type = { in: jobTypes };
+    }
+    
+    // Add experience level filter
+    if (experienceLevel) {
+        where.experienceLevel = experienceLevel;
+    }
+    
+    // Determine sort order based on sortBy parameter
+    let orderBy: any = {};
+    switch (sortBy) {
+        case 'date_desc':
+            orderBy = { createdAt: 'desc' };
+            break;
+        case 'date_asc':
+            orderBy = { createdAt: 'asc' };
+            break;
+        case 'salary_desc':
+            orderBy = { salaryMax: 'desc' };
+            break;
+        case 'salary_asc':
+            orderBy = { salaryMin: 'asc' };
+            break;
+        case 'relevance':
+            // For relevance, we'll keep the default ordering
+            // In a real implementation, this would use a more sophisticated
+            // relevance algorithm based on the search term
+            orderBy = { createdAt: 'desc' };
+            break;
+        default:
+            orderBy = { createdAt: 'desc' };
     }
 
-    return jobs;
+    // Get total count for pagination
+    const totalCount = await prisma.job.count({ where });
+    
+    // Calculate total pages
+    const totalPages = Math.ceil(totalCount / limit);
+    
+    // Fetch jobs with pagination, sorting, and filtering
+    const jobs = await prisma.job.findMany({
+        where,
+        orderBy,
+        skip,
+        take: limit,
+        include: {
+            company: {
+                select: {
+                    name: true,
+                    logo: true,
+                    industry: true,
+                }
+            },
+            postedBy: {
+                select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                }
+            }
+        }
+    });
+
+    // Return in the format expected by the frontend
+    return {
+        jobs,
+        totalPages,
+        totalCount,
+        currentPage: page
+    };
 }
 
 export const fetchJobById = async (id: string) => {
-    const job = await prisma.job.findUnique({ where: { id }});
+    const job = await prisma.job.findUnique({ 
+        where: { id },
+        include: {
+            company: {
+                select: {
+                    name: true,
+                    logo: true,
+                    industry: true,
+                }
+            },
+            postedBy: {
+                select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                }
+            }
+        }
+    });
+    
     if (!job) {
         const error = new Error('No job found') as CustomError;
         error.status = 404;
@@ -26,15 +151,141 @@ export const fetchJobById = async (id: string) => {
     return job;
 }
 
-export const fetchJobsByCompanyId = async (companyId: string) => {
-    const jobs = await prisma.job.findMany({ where: { companyId }});
+export const fetchJobsByCompanyId = async (companyId: string, params?: JobSearchParams) => {
+    const {
+        page = 1,
+        limit = 10,
+        sortBy = 'date_desc'
+    } = params || {};
+
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+    
+    // Determine sort order
+    let orderBy: any = {};
+    switch (sortBy) {
+        case 'date_desc':
+            orderBy = { createdAt: 'desc' };
+            break;
+        case 'date_asc':
+            orderBy = { createdAt: 'asc' };
+            break;
+        default:
+            orderBy = { createdAt: 'desc' };
+    }
+
+    // Get total count
+    const totalCount = await prisma.job.count({ 
+        where: { companyId, isActive: true } 
+    });
+    
+    // Calculate total pages
+    const totalPages = Math.ceil(totalCount / limit);
+    
+    const jobs = await prisma.job.findMany({ 
+        where: { companyId, isActive: true },
+        orderBy,
+        skip,
+        take: limit,
+        include: {
+            company: {
+                select: {
+                    name: true,
+                    logo: true,
+                    industry: true,
+                }
+            },
+            postedBy: {
+                select: {
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                }
+            }
+        }
+    });
+    
     if (!jobs || jobs.length === 0) {
-        const error = new Error('No job found') as CustomError;
+        const error = new Error('No jobs found for this company') as CustomError;
         error.status = 404;
         throw error;
     }
 
-    return jobs;
+    // Return in the format expected by the frontend
+    return {
+        jobs,
+        totalPages,
+        totalCount,
+        currentPage: page
+    };
+}
+
+/**
+ * Get search suggestions for autocomplete
+ * @param term The search term to get suggestions for
+ * @param type The type of suggestions (keyword, location, or all)
+ * @param limit Maximum number of suggestions to return
+ * @returns Array of suggestion strings
+ */
+export const getSearchSuggestions = async (
+    term: string,
+    type: 'keyword' | 'location' | 'all' = 'all',
+    limit: number = 5
+): Promise<string[]> => {
+    if (!term || term.length < 2) {
+        return [];
+    }
+
+    try {
+        let suggestions: string[] = [];
+
+        if (type === 'keyword' || type === 'all') {
+            // Get title suggestions
+            const titleSuggestions = await prisma.job.findMany({
+                where: {
+                    title: {
+                        contains: term,
+                        mode: 'insensitive'
+                    },
+                    isActive: true
+                },
+                select: {
+                    title: true
+                },
+                distinct: ['title'],
+                take: limit
+            });
+            
+            suggestions = [...suggestions, ...titleSuggestions.map(job => job.title)];
+        }
+
+        if (type === 'location' || type === 'all') {
+            // Get location suggestions
+            const locationSuggestions = await prisma.job.findMany({
+                where: {
+                    location: {
+                        contains: term,
+                        mode: 'insensitive'
+                    },
+                    isActive: true
+                },
+                select: {
+                    location: true
+                },
+                distinct: ['location'],
+                take: limit
+            });
+            
+            suggestions = [...suggestions, ...locationSuggestions.map(job => job.location)];
+        }
+
+        // Remove duplicates and limit results
+        const uniqueSuggestions = [...new Set(suggestions)];
+        return uniqueSuggestions.slice(0, limit);
+    } catch (error) {
+        console.error('Error fetching search suggestions:', error);
+        return [];
+    }
 }
 
 // Define the type for job create parameters

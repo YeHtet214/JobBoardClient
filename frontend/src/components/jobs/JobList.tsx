@@ -77,10 +77,14 @@ const JobList: React.FC = () => {
         </div>
       </div>
 
-      {/* Job listings */}
-      <div className="space-y-4 mb-8">
+      {/* Job listings - Responsive Grid Layout with !important */}
+      <div className="grid grid-cols-1 md:!grid-cols-2 lg:!grid-cols-3 gap-4 mb-8">
         {jobs.map((job: Job) => (
-          <JobCard key={job.id} job={job} />
+          <JobCard 
+            key={job.id} 
+            job={job} 
+            isCompact={false} 
+          />
         ))}
       </div>
 
