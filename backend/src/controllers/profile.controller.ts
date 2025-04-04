@@ -5,11 +5,8 @@ import { RequestWithUser } from "../types/users.type.js";
 export const getProfile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
         const userId = req.user.userId;
-        console.log("user profile fetching: ", userId);
         const profile = await fetchProfile(userId);
 
-        console.log("Fetched profile data: ", profile);
-        
         res.status(200).json({
             success: true,
             message: "Profile fetched successfully",

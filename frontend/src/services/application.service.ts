@@ -2,7 +2,7 @@ import { ApiService } from './api.service';
 import { Application, CreateApplicationDto, UpdateApplicationDto } from '../types/application.types';
 
 class ApplicationService extends ApiService {
-  private baseUrl = '/api/applications';
+  private baseUrl = '/applications';
 
   public async getMyApplications(): Promise<Application[]> {
     const response = await this.get<Application[]>(`${this.baseUrl}/me`);

@@ -2,7 +2,7 @@ import { ApiService } from './api.service';
 import { Profile, CreateProfileDto, UpdateProfileDto } from '../types/profile.types';
 
 class ProfileService extends ApiService {
-  private baseUrl = '/api/profiles';
+  private baseUrl = '/profiles';
 
   public async getMyProfile(): Promise<Profile> {
     const response = await this.get<Profile>(`${this.baseUrl}/me`);
