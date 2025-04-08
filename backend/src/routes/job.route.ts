@@ -1,10 +1,10 @@
 import { Router, RequestHandler } from "express";
-import { 
-    getAllJobs, 
-    getJobById, 
-    getJobsByCompanyId, 
-    createJobHandler, 
-    updateJobHandler, 
+import {
+    getAllJobs,
+    getJobById,
+    getJobsByCompanyId,
+    createJobHandler,
+    updateJobHandler,
     deleteJobHandler,
     getSearchSuggestionsHandler
 } from "../controllers/job.controller.js";
@@ -17,7 +17,7 @@ const jobRouter = Router();
 jobRouter.get('/', getAllJobs as RequestHandler);
 // The suggestions route must come before the :id route to avoid being treated as an ID parameter
 jobRouter.get('/suggestions', getSearchSuggestionsHandler as RequestHandler);
-jobRouter.get('/by-company/:companyId', getJobsByCompanyId as RequestHandler);
+jobRouter.get('/company/:companyId', getJobsByCompanyId as RequestHandler);
 // This route should be last among the GET routes with path parameters to avoid conflicts
 jobRouter.get('/:id', getJobById as RequestHandler);
 

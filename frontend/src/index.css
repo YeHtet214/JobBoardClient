@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* Tailwind plugins */
 @plugin "tailwindcss-animate";
@@ -123,6 +121,13 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+@theme {
+  --color-jobboard-darkblue: #211951;
+  --color-jobboard-purple: #836FFF;
+  --color-jobboard-teal: #15F5BA;
+  --color-jobboard-light: #F0F3FF;
+}
+
 /* Base layer styles */
 @layer base {
   * {
@@ -131,40 +136,5 @@
 
   body {
     @apply bg-background text-foreground;
-  }
-}
-
-/* Additional custom styles */
-@layer components {
-  .bg-jobboard-darkblue {
-    background-color: #211951;
-  }
-  
-  .bg-jobboard-purple {
-    background-color: #836FFF;
-  }
-  
-  .bg-jobboard-teal {
-    background-color: #15F5BA;
-  }
-  
-  .bg-jobboard-light {
-    background-color: #F0F3FF;
-  }
-  
-  .text-jobboard-darkblue {
-    color: #211951;
-  }
-  
-  .text-jobboard-purple {
-    color: #836FFF;
-  }
-  
-  .text-jobboard-teal {
-    color: #15F5BA;
-  }
-  
-  .text-jobboard-light {
-    color: #F0F3FF;
   }
 }

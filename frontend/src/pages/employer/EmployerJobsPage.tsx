@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CompanyRequiredCheck } from '../../components/company';
 import { useCompanyJobs, useDeleteJob } from '../../hooks/react-queries/job/useJobQueries';
@@ -32,15 +32,24 @@ import {
 } from 'lucide-react';
 import { Job } from '../../types/job.types';
 import { useMyCompany } from '../../hooks/react-queries/company/useCompanyQueries';
+import { motion } from 'framer-motion';
 
 const EmployerJobsPage: React.FC = () => {
   const navigate = useNavigate();
   const { data: company, isLoading: isCompanyLoading } = useMyCompany();
-  const { data: jobs, isLoading: isJobsLoading } = useCompanyJobs(company?.id || '');
+  const { data: jobsData, isLoading: isJobsLoading } = useCompanyJobs(company?.id || '');
   const deleteJob = useDeleteJob();
+
+  const [companyJobs, setCompanyJobs] = useState<Job[] | []>(jobsData ? jobsData.jobs : []);
 
   const [jobToDelete, setJobToDelete] = useState<Job | null>(null);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (jobsData && jobsData.jobs) {
+      setCompanyJobs(jobsData.jobs);
+    }
+  }, [company, jobsData])
 
   // Handle job deletion
   const handleDeleteJob = async () => {
@@ -101,7 +110,12 @@ const EmployerJobsPage: React.FC = () => {
 
   return (
     <div className="container mx-auto max-w-6xl py-10 px-4 sm:px-6">
-      <div className="flex justify-between items-center mb-8">
+      <motion.div 
+        className="flex justify-between items-center mb-8"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         <h1 className="text-3xl font-bold text-jobboard-darkblue">Your Job Postings</h1>
         <Button
           onClick={() => navigate('/employer/jobs/create')}
@@ -110,102 +124,122 @@ const EmployerJobsPage: React.FC = () => {
           <Plus className="h-4 w-4 mr-2" />
           Post New Job
         </Button>
-      </div>
+      </motion.div>
 
       <CompanyRequiredCheck>
-        <Card>
-          <CardHeader>
-            <CardTitle>Manage Your Job Listings</CardTitle>
-            <CardDescription>
-              View, edit, and track applications for your posted jobs
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {jobs && jobs.length > 0 ? (
-              <div className="space-y-4">
-                {jobs.map((job) => (
-                  <div key={job.id} className="border rounded-lg p-4 hover:border-jobboard-purple transition-colors">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-xl font-medium">{job.title}</h3>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {getStatusBadge(job)}
-                          <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
-                            {job.type}
-                          </Badge>
-                          <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
-                            {job.location}
-                          </Badge>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Manage Your Job Listings</CardTitle>
+              <CardDescription>
+                View, edit, and track applications for your posted jobs
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {companyJobs && companyJobs.length > 0 ? (
+                <div className="space-y-6 grid grid-cols-1 md:!grid-cols-2 lg:!grid-cols-3 xl:!grid-cols-4 gap-4">
+                  {companyJobs.map((job, index) => (
+                    <motion.div 
+                      key={job.id} 
+                      className=" background-primary-500 rounded-lg p-4 hover:border-jobboard-purple transition-all duration-300 shadow-sm hover:shadow-md"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.1 }}
+                      whileHover={{ scale: 1.01 }}
+                    >
+                      <div className="flex flex-col md:!flex-row md:!justify-between md:!items-start gap-4 mb-4">
+                        <div className="flex-1">
+                          <h3 className="text-xl font-medium text-jobboard-darkblue">{job.title}</h3>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {getStatusBadge(job)}
+                            <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+                              {job.type}
+                            </Badge>
+                            <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+                              {job.location}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 mt-2 md:mt-0">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => navigate(`/jobs/${job.id}`)}
+                            title="View Job"
+                            className="hover:bg-gray-100 transition-colors"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => navigate(`/employer/jobs/edit/${job.id}`)}
+                            title="Edit Job"
+                            className="hover:bg-gray-100 transition-colors"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                            onClick={() => openDeleteConfirmDialog(job)}
+                            title="Delete Job"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => navigate(`/jobs/${job.id}`)}
-                          title="View Job"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => navigate(`/employer/jobs/edit/${job.id}`)}
-                          title="Edit Job"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="text-red-500 hover:text-red-600"
-                          onClick={() => openDeleteConfirmDialog(job)}
-                          title="Delete Job"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm text-gray-600">
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-2 text-gray-400" />
-                        <span>Posted: {formatDate(job.createdAt)}</span>
-                      </div>
-                      {job.expiresAt && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-4 text-sm text-gray-600">
                         <div className="flex items-center">
-                          <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                          <span>Expires: {formatDate(job.expiresAt)}</span>
+                          <Clock className="h-4 w-4 mr-2 text-gray-400" />
+                          <span>Posted: {formatDate(job.createdAt)}</span>
                         </div>
-                      )}
-                      <div className="flex items-center">
-                        <Users className="h-4 w-4 mr-2 text-gray-400" />
-                        <span>
-                          {/* This would be fetched from the backend in a real implementation */}
-                          {Math.floor(Math.random() * 20)} Applications
-                        </span>
+                        {job.expiresAt && (
+                          <div className="flex items-center">
+                            <Calendar className="h-4 w-4 mr-2 text-gray-400" />
+                            <span>Expires: {formatDate(job.expiresAt)}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center">
+                          <Users className="h-4 w-4 mr-2 text-gray-400" />
+                          <span>
+                            {/* This would be fetched from the backend in a real implementation */}
+                            {Math.floor(Math.random() * 20)} Applications
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <Briefcase className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">No Jobs Posted Yet</h3>
-                <p className="text-gray-500 mb-6">
-                  Start posting jobs and find the perfect candidates for your positions.
-                </p>
-                <Button
-                  onClick={() => navigate('/employer/jobs/create')}
-                  className="bg-jobboard-darkblue hover:bg-jobboard-darkblue/90"
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <motion.div 
+                  className="text-center py-12"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
                 >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Post Your First Job
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  <Briefcase className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">No Jobs Posted Yet</h3>
+                  <p className="text-gray-500 mb-6">
+                    Start posting jobs and find the perfect candidates for your positions.
+                  </p>
+                  <Button
+                    onClick={() => navigate('/employer/jobs/create')}
+                    className="bg-jobboard-darkblue hover:bg-jobboard-darkblue/90"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Post Your First Job
+                  </Button>
+                </motion.div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
       </CompanyRequiredCheck>
 
       {/* Confirmation Dialog for Job Deletion */}

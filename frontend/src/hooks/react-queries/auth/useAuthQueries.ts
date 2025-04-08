@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import authService from '../../../services/auth.service';
+import authService from '@/services/auth.service';
 import type { User, LoginRequest, RegisterRequest, VerifiedEmailResponse } from '../../../types/auth.types';
 
 // Query keys
@@ -11,37 +11,7 @@ export const authKeys = {
   verifyEmail: (token: string) => [...authKeys.verification(), token] as const,
 };
 
-// Current User Query
-export const useCurrentUser = () => {
-  return useQuery<User | null>({
-    queryKey: authKeys.currentUser(),
-    queryFn: async () => {
-      try {
-        // Only attempt to fetch if we have a token
-        const isAuthenticated = authService.isAuthenticated();
-        console.log("Is authenticated:", isAuthenticated);
-        
-        if (!isAuthenticated) {
-          return null;
-        }
-        
-        const user = await authService.getCurrentUser();
-        console.log("Fetched user:", user);
-        return user;
-      } catch (error) {
-        console.error('Error fetching current user:', error);
-        // If there's an error that's not a 401, we should still return null
-        // The 401 errors are handled by the axios interceptors
-        return null;
-      }
-    },
-    retry: 1, // Allow one retry in case of network issues
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
-    refetchOnReconnect: true,
-  });
-};
+
 
 // Login Mutation
 export const useLogin = () => {

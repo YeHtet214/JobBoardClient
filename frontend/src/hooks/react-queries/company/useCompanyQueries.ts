@@ -52,6 +52,7 @@ export const useMyCompany = () => {
     queryFn: async () => {
       try {
         const company = await companyService.getMyCompany();
+        console.log("Company: ", company)
         return company || null;
       } catch (error) {
         // 404 means the company doesn't exist yet, which is fine
@@ -75,6 +76,8 @@ export const useCompanyJobs = (companyId: string | undefined) => {
     queryFn: async () => {
       if (!companyId) throw new Error('Company ID is required');
       const response = await jobService.getJobsByCompany(companyId);
+
+      console.log("Jobs query response: ", response);
       // Ensure we return an array of jobs
       return Array.isArray(response.jobs) ? response.jobs : [];
     },

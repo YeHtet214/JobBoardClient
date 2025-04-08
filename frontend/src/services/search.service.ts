@@ -1,5 +1,5 @@
-import { ApiService } from './api.service';
-import { Job } from '../types/job.types';
+import { ApiService } from '@/services/api.service';
+import { Job } from '@/types/job.types';
 
 export interface JobSearchParams {
   keyword?: string;
@@ -14,7 +14,11 @@ export interface JobSearchParams {
 }
 
 class SearchService extends ApiService {
-  private baseUrl = '/api/jobs/search';
+  private endpoints = {
+    SEARCH: '/jobs/search',
+    SUGGESTED: '/jobs/suggested',
+    POPULAR_KEYWORDS: '/jobs/popular-keywords'
+  };
 
   public async searchJobs(params: JobSearchParams): Promise<{ jobs: Job[]; total: number; page: number; limit: number }> {
     // Convert params to query string
@@ -32,19 +36,19 @@ class SearchService extends ApiService {
     });
     
     const queryString = queryParams.toString();
-    const url = queryString ? `${this.baseUrl}?${queryString}` : this.baseUrl;
+    const url = queryString ? `${this.endpoints.SEARCH}?${queryString}` : this.endpoints.SEARCH;
     
     const response = await this.get<{ jobs: Job[]; total: number; page: number; limit: number }>(url);
     return response.data.data;
   }
 
   public async getSuggestedJobs(): Promise<Job[]> {
-    const response = await this.get<Job[]>('/api/jobs/suggested');
+    const response = await this.get<Job[]>(this.endpoints.SUGGESTED);
     return response.data.data;
   }
 
   public async getPopularKeywords(): Promise<string[]> {
-    const response = await this.get<string[]>('/api/jobs/popular-keywords');
+    const response = await this.get<string[]>(this.endpoints.POPULAR_KEYWORDS);
     return response.data.data;
   }
 }

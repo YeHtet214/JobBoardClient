@@ -37,6 +37,8 @@ export const getCurrentCompany = async (req: RequestWithUser, res: Response, nex
     
     try {
       const company = await getCompanyByOwnerId(userId);
+
+      console.log("Current Company: ", company);
       return res.status(200).json({ 
         success: true, 
         message: 'Company fetched successfully', 

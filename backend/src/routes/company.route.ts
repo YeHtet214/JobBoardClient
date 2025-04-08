@@ -16,7 +16,7 @@ const companyRouter = Router();
 companyRouter.get('/', getAllCompanies);
 // Important: Route order matters - specific routes before parameterized routes
 // @ts-ignore - The authorize middleware adds the user property to the request
-companyRouter.get('/my-company', authorize, getCurrentCompany as any);
+companyRouter.get('/my-company', authorize, getCurrentCompany);
 
 companyRouter.get('/:id', getCompanyById);
 

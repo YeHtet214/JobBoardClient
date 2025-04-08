@@ -55,12 +55,12 @@ const JobsPage: React.FC = () => {
               </div>
               
               {/* Employer Call-to-Action Section - Below job list on desktop */}
-              <div className="bg-gradient-to-r from-[#211951] to-[#836FFF] rounded-lg shadow-sm p-6 text-center">
+              <div className="bg-gradient-to-r from-jobboard-darkblue to-jobboard-purple rounded-lg shadow-sm p-6 text-center">
                 <h2 className="text-xl font-bold text-white mb-3">Looking to Hire?</h2>
                 <p className="text-jobboard-light opacity-90 mb-4 text-sm">
                   Post your job openings and connect with qualified candidates.
                 </p>
-                <Link to="/post-job">
+                <Link to="/employer/jobs">
                   <Button className="bg-white hover:bg-gray-100 text-jobboard-darkblue cursor-pointer font-semibold">
                     Post a Job
                   </Button>
@@ -94,12 +94,12 @@ const JobsPage: React.FC = () => {
             </div>
             
             {/* Employer Call-to-Action Section - Below job list on mobile */}
-            <div className="bg-gradient-to-r from-[#211951] to-[#836FFF] rounded-lg shadow-sm p-6 text-center">
+            <div className="bg-gradient-to-r from-jobboard-darkblue to-jobboard-purple rounded-lg shadow-sm p-6 text-center">
               <h2 className="text-xl font-bold text-white mb-3">Looking to Hire?</h2>
               <p className="text-jobboard-light opacity-90 mb-4 text-sm">
                 Post your job openings and connect with qualified candidates.
               </p>
-              <Link to="/post-job">
+              <Link to="/employer/jobs/create">
                 <Button className="bg-white hover:bg-gray-100 text-jobboard-darkblue cursor-pointer font-semibold w-full">
                   Post a Job
                 </Button>

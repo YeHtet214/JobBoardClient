@@ -1,22 +1,22 @@
 import React, { FormEvent, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/authContext';
-import { LoginRequest } from '../types/auth.types';
+import { useAuth } from '@/contexts/authContext';
+import { LoginRequest } from '@/types/auth.types';
 import * as Yup from 'yup';
 import { Formik, FormikHelpers, Field, ErrorMessage, FormikProps } from 'formik';
-import { Form } from '../components/forms/components';
-import AuthLayout from '../components/layouts/AuthLayout';
+import { Form } from '@/components/forms/components';
+import AuthLayout from '@/components/layouts/AuthLayout';
 
 // Shadcn UI components with correct import paths
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Checkbox } from "../components/ui/checkbox";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
-import { Separator } from "../components/ui/separator";
-import { useToast } from "../components/ui/use-toast";
-import LoadingSpinner from "../components/ui/LoadingSpinner";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/components/ui/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 // Login validation schema
 const loginSchema = Yup.object({

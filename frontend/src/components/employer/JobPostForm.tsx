@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
@@ -48,7 +48,8 @@ const JobSchema = Yup.object().shape({
     .min(0, 'Maximum salary cannot be negative')
     .moreThan(Yup.ref('salaryMin'), 'Maximum salary must be greater than minimum salary')
     .required('Maximum salary is required'),
-  requiredSkills: Yup.string()
+  requiredSkills: Yup.array()
+    .min(1, 'At least one required skill is needed')
     .required('Required skills are needed'),
   experienceLevel: Yup.string()
     .required('Experience level is required'),
@@ -82,6 +83,7 @@ const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
   const { toast } = useToast();
   const [skillInput, setSkillInput] = useState('');
   const [skills, setSkills] = useState<string[]>(job?.requiredSkills || []);
+  const formikRef = useRef<any>(null);
 
   // React Query mutations
   const createJob = useCreateJob();
@@ -103,22 +105,45 @@ const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
   // Handle skill input
   const handleAddSkill = () => {
     if (skillInput.trim() && !skills.includes(skillInput.trim())) {
-      setSkills([...skills, skillInput.trim()]);
+      const newSkills = [...skills, skillInput.trim()];
+      setSkills(newSkills);
       setSkillInput('');
     }
   };
 
   const handleRemoveSkill = (skillToRemove: string) => {
-    setSkills(skills.filter(skill => skill !== skillToRemove));
+    const newSkills = skills.filter(skill => skill !== skillToRemove);
+    setSkills(newSkills);
   };
 
+  // Use useEffect to update Formik values when skills change
+  useEffect(() => {
+    // This will run whenever the skills array changes
+    if (formikRef.current) {
+      formikRef.current.setFieldValue('requiredSkills', skills);
+    }
+  }, [skills]);
+
   // Handle form submission
-  const handleSubmit = async (values: CreateJobDto, { setSubmitting }: any) => {
+  const handleSubmit = async (values: CreateJobDto, { setSubmitting, setFieldValue }: any) => {
     try {
-      // Include current skills in the form values
+      // Set the skills in the form values before validation
+      setFieldValue('requiredSkills', skills);
+      
+      // Check if skills array is empty
+      if (skills.length === 0) {
+        toast({
+          title: "Error",
+          description: "Please add at least one required skill",
+          variant: "destructive",
+        });
+        setSubmitting(false);
+        return;
+      }
+      
       const jobData = {
         ...values,
-        requiredSkills: skills,
+        requiredSkills: skills, // Use the skills from state
       };
 
       if (isEditing && job) {
@@ -161,8 +186,9 @@ const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
         initialValues={initialValues}
         validationSchema={JobSchema}
         onSubmit={handleSubmit}
+        innerRef={formikRef}
       >
-        {({ values, errors, touched, isSubmitting: formikSubmitting, handleChange, setFieldValue }) => (
+        {({ errors, touched, isSubmitting: formikSubmitting, setFieldValue }) => (
           <Form>
             <CardContent className="space-y-6">
               {/* Job Title */}
@@ -276,7 +302,10 @@ const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={handleAddSkill}
+                    onClick={() => {
+                      handleAddSkill();
+                      setFieldValue('requiredSkills', skills);
+                    }}
                   >
                     Add
                   </Button>
@@ -290,7 +319,10 @@ const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
                       {skill}
                       <button
                         type="button"
-                        onClick={() => handleRemoveSkill(skill)}
+                        onClick={() => {
+                          handleRemoveSkill(skill);
+                          setFieldValue('requiredSkills', skills);
+                        }}
                         className="text-jobboard-purple hover:text-jobboard-purple/70 ml-1 h-4 w-4 rounded-full flex items-center justify-center text-xs"
                       >
                         &times;
@@ -352,9 +384,9 @@ const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
               <Button
                 type="submit"
                 className="bg-jobboard-darkblue hover:bg-jobboard-darkblue/90"
-                disabled={isSubmitting}
+                disabled={isSubmitting || formikSubmitting}
               >
-                {isSubmitting ? (
+                {isSubmitting || formikSubmitting ? (
                   <>
                     <LoadingSpinner size="sm" className="mr-2" />
                     {isEditing ? 'Updating...' : 'Posting...'}

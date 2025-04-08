@@ -21,8 +21,9 @@ export const createProfile = async (req: RequestWithUser, res: Response, next: N
     try {
         const userId = req.user.userId;
         const profileData = req.body;
-        console.log("userid: ", userId, "Profile Data: ", profileData);
         const profile = await createNewProfile({ ...profileData, userId});
+
+        console.log("Profile created:", profile);
         
         res.status(201).json({
             success: true,

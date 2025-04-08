@@ -190,7 +190,7 @@ const HomePage: React.FC = () => {
                 variant="outline"
                 className="border-jobboard-purple text-jobboard-purple hover:bg-[#836FFF] hover:text-white font-medium transition-all duration-300 text-sm md:text-base"
               >
-                <Link to="/jobs/post">
+                <Link to="/employer/jobs/create">
                   Post a Job
                 </Link>
               </Button>

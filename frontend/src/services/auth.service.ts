@@ -1,12 +1,20 @@
-import { ApiService } from './api.service';
-import { User, LoginRequest, RegisterRequest, AuthResponse, VerifiedEmailResponse } from '../types/auth.types';
-import { isTokenExpired } from '../utils/jwt';
+import { ApiService } from '@/services/api.service';
+import { User, LoginRequest, RegisterRequest, AuthResponse, VerifiedEmailResponse } from '@/types/auth.types';
+import { isTokenExpired } from '@/utils/jwt';
 
 class AuthService extends ApiService {
-  private baseUrl = 'http://localhost:3000/api';
+  private endpoints = {
+    SIGNIN: '/auth/signin',
+    SIGNUP: '/auth/signup',
+    GOOGLE_AUTH: '/auth/google',
+    GOOGLE_CALLBACK: '/auth/google/callback',
+    LOGOUT: '/auth/logout',
+    REFRESH_TOKEN: '/auth/refresh-token',
+    VERIFY_EMAIL: (token: string) => `/auth/verify-email/${token}`
+  };
 
   public async login(credentials: LoginRequest): Promise<User> {
-    const response = await this.post<AuthResponse>(`${this.baseUrl}/auth/signin`, credentials);
+    const response = await this.post<AuthResponse>(this.endpoints.SIGNIN, credentials);
     const data = response.data.data;
 
     if (data.accessToken && data.refreshToken) {
@@ -18,7 +26,7 @@ class AuthService extends ApiService {
   }
 
   public async register(userData: RegisterRequest): Promise<User> {
-    const response = await this.post<AuthResponse>(`${this.baseUrl}/auth/signup`, userData);
+    const response = await this.post<AuthResponse>(this.endpoints.SIGNUP, userData);
     const data = response.data.data;
     
     if (data.accessToken && data.refreshToken) {
@@ -31,11 +39,11 @@ class AuthService extends ApiService {
 
   public async googleLogin(): Promise<void> {
     // Redirect to Google OAuth endpoint
-    window.location.href = `${this.baseUrl}/auth/google`;
+    window.location.href = this.endpoints.GOOGLE_AUTH;
   }
 
   public async handleGoogleCallback(code: string): Promise<User> {
-    const response = await this.post<AuthResponse>(`${this.baseUrl}/auth/google/callback`, { code });
+    const response = await this.post<AuthResponse>(this.endpoints.GOOGLE_CALLBACK, { code });
     const data = response.data.data;
     
     if (data.accessToken && data.refreshToken) {
@@ -50,7 +58,7 @@ class AuthService extends ApiService {
     try {
       // The token will be automatically included in the Authorization header
       // by the axios interceptor in index.ts
-      await this.post<void>(`${this.baseUrl}/auth/logout`, {});
+      await this.post<void>(this.endpoints.LOGOUT, {});
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -59,14 +67,8 @@ class AuthService extends ApiService {
     }
   }
 
-  public async getCurrentUser(): Promise<User> {
-    // Use the new user endpoint instead of the profile endpoint
-    const response = await this.get<User>(`${this.baseUrl}/user/me`);
-    return response.data.data;
-  }
-
   public async refreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
-    const response = await this.post<AuthResponse>(`${this.baseUrl}/auth/refresh-token`, { refreshToken });
+    const response = await this.post<AuthResponse>(this.endpoints.REFRESH_TOKEN, { refreshToken });
     const data = response.data.data;
     
     if (data.accessToken && data.refreshToken) {
@@ -95,7 +97,7 @@ class AuthService extends ApiService {
   }
 
   public async verifyEmail(token: string): Promise<VerifiedEmailResponse> {
-    const response = await this.get<VerifiedEmailResponse>(`${this.baseUrl}/auth/verify-email/${token}`);
+    const response = await this.get<VerifiedEmailResponse>(this.endpoints.VERIFY_EMAIL(token));
     return response.data.data;
   }
 }

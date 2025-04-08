@@ -1,15 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import {
-  useCurrentUser,
   useLogin as useLoginQuery,
   useRegister as useRegisterQuery,
   useLogout as useLogoutQuery,
   useGoogleLogin as useGoogleLoginQuery,
   useGoogleCallback as useGoogleCallbackQuery
-} from '../hooks/react-queries/auth';
-import authService from '../services/auth.service';
-import { User } from '../types/auth.types';
-import { isTokenExpired } from '../utils/jwt';
+} from '@/hooks/react-queries/auth';
+import { useCurrentUser } from '@/hooks/react-queries/user';
+import authService from '@/services/auth.service';
+import { User } from '@/types/auth.types';
+import { isTokenExpired } from '@/utils/jwt';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -57,7 +57,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Handle session expiration events
   useEffect(() => {
     const handleSessionExpired = () => {
-      console.log('Session expired event received');
       setIsAuthenticated(false);
       setShowSessionExpiredDialog(true);
     };
@@ -99,7 +98,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     // If the user query failed due to auth error, ensure we're logged out
     if (isError) {
-      console.log('User query error, logging out');
       setIsAuthenticated(false);
     }
   }, [currentUser, isError, isUserLoading, refetchUser]);

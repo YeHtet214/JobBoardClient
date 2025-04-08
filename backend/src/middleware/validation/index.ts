@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { ValidationError, validationResult } from 'express-validator';
-import { CustomError } from '../../types/users.type.js';
+import { CustomError } from '../../types/error.type.js';
+import { authValidation } from './auth.validation.js';
+import { jobValidation } from './job.validation.js';
+import { applicationValidation } from './application.validation.js';
+import { profileValidation } from './profile.validation.js';
 
 /**
  * Middleware to validate request data based on the validation chains
@@ -25,3 +29,5 @@ export const validate = (req: Request, res: Response, next: NextFunction) => {
   
   next(error);
 };
+
+export { authValidation, jobValidation, applicationValidation, profileValidation };

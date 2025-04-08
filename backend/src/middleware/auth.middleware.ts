@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
 import jwt from "jsonwebtoken";
-import { CustomError, RequestWithUser } from "../types/users.type.js";
+import { CustomError } from "../types/error.type.js";
+import { RequestWithUser } from "../types/users.type.js";
 import { JWT_SECRET } from "../config/env.config.js";
 import prisma from "../prisma/client.js";
 

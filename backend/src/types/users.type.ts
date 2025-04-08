@@ -1,10 +1,5 @@
 import { Request } from 'express';
 
-export interface CustomError extends Error {
-  status: number;
-  data?: Record<string, any>;
-}
-
 // Define the file interface to match our UploadedFile type
 export interface UploadedFile {
   originalname: string;

@@ -4,7 +4,8 @@ import jwt from "jsonwebtoken";
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 
-import { UserRole, CustomError } from './../types/users.type.js';
+import { UserRole } from '../types/users.type.js';
+import { CustomError } from '../types/error.type.js';
 import { JWT_SECRET, REFRESH_TOKEN_SECRET, SMTP_CONFIG, SMTP_FROM_EMAIL, FRONTEND_URL } from "../config/env.config.js";
 
 const SALT_ROUNDS = 10;

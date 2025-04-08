@@ -1,17 +1,17 @@
 import prisma from "../prisma/client.js";
-import { CustomError } from "../types/users.type.js";
+import { CustomError } from "../types/error.type.js";
 import { CreateJobDto, JobType } from "../types/job.type.js";
-import { fetchUserById } from "./users.service.js";
+import { fetchUserById } from "./user.service.js";
 
 // Define search params interface to match frontend
 export interface JobSearchParams {
-  keyword?: string;
-  location?: string;
-  jobTypes?: string[];
-  experienceLevel?: string;
-  page?: number;
-  limit?: number;
-  sortBy?: string;
+    keyword?: string;
+    location?: string;
+    jobTypes?: string[];
+    experienceLevel?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
 }
 
 // Basic data access functions
@@ -28,12 +28,12 @@ export const fetchAllJobs = async (params?: JobSearchParams) => {
 
     // Calculate pagination
     const skip = (page - 1) * limit;
-    
+
     // Build the where clause for filtering
     const where: any = {
         isActive: true,
     };
-    
+
     // Add keyword search (search in title and description)
     if (keyword) {
         where.OR = [
@@ -41,22 +41,22 @@ export const fetchAllJobs = async (params?: JobSearchParams) => {
             { description: { contains: keyword, mode: 'insensitive' } },
         ];
     }
-    
+
     // Add location filter
     if (location) {
         where.location = { contains: location, mode: 'insensitive' };
     }
-    
+
     // Add job types filter
     if (jobTypes.length > 0) {
         where.type = { in: jobTypes };
     }
-    
+
     // Add experience level filter
     if (experienceLevel) {
         where.experienceLevel = experienceLevel;
     }
-    
+
     // Determine sort order based on sortBy parameter
     let orderBy: any = {};
     switch (sortBy) {
@@ -84,10 +84,10 @@ export const fetchAllJobs = async (params?: JobSearchParams) => {
 
     // Get total count for pagination
     const totalCount = await prisma.job.count({ where });
-    
+
     // Calculate total pages
     const totalPages = Math.ceil(totalCount / limit);
-    
+
     // Fetch jobs with pagination, sorting, and filtering
     const jobs = await prisma.job.findMany({
         where,
@@ -122,7 +122,7 @@ export const fetchAllJobs = async (params?: JobSearchParams) => {
 }
 
 export const fetchJobById = async (id: string) => {
-    const job = await prisma.job.findUnique({ 
+    const job = await prisma.job.findUnique({
         where: { id },
         include: {
             company: {
@@ -141,7 +141,7 @@ export const fetchJobById = async (id: string) => {
             }
         }
     });
-    
+
     if (!job) {
         const error = new Error('No job found') as CustomError;
         error.status = 404;
@@ -160,7 +160,7 @@ export const fetchJobsByCompanyId = async (companyId: string, params?: JobSearch
 
     // Calculate pagination
     const skip = (page - 1) * limit;
-    
+
     // Determine sort order
     let orderBy: any = {};
     switch (sortBy) {
@@ -175,14 +175,14 @@ export const fetchJobsByCompanyId = async (companyId: string, params?: JobSearch
     }
 
     // Get total count
-    const totalCount = await prisma.job.count({ 
-        where: { companyId, isActive: true } 
+    const totalCount = await prisma.job.count({
+        where: { companyId, isActive: true }
     });
-    
+
     // Calculate total pages
     const totalPages = Math.ceil(totalCount / limit);
-    
-    const jobs = await prisma.job.findMany({ 
+
+    const jobs = await prisma.job.findMany({
         where: { companyId, isActive: true },
         orderBy,
         skip,
@@ -204,7 +204,9 @@ export const fetchJobsByCompanyId = async (companyId: string, params?: JobSearch
             }
         }
     });
-    
+
+    console.log("Company jobs: ", jobs);
+
     if (!jobs || jobs.length === 0) {
         const error = new Error('No jobs found for this company') as CustomError;
         error.status = 404;
@@ -255,7 +257,7 @@ export const getSearchSuggestions = async (
                 distinct: ['title'],
                 take: limit
             });
-            
+
             suggestions = [...suggestions, ...titleSuggestions.map(job => job.title)];
         }
 
@@ -275,7 +277,7 @@ export const getSearchSuggestions = async (
                 distinct: ['location'],
                 take: limit
             });
-            
+
             suggestions = [...suggestions, ...locationSuggestions.map(job => job.location)];
         }
 
@@ -319,14 +321,14 @@ export const createJob = async (jobData: Partial<CreateJobDto> & { postedById: s
         error.status = 400;
         throw error;
     }
-    
+
     // Validate job type
     if (!['FULL_TIME', 'PART_TIME', 'CONTRACT'].includes(jobData.type)) {
         const error = new Error('Invalid job type. Must be one of: FULL_TIME, PART_TIME, CONTRACT') as CustomError;
         error.status = 400;
         throw error;
     }
-    
+
     // Process and transform the data
     const processedData: JobCreateData = {
         title: jobData.title,
@@ -341,7 +343,7 @@ export const createJob = async (jobData: Partial<CreateJobDto> & { postedById: s
         experienceLevel: jobData.experienceLevel,
         expiresAt: jobData.expiresAt
     };
-    
+
     // Create the job in the database
     return createNewJob(processedData);
 }
@@ -354,24 +356,24 @@ export const updateJob = async (jobId: string, updateData: Partial<UpdateJobDto>
     const existingJob = await fetchJobById(jobId);
 
     const userRole = (await fetchUserById(userId))?.role;
-    
+
     // Verify ownership
     if (existingJob.postedById !== userId || userRole !== 'EMPLOYER') {
         const error = new Error('You don\'t have permission to update this job') as CustomError;
         error.status = 403;
         throw error;
     }
-    
+
     // Validate job type if provided
     if (updateData.type && !['FULL_TIME', 'PART_TIME', 'CONTRACT'].includes(updateData.type)) {
         const error = new Error('Invalid job type. Must be one of: FULL_TIME, PART_TIME, CONTRACT') as CustomError;
         error.status = 400;
         throw error;
     }
-    
+
     // Process and transform the update data
     const processedUpdateData: UpdateJobDto = {};
-    
+
     // Only include fields that were provided
     if (updateData.title !== undefined) processedUpdateData.title = updateData.title;
     if (updateData.description !== undefined) processedUpdateData.description = updateData.description;
@@ -380,14 +382,14 @@ export const updateJob = async (jobId: string, updateData: Partial<UpdateJobDto>
     if (updateData.salaryMin !== undefined) processedUpdateData.salaryMin = Number(updateData.salaryMin);
     if (updateData.salaryMax !== undefined) processedUpdateData.salaryMax = Number(updateData.salaryMax);
     if (updateData.requiredSkills !== undefined) {
-        processedUpdateData.requiredSkills = Array.isArray(updateData.requiredSkills) 
-            ? updateData.requiredSkills 
+        processedUpdateData.requiredSkills = Array.isArray(updateData.requiredSkills)
+            ? updateData.requiredSkills
             : [];
     }
     if (updateData.experienceLevel !== undefined) processedUpdateData.experienceLevel = updateData.experienceLevel;
     if (updateData.expiresAt !== undefined) processedUpdateData.expiresAt = updateData.expiresAt;
     if (updateData.isActive !== undefined) processedUpdateData.isActive = updateData.isActive;
-    
+
     // Update the job in the database
     return updateExistingJob(jobId, processedUpdateData);
 }
@@ -404,7 +406,7 @@ const createNewJob = async (jobData: JobCreateData) => {
             expiresAt: jobData.expiresAt ? new Date(jobData.expiresAt) : undefined
         }
     });
-    
+
     return job;
 }
 
@@ -427,7 +429,7 @@ const updateExistingJob = async (id: string, data: UpdateJobDto) => {
 
 export const deleteExistingJob = async (id: string, userId: string) => {
     const existingJob = await fetchJobById(id);
-    
+
     if (!existingJob) {
         const error = new Error('Job not found') as CustomError;
         error.status = 404;
@@ -441,6 +443,6 @@ export const deleteExistingJob = async (id: string, userId: string) => {
         error.status = 403;
         throw error;
     }
-    
+
     return prisma.job.delete({ where: { id } });
 }

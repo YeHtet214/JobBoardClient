@@ -42,18 +42,20 @@ model Profile {
   id          String   @id @default(uuid())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String   @unique  // @unique ensures one-to-one relationship
-  bio         String?
-  address     String?
-  education   String?
-  experience  String?
+  bio         String
   skills      String[]
+  education   Json     // Stores Education[] as JSON
+  experience  Json     // Stores Experience[] as JSON
   resumeUrl   String?  // URL to the user's uploaded resume
-  socialLinks Json?    // For storing multiple social media links
+  linkedInUrl String?
+  githubUrl   String?
+  portfolioUrl String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([userId])
 }
+
 enum UserRole {
   EMPLOYER
   JOBSEEKER
@@ -62,7 +64,7 @@ enum UserRole {
 model Company {
   id          String   @id @default(uuid())
   owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId     String
+  ownerId     String   @unique
   name        String
   description String?
   logo        String?

@@ -1,5 +1,5 @@
 import prisma from "../prisma/client.js"
-import { CustomError } from "../types/users.type.js";
+import { CustomError } from "../types/error.type.js";
 import { createApplicationDto, updateApplicationDto } from "../types/application.type.js";
 
 export const fetchAllApplicationsByJobId = async (jobId: string) => {

@@ -1,5 +1,5 @@
 import prisma from "../prisma/client.js";
-import { CustomError } from "../types/users.type.js";
+import { CustomError } from "../types/error.type.js";
 import { CreateCompanyDto, UpdateCompanyDto } from "../types/company.type.js";
 
 export const fetchAllCompanies = async () => {

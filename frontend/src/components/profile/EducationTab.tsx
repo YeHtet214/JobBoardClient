@@ -3,7 +3,7 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Button } from '../../components/ui/button';
 import { Textarea } from '../../components/ui/textarea';
-import { X, Plus, GraduationCap, BookOpen } from 'lucide-react';
+import { X, Plus, GraduationCap } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -39,7 +39,7 @@ const EducationTab = ({ formik, isSaving, onTabChange }: EducationTabProps) => {
           render={arrayHelpers => (
             <div className="space-y-8">
               {values?.education && values.education.length > 0 ? (
-                values.education.map((edu, index) => (
+                values.education.map((_, index) => (
                   <div key={index} className="relative p-4 sm:p-6 border rounded-lg">
                     <button
                       type="button"

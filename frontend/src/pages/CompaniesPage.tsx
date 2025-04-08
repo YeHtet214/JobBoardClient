@@ -42,7 +42,7 @@ const CompaniesPageContent: React.FC = () => {
             <Input
               type="text"
               placeholder="Search companies by name, description or location..."
-              className="pl-10 py-3"
+              className="pl-10 py-3 bg-white/50 outline-none"
               value={searchTerm}
               onChange={handleSearch}
             />
