@@ -34,6 +34,7 @@ const CompanyDetailPage = lazy(() => import('@/pages/CompanyDetailPage'));
 const CreateJobPage = lazy(() => import('@/pages/employer/CreateJobPage'));
 const EditJobPage = lazy(() => import('@/pages/employer/EditJobPage'));
 const EmployerJobsPage = lazy(() => import('@/pages/employer/EmployerJobsPage'));
+const CompanyProfileEditPage = lazy(() => import('@/pages/employer/CompanyProfileEditPage'));
 
 // Define routes
 export const routes: RouteConfig[] = [
@@ -102,6 +103,13 @@ export const routes: RouteConfig[] = [
     requiresAuth: true,
     allowedRoles: ['EMPLOYER'],
     meta: { title: 'Company Profile', description: 'Manage your company profile' }
+  },
+  {
+    path: '/employer/company/edit',
+    element: CompanyProfileEditPage,
+    requiresAuth: true,
+    allowedRoles: ['EMPLOYER'],
+    meta: { title: 'Edit Company Profile', description: 'Edit your company profile' }
   },
   {
     path: '/employer/jobs',

@@ -6,20 +6,27 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
-import CompanyFilters from '@/components/companies/CompanyFilters';
+import CompanyFilters from '@/components/company/CompanyFilters';
 import { CompaniesProvider, useCompanies } from '@/contexts/CompaniesContext';
+import { useAuth } from '@/contexts/authContext';
+import { useMyCompany } from '@/hooks/react-queries/company';
 
 const CompaniesPageContent: React.FC = () => {
-  const { 
-    filteredCompanies, 
-    isLoading, 
-    searchTerm, 
+  const {
+    filteredCompanies,
+    isLoading,
+    searchTerm,
     setSearchTerm,
     selectedIndustries,
     setSelectedIndustries,
     selectedSizes,
     setSelectedSizes
   } = useCompanies();
+
+  // Get current user and check if they have a company
+  const { currentUser } = useAuth();
+  const { data: userCompany } = useMyCompany();
+  const isEmployer = currentUser?.role === 'EMPLOYER';
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -57,19 +64,38 @@ const CompaniesPageContent: React.FC = () => {
                 selectedSizes={selectedSizes}
                 setSelectedSizes={setSelectedSizes}
               />
-              
+
               {/* Employer Call-to-Action Section */}
               <div className="mt-8 bg-gradient-to-r from-[#211951] to-[#836FFF] rounded-lg shadow-lg p-6 text-center">
                 <Building className="h-12 w-12 mx-auto text-white mb-4" />
                 <h2 className="text-xl font-bold text-white mb-3">Are You an Employer?</h2>
                 <p className="text-jobboard-light opacity-90 mb-6 text-sm">
-                  Create your company profile and start posting jobs to find the perfect candidates.
+                  {!isEmployer
+                    ? "Create your company profile and start posting jobs to find the perfect candidates."
+                    : userCompany
+                      ? "Manage your company profile and continue posting jobs to find the perfect candidates."
+                      : "Create your company profile and start posting jobs to find the perfect candidates."
+                  }
                 </p>
-                <Link to="/company/profile">
-                  <Button className="bg-white hover:bg-gray-100 text-jobboard-darkblue cursor-pointer font-semibold w-full">
-                    Create Company Profile
-                  </Button>
-                </Link>
+                {!isEmployer ? (
+                  <Link to="/register?role=EMPLOYER">
+                    <Button className="bg-white hover:bg-gray-100 text-jobboard-darkblue cursor-pointer font-semibold w-full">
+                      Register as Employer
+                    </Button>
+                  </Link>
+                ) : userCompany ? (
+                  <Link to="/employer/company/profile">
+                    <Button className="bg-white hover:bg-gray-100 text-jobboard-darkblue cursor-pointer font-semibold w-full">
+                      Manage Company Profile
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link to="/employer/company/profile">
+                    <Button className="bg-white hover:bg-gray-100 text-jobboard-darkblue cursor-pointer font-semibold w-full">
+                      Create Company Profile
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -110,9 +136,9 @@ const CompaniesPageContent: React.FC = () => {
                             <CardContent className="p-0">
                               <div className="h-32 bg-gradient-to-r from-jobboard-purple/20 to-jobboard-teal/20 relative">
                                 {company.logo ? (
-                                  <img 
-                                    src={company.logo} 
-                                    alt={`${company.name} logo`} 
+                                  <img
+                                    src={company.logo}
+                                    alt={`${company.name} logo`}
                                     className="absolute bottom-0 left-6 w-16 h-16 rounded-md border-2 border-white bg-white object-contain"
                                   />
                                 ) : (

@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/authContext";
 import { Card, CardContent } from '@/components/ui/card';
 import { Info } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import { CompanyProfileForm } from '@/components/company';
+import { CompanyProfileForm, CompanyProfileDisplay } from '@/components/company';
 import { useMyCompany } from '@/hooks/react-queries/company';
 
 const CompanyProfilePage = () => {
@@ -34,7 +34,7 @@ const CompanyProfilePage = () => {
   return (
     <div className="container mx-auto max-w-4xl py-10 px-4 sm:px-6">
       <h1 className="text-3xl font-bold mb-8 text-jobboard-darkblue">
-        {isNewCompany ? 'Create Company Profile' : 'Edit Company Profile'}
+        {isNewCompany ? 'Create Company Profile' : 'Company Profile'}
       </h1>
 
       {isNewCompany && (
@@ -54,7 +54,11 @@ const CompanyProfilePage = () => {
         </Card>
       )}
 
-      <CompanyProfileForm company={company || null} isNewCompany={isNewCompany} />
+      {isNewCompany ? (
+        <CompanyProfileForm company={null} isNewCompany={true} />
+      ) : (
+        <CompanyProfileDisplay company={company} />
+      )}
     </div>
   );
 };

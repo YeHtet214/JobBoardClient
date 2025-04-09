@@ -18,20 +18,29 @@ export const getExistingCompany = async (id: string) => {
 }
 
 export const getCompanyByOwnerId = async (ownerId: string) => {
-    const company = await prisma.company.findFirst({ 
-        where: { ownerId } 
+    const company = await prisma.company.findFirst({
+        where: { ownerId }
     });
-    
+
     if (!company) {
         const error = new Error('Company not found') as CustomError;
         error.status = 404;
         throw error;
     }
-    
+
     return company;
 }
 
 export const createNewCompany = async (companyData: CreateCompanyDto) => {
+    const existingCompany = await prisma.company.findFirst({
+        where: { ownerId: companyData.ownerId }
+    });
+
+    if (existingCompany) {
+        const error = new Error('Employer already has a company profile') as CustomError;
+        error.status = 409;
+        throw error;
+    }
     const company = await prisma.company.create({
         data: companyData
     });

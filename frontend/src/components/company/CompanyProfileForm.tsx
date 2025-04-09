@@ -99,10 +99,19 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
           setActiveTab('branding');
         }
         
+        // Create a more specific error message based on missing fields
+        const missingFields = Object.keys(errors)
+          .map(key => {
+            // Convert camelCase to readable format
+            const formatted = key.replace(/([A-Z])/g, ' $1').toLowerCase();
+            return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+          })
+          .join(', ');
+
         toast({
-          title: "Validation Error",
-          description: "Please fill in all required fields correctly.",
-          variant: "destructive"
+          title: "Required Fields Missing",
+          description: `Please complete the following fields: ${missingFields}`,
+          variant: "default"
         });
         
         return;
@@ -115,7 +124,7 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
           title: "Success",
           description: "Company profile has been updated successfully."
         });
-        navigate('/employer/dashboard');
+        navigate('/dashboard');
       } else {
         // Create new company
         await createCompany.mutateAsync(values as CreateCompanyDto);
@@ -123,7 +132,7 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
           title: "Success",
           description: "Company profile has been created successfully."
         });
-        navigate('/employer/dashboard');
+        navigate('/dashboard');
       }
     } catch (error) {
       const errorMessage = error instanceof Error 
@@ -162,7 +171,7 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
           validateOnChange={false}
           validateOnBlur={true}
         >
-          {({ isSubmitting: formikSubmitting, errors, submitForm }) => (
+          {({ errors }) => (
             <Form>
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid grid-cols-3 mb-8">
