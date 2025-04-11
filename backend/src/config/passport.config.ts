@@ -24,7 +24,7 @@ passport.use(
     {
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL: '/auth/google/callback',
+      callbackURL: 'http://localhost:3000/api/auth/google/callback',
       scope: ['profile', 'email']
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -41,6 +41,7 @@ passport.use(
               email: profile.emails![0].value,
               firstName: profile.name?.givenName || '',
               lastName: profile.name?.familyName || '',
+              role: 'JOBSEEKER',
               googleId: profile.id,
               isEmailVerified: true
             }

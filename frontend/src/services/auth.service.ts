@@ -6,8 +6,8 @@ class AuthService extends ApiService {
   private endpoints = {
     SIGNIN: '/auth/signin',
     SIGNUP: '/auth/signup',
-    GOOGLE_AUTH: '/auth/google',
-    GOOGLE_CALLBACK: '/auth/google/callback',
+    GOOGLE_AUTH: 'http://localhost:3000/api/auth/google',
+    GOOGLE_CALLBACK: 'http://localhost:3000/api/auth/google/callback',
     LOGOUT: '/auth/logout',
     REFRESH_TOKEN: '/auth/refresh-token',
     VERIFY_EMAIL: (token: string) => `/auth/verify-email/${token}`
@@ -21,36 +21,37 @@ class AuthService extends ApiService {
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
     }
-    
+
     return data.user;
   }
 
   public async register(userData: RegisterRequest): Promise<User> {
     const response = await this.post<AuthResponse>(this.endpoints.SIGNUP, userData);
     const data = response.data.data;
-    
+
     if (data.accessToken && data.refreshToken) {
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
     }
-    
+
     return data.user;
   }
 
   public async googleLogin(): Promise<void> {
     // Redirect to Google OAuth endpoint
     window.location.href = this.endpoints.GOOGLE_AUTH;
+    // await this.get(this.endpoints.GOOGLE_AUTH);
   }
 
   public async handleGoogleCallback(code: string): Promise<User> {
     const response = await this.post<AuthResponse>(this.endpoints.GOOGLE_CALLBACK, { code });
     const data = response.data.data;
-    
+
     if (data.accessToken && data.refreshToken) {
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
     }
-    
+
     return data.user;
   }
 
@@ -70,7 +71,7 @@ class AuthService extends ApiService {
   public async refreshToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
     const response = await this.post<AuthResponse>(this.endpoints.REFRESH_TOKEN, { refreshToken });
     const data = response.data.data;
-    
+
     if (data.accessToken && data.refreshToken) {
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
@@ -79,7 +80,7 @@ class AuthService extends ApiService {
         refreshToken: data.refreshToken
       };
     }
-    
+
     throw new Error('Failed to refresh token');
   }
 

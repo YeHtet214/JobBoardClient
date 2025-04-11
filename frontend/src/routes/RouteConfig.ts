@@ -2,6 +2,8 @@ import ApplicationDetailPage from '@/pages/jobseeker/ApplicationDetailPage';
 import JobDetailPage from '@/pages/employer/JobDetailPage';
 import React, { lazy } from 'react';
 
+import OAuthCallbackPage from '@/pages/OAuthCallbackPage';
+
 // Define route types
 export interface RouteConfig {
   path: string;
@@ -52,6 +54,11 @@ export const routes: RouteConfig[] = [
     path: '/register',
     element: RegisterPage,
     meta: { title: 'Register', description: 'Create a new account' }
+  },
+  {
+    path: '/oauth/callback',
+    element: OAuthCallbackPage,
+    meta: { title: 'Google Callback' }
   },
   {
     path: '/verify-email/:token',

@@ -63,19 +63,10 @@ const LoginPage: React.FC = () => {
       // More comprehensive error handling with better pattern matching
       if (errorMessage.toLowerCase().includes('email not found')) {
         setFieldError('email', 'Email not found');
-      } else if (errorMessage.toLowerCase().includes('password') ||
-                 errorMessage.toLowerCase().includes('incorrect') ||
-                 errorMessage.toLowerCase().includes('invalid') ||
-                 errorMessage.toLowerCase().includes('wrong') ||
-                 errorMessage.toLowerCase().includes('credentials')) {
-        // Ensure password errors are properly caught and displayed
+      } else if (errorMessage.toLowerCase().includes('invalid password')) {
         setFieldError('password', 'Invalid Password');
-        setFormError(prev => ({ ...prev, password: 'Invalid Password' }));
       } else {
-        // For other general errors
         setFormError({ general: errorMessage });
-        
-        // Also show a toast for these errors
         toast({
           title: "Login Failed",
           description: errorMessage,
@@ -83,7 +74,6 @@ const LoginPage: React.FC = () => {
         });
       }
     } finally {
-      // Make sure to set both loading states to false
       setSubmitting(false);
       setIsLoggingIn(false);
     }

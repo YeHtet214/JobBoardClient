@@ -23,7 +23,7 @@ const checkUserExists = async (email: string) => {
   return user;
 }
 
-const generateTokens = (userId: string) => {
+export const generateTokens = (userId: string) => {
   const accessToken = jwt.sign(
     { userId },
     JWT_SECRET as string,
@@ -39,7 +39,7 @@ const generateTokens = (userId: string) => {
   return { accessToken, refreshToken };
 }
 
-const storeRefreshToken = async (userId: string, refreshToken: string) => {
+export const storeRefreshToken = async (userId: string, refreshToken: string) => {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
   await prisma.refreshToken.create({
     data: {

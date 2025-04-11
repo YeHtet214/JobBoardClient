@@ -15,12 +15,12 @@ interface AuthContextType {
   currentUser: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  refetchUser: () => Promise<any>;
   login: (email: string, password: string) => Promise<void>;
   register: (userData: any) => Promise<void>;
   logout: () => Promise<void>;
   verifyEmail: (token: string) => Promise<any>;
   googleLogin: () => Promise<void>;
-  handleGoogleCallback: (code: string) => Promise<void>;
   showSessionExpiredDialog: boolean;
   dismissSessionExpiredDialog: () => void;
 }
@@ -72,18 +72,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
-    
+
     // Check if tokens exist and are valid
-    const tokensValid = accessToken && refreshToken && 
-                        !isTokenExpired(accessToken) && 
-                        !isTokenExpired(refreshToken);
-    
+    const tokensValid = accessToken && refreshToken &&
+      !isTokenExpired(accessToken) &&
+      !isTokenExpired(refreshToken);
+
     if (tokensValid) {
       setIsAuthenticated(true);
-      
+
       // If we have valid tokens but no user data, refetch the user
       if (!currentUser && !isUserLoading) {
-        console.log('Refetching user data...');
         refetchUser();
       }
     } else if (!tokensValid) {
@@ -133,17 +132,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const handleGoogleCallback = async (code: string): Promise<void> => {
-    try {
-      await googleCallbackMutation.mutateAsync(code);
-      setIsAuthenticated(true);
-      refetchUser(); // Refresh user data after Google login
-    } catch (error) {
-      console.error('Google callback error:', error);
-      throw error;
-    }
-  };
-
   const logout = async () => {
     try {
       await logoutMutation.mutateAsync();
@@ -181,12 +169,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     currentUser: currentUser || null,
     isAuthenticated,
     isLoading,
+    refetchUser,
     login,
     register,
     logout,
     verifyEmail,
     googleLogin,
-    handleGoogleCallback,
     showSessionExpiredDialog,
     dismissSessionExpiredDialog
   };

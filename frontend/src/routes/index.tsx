@@ -51,7 +51,13 @@ const isAuthRoute = (path: string): boolean => {
 const AppRoutes = () => {
   const { isLoading } = useAuth();
 
-  if (isLoading) {
+  // Only show loading spinner on initial auth check, not during login/register operations
+  // This prevents full-page refresh during failed login attempts
+  const isInitialAuthCheckOnly = window.location.pathname !== '/login' && 
+                                window.location.pathname !== '/register' && 
+                                isLoading;
+
+  if (isInitialAuthCheckOnly) {
     return <LoadingSpinner fullScreen />;
   }
 
