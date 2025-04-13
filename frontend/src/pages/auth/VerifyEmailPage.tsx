@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../contexts/authContext';
+import { useAuth } from '../../contexts/authContext';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
-import { Button } from "../components/ui/button";
+import { Button } from "../../components/ui/button";
 import { AlertCircle, Mail, Check, Loader2 } from "lucide-react";
 
 const VerifyEmailPage: React.FC = () => {

@@ -1,354 +1,199 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/authContext';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
-import JobSeekerDashboard from '../components/jobseeker/JobSeekerDashboard';
-import EmployerDashboard from '../components/employer/EmployerDashboard';
-
-// Job seeker types
-interface JobApplication {
-  id: string;
-  jobTitle: string;
-  companyName: string;
-  status: 'PENDING' | 'INTERVIEW' | 'REJECTED' | 'ACCEPTED';
-  applied: string; // ISO date string
-  logo?: string;
-}
-
-interface SavedJob {
-  id: string;
-  title: string;
-  companyName: string;
-  location: string;
-  savedAt: string; // ISO date string
-  logo?: string;
-}
-
-interface RecentActivity {
-  id: string;
-  type: 'VIEW' | 'APPLY' | 'SAVE' | 'MESSAGE';
-  title: string;
-  timestamp: string; // ISO date string
-  relatedEntity: string;
-}
-
-// Employer types
-interface PostedJob {
-  id: string;
-  title: string;
-  location: string;
-  type: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT';
-  applicationsCount: number;
-  status: 'ACTIVE' | 'EXPIRED' | 'DRAFT';
-  postedAt: string; // ISO date string
-  expiresAt: string; // ISO date string
-}
-
-interface ReceivedApplication {
-  id: string;
-  jobId: string;
-  jobTitle: string;
-  applicantName: string;
-  applicantId: string;
-  status: 'PENDING' | 'REVIEWING' | 'INTERVIEW' | 'REJECTED' | 'ACCEPTED';
-  appliedAt: string; // ISO date string
-}
-
-interface EmployerActivity {
-  id: string;
-  type: 'NEW_APPLICATION' | 'APPLICATION_VIEWED' | 'JOB_POSTED' | 'JOB_EXPIRED' | 'INTERVIEW_SCHEDULED';
-  title: string;
-  timestamp: string; // ISO date string
-  relatedEntity: string;
-}
+import { useCallback } from 'react';
+import { useAuth } from '@/contexts/authContext';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import JobSeekerDashboard from '@/components/jobseeker/JobSeekerDashboard';
+import EmployerDashboard from '@/components/employer/EmployerDashboard';
+import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
+import { 
+  useJobSeekerDashboard, 
+  useEmployerDashboard,
+  useRemoveSavedJob,
+  useWithdrawApplication,
+  useUpdateApplicationStatus,
+  useDeletePostedJob
+} from '@/hooks/react-queries/dashboard';
+import { 
+  JobApplication, 
+  SavedJob, 
+  PostedJob, 
+  ReceivedApplication,
+  UpdateApplicationStatusDto
+} from '@/types/dashboard.types';
+import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
 
 const DashboardPage = () => {
-  const { currentUser, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const { currentUser } = useAuth();
+  const { toast } = useToast();
   
-  // Job seeker state
-  const [applications, setApplications] = useState<JobApplication[]>([]);
-  const [savedJobs, setSavedJobs] = useState<SavedJob[]>([]);
-  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
-  const [stats, setStats] = useState({
-    totalApplications: 0,
-    interviews: 0,
-    offers: 0,
-    savedJobs: 0
-  });
+  // Job seeker query and mutations
+  const { 
+    data: jobseekerData,
+    isLoading: isJobseekerLoading,
+    error: jobseekerError,
+    refetch: refetchJobseekerData
+  } = useJobSeekerDashboard();
+  
+  const { mutate: removeSavedJob } = useRemoveSavedJob();
+  const { mutate: withdrawApplication } = useWithdrawApplication();
+  
+  // Employer query and mutations
+  const { 
+    data: employerData,
+    isLoading: isEmployerLoading,
+    error: employerError,
+    refetch: refetchEmployerData
+  } = useEmployerDashboard();
+  
+  const { mutate: updateApplicationStatus } = useUpdateApplicationStatus();
+  const { mutate: deletePostedJob } = useDeletePostedJob();
 
-  // Employer state
-  const [postedJobs, setPostedJobs] = useState<PostedJob[]>([]);
-  const [receivedApplications, setReceivedApplications] = useState<ReceivedApplication[]>([]);
-  const [employerActivity, setEmployerActivity] = useState<EmployerActivity[]>([]);
-  const [employerStats, setEmployerStats] = useState({
-    activeJobs: 0,
-    totalApplications: 0,
-    reviewingApplications: 0,
-    interviewInvitations: 0
-  });
-  const [companyProfileComplete, setCompanyProfileComplete] = useState(false);
+  // Determine if loading based on user role
+  const isLoading = currentUser?.role === 'JOBSEEKER' 
+    ? isJobseekerLoading 
+    : currentUser?.role === 'EMPLOYER' 
+      ? isEmployerLoading 
+      : false;
+  
+  // Handle job seeker actions
+  const handleRemoveSavedJob = useCallback((job: SavedJob) => {
+    removeSavedJob(job.id, {
+      onSuccess: () => {
+        toast({
+          title: "Job removed",
+          description: `${job.title} has been removed from your saved jobs.`,
+        });
+      },
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to remove job. Please try again.",
+          variant: "destructive"
+        });
+      }
+    });
+  }, [removeSavedJob]);
 
-  useEffect(() => {
-    // This would be fetched from your API in a real implementation
-    const fetchDashboardData = async () => {
-      try {
-        // Simulate API call with timeout
-        await new Promise(resolve => setTimeout(resolve, 1000));
+  const handleWithdrawApplication = useCallback((application: JobApplication) => {
+    withdrawApplication(application.id, {
+      onSuccess: () => {
+        toast({
+          title: "Application withdrawn",
+          description: `Your application for ${application.jobTitle} has been withdrawn.`,
+        });
+      },
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to withdraw application. Please try again.",
+          variant: "destructive"
+        });
+      }
+    });
+  }, [withdrawApplication]);
 
-        if (currentUser?.role === 'JOBSEEKER') {
-          // Fetch job seeker dashboard data
-          fetchJobSeekerData();
-        } else if (currentUser?.role === 'EMPLOYER') {
-          // Fetch employer dashboard data
-          fetchEmployerData();
+  // Handle employer actions
+  const handleUpdateApplicationStatus = useCallback((
+    application: ReceivedApplication, 
+    status: ReceivedApplication['status']
+  ) => {
+    const statusData: UpdateApplicationStatusDto = { status };
+    updateApplicationStatus(
+      { id: application.id, statusData },
+      {
+        onSuccess: () => {
+          toast({
+            title: "Status updated",
+            description: `Application status updated to ${status.toLowerCase()}.`,
+          });
+        },
+        onError: () => {
+          toast({
+            title: "Error",
+            description: "Failed to update application status. Please try again.",
+            variant: "destructive"
+          });
         }
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-      } finally {
-        setLoading(false);
       }
-    };
+    );
+  }, [updateApplicationStatus]);
 
-    fetchDashboardData();
-  }, [isAuthenticated, currentUser, navigate]);
-
-  // Function to fetch job seeker data
-  const fetchJobSeekerData = () => {
-    // Mock data for demonstration purposes
-    setApplications([
-      {
-        id: '1',
-        jobTitle: 'Frontend Developer',
-        companyName: 'TechCorp',
-        status: 'INTERVIEW',
-        applied: '2025-03-20T09:30:00.000Z'
+  const handleDeleteJob = useCallback((job: PostedJob) => {
+    deletePostedJob(job.id, {
+      onSuccess: () => {
+        toast({
+          title: "Job deleted",
+          description: `${job.title} has been deleted.`,
+        });
       },
-      {
-        id: '2',
-        jobTitle: 'UI/UX Designer',
-        companyName: 'Design Studio',
-        status: 'PENDING',
-        applied: '2025-03-18T14:20:00.000Z'
-      },
-      {
-        id: '3',
-        jobTitle: 'Full Stack Developer',
-        companyName: 'Startup Inc',
-        status: 'REJECTED',
-        applied: '2025-03-15T11:45:00.000Z'
-      },
-      {
-        id: '4',
-        jobTitle: 'React Developer',
-        companyName: 'WebSolutions',
-        status: 'ACCEPTED',
-        applied: '2025-03-10T08:15:00.000Z'
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to delete job. Please try again.",
+          variant: "destructive"
+        });
       }
-    ]);
-
-    setSavedJobs([
-      {
-        id: '1',
-        title: 'Backend Engineer',
-        companyName: 'Cloud Systems',
-        location: 'Remote',
-        savedAt: '2025-03-22T16:30:00.000Z'
-      },
-      {
-        id: '2',
-        title: 'DevOps Engineer',
-        companyName: 'InfraTech',
-        location: 'New York, NY',
-        savedAt: '2025-03-21T10:15:00.000Z'
-      },
-      {
-        id: '3',
-        title: 'Mobile Developer',
-        companyName: 'AppWorks',
-        location: 'San Francisco, CA',
-        savedAt: '2025-03-19T14:45:00.000Z'
-      }
-    ]);
-
-    setRecentActivity([
-      {
-        id: '1',
-        type: 'APPLY',
-        title: 'Applied to Frontend Developer',
-        timestamp: '2025-03-20T09:30:00.000Z',
-        relatedEntity: 'TechCorp'
-      },
-      {
-        id: '2',
-        type: 'VIEW',
-        title: 'Viewed Backend Engineer job',
-        timestamp: '2025-03-22T16:30:00.000Z',
-        relatedEntity: 'Cloud Systems'
-      },
-      {
-        id: '3',
-        type: 'SAVE',
-        title: 'Saved DevOps Engineer job',
-        timestamp: '2025-03-21T10:15:00.000Z',
-        relatedEntity: 'InfraTech'
-      },
-      {
-        id: '4',
-        type: 'MESSAGE',
-        title: 'Received message regarding your application',
-        timestamp: '2025-03-21T15:20:00.000Z',
-        relatedEntity: 'TechCorp'
-      }
-    ]);
-
-    setStats({
-      totalApplications: 4,
-      interviews: 1,
-      offers: 1,
-      savedJobs: 3
     });
-  };
+  }, [deletePostedJob]);
 
-  // Function to fetch employer data
-  const fetchEmployerData = () => {
-    // Mock data for employer dashboard
-    setPostedJobs([
-      {
-        id: '1',
-        title: 'Senior Frontend Developer',
-        location: 'New York, NY',
-        type: 'FULL_TIME',
-        applicationsCount: 12,
-        status: 'ACTIVE',
-        postedAt: '2025-03-15T10:00:00.000Z',
-        expiresAt: '2025-04-15T10:00:00.000Z'
-      },
-      {
-        id: '2',
-        title: 'UX/UI Designer',
-        location: 'Remote',
-        type: 'FULL_TIME',
-        applicationsCount: 8,
-        status: 'ACTIVE',
-        postedAt: '2025-03-18T11:30:00.000Z',
-        expiresAt: '2025-04-18T11:30:00.000Z'
-      },
-      {
-        id: '3',
-        title: 'Junior Backend Developer',
-        location: 'San Francisco, CA',
-        type: 'FULL_TIME',
-        applicationsCount: 5,
-        status: 'ACTIVE',
-        postedAt: '2025-03-20T09:15:00.000Z',
-        expiresAt: '2025-04-20T09:15:00.000Z'
-      },
-      {
-        id: '4',
-        title: 'DevOps Engineer',
-        location: 'Chicago, IL',
-        type: 'CONTRACT',
-        applicationsCount: 3,
-        status: 'EXPIRED',
-        postedAt: '2025-02-10T14:00:00.000Z',
-        expiresAt: '2025-03-10T14:00:00.000Z'
-      }
-    ]);
+  const handleRefresh = useCallback(() => {
+    if (currentUser?.role === 'JOBSEEKER') {
+      refetchJobseekerData();
+    } else if (currentUser?.role === 'EMPLOYER') {
+      refetchEmployerData();
+    }
+  }, [currentUser, refetchJobseekerData, refetchEmployerData]);
 
-    setReceivedApplications([
-      {
-        id: '1',
-        jobId: '1',
-        jobTitle: 'Senior Frontend Developer',
-        applicantName: 'John Smith',
-        applicantId: 'user-123',
-        status: 'REVIEWING',
-        appliedAt: '2025-03-16T11:30:00.000Z'
-      },
-      {
-        id: '2',
-        jobId: '1',
-        jobTitle: 'Senior Frontend Developer',
-        applicantName: 'Sarah Johnson',
-        applicantId: 'user-124',
-        status: 'INTERVIEW',
-        appliedAt: '2025-03-17T09:45:00.000Z'
-      },
-      {
-        id: '3',
-        jobId: '2',
-        jobTitle: 'UX/UI Designer',
-        applicantName: 'Michael Brown',
-        applicantId: 'user-125',
-        status: 'PENDING',
-        appliedAt: '2025-03-19T14:20:00.000Z'
-      },
-      {
-        id: '4',
-        jobId: '3',
-        jobTitle: 'Junior Backend Developer',
-        applicantName: 'Emily Davis',
-        applicantId: 'user-126',
-        status: 'REVIEWING',
-        appliedAt: '2025-03-21T16:10:00.000Z'
-      }
-    ]);
-
-    setEmployerActivity([
-      {
-        id: '1',
-        type: 'NEW_APPLICATION',
-        title: 'New application for Senior Frontend Developer',
-        timestamp: '2025-03-21T16:10:00.000Z',
-        relatedEntity: 'Emily Davis'
-      },
-      {
-        id: '2',
-        type: 'INTERVIEW_SCHEDULED',
-        title: 'Interview scheduled with Sarah Johnson',
-        timestamp: '2025-03-20T10:30:00.000Z',
-        relatedEntity: 'Senior Frontend Developer'
-      },
-      {
-        id: '3',
-        type: 'JOB_POSTED',
-        title: 'Posted Junior Backend Developer job',
-        timestamp: '2025-03-20T09:15:00.000Z',
-        relatedEntity: 'Your Company'
-      },
-      {
-        id: '4',
-        type: 'APPLICATION_VIEWED',
-        title: 'Reviewed Michael Brown\'s application',
-        timestamp: '2025-03-19T15:45:00.000Z',
-        relatedEntity: 'UX/UI Designer'
-      },
-      {
-        id: '5',
-        type: 'JOB_EXPIRED',
-        title: 'DevOps Engineer job posting expired',
-        timestamp: '2025-03-10T14:00:00.000Z',
-        relatedEntity: 'Your Company'
-      }
-    ]);
-
-    setEmployerStats({
-      activeJobs: 3,
-      totalApplications: 28,
-      reviewingApplications: 5,
-      interviewInvitations: 2
-    });
-
-    // Check if company profile is complete - this would come from an API in a real implementation
-    setCompanyProfileComplete(false);
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner />
+      </div>
+    );
+  }
+
+  // Handle error states
+  if (
+    (currentUser?.role === 'JOBSEEKER' && jobseekerError) || 
+    (currentUser?.role === 'EMPLOYER' && employerError)
+  ) {
+    return (
+      <div className="container mx-auto max-w-5xl py-10 px-4 sm:px-6">
+        <h1 className="text-3xl font-bold mb-8 text-jobboard-darkblue">Dashboard</h1>
+        <div className="bg-red-50 p-6 rounded-lg border border-red-100">
+          <h2 className="text-xl font-semibold text-red-700 mb-2">Error loading dashboard</h2>
+          <p className="text-red-600 mb-4">
+            There was an error loading your dashboard data. Please try refreshing the page.
+          </p>
+          <p className="text-sm text-red-500">
+            {currentUser?.role === 'JOBSEEKER' 
+              ? (jobseekerError as Error)?.message 
+              : (employerError as Error)?.message}
+          </p>
+          <Button onClick={handleRefresh}>
+            <RefreshCw className="mr-2" size={16} />
+            Refresh
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // If the user doesn't have a valid role
+  if (
+    !currentUser || 
+    (currentUser.role !== 'JOBSEEKER' && currentUser.role !== 'EMPLOYER')
+  ) {
+    return (
+      <div className="container mx-auto max-w-5xl py-10 px-4 sm:px-6">
+        <h1 className="text-3xl font-bold mb-8 text-jobboard-darkblue">Dashboard</h1>
+        <div className="bg-yellow-50 p-6 rounded-lg border border-yellow-100">
+          <h2 className="text-xl font-semibold text-yellow-700 mb-2">Account setup required</h2>
+          <p className="text-yellow-600">
+            Please complete your account setup to access the dashboard features.
+          </p>
+        </div>
       </div>
     );
   }
@@ -357,28 +202,28 @@ const DashboardPage = () => {
     <div className="container mx-auto max-w-5xl py-10 px-4 sm:px-6">
       <h1 className="text-3xl font-bold mb-8 text-jobboard-darkblue">Dashboard</h1>
 
-      {currentUser?.role === 'JOBSEEKER' ? (
+      {currentUser?.role === 'JOBSEEKER' && jobseekerData ? (
         <JobSeekerDashboard 
-          stats={stats}
-          applications={applications}
-          savedJobs={savedJobs}
-          recentActivity={recentActivity}
+          stats={jobseekerData.stats}
+          applications={jobseekerData.applications}
+          savedJobs={jobseekerData.savedJobs}
+          recentActivity={jobseekerData.recentActivity}
+          onRemoveSavedJob={handleRemoveSavedJob}
+          onWithdrawApplication={handleWithdrawApplication}
         />
-      ) : currentUser?.role === 'EMPLOYER' ? (
+      ) : currentUser?.role === 'EMPLOYER' && employerData ? (
         <EmployerDashboard 
-          stats={employerStats}
-          postedJobs={postedJobs}
-          applications={receivedApplications}
-          recentActivity={employerActivity}
-          companyProfileComplete={companyProfileComplete}
+          stats={employerData.stats}
+          postedJobs={employerData.postedJobs}
+          applications={employerData.applications}
+          recentActivity={employerData.recentActivity}
+          companyProfileComplete={employerData.companyProfileComplete}
+          companyProfilePercentage={employerData.companyProfilePercentage}
+          onUpdateApplicationStatus={handleUpdateApplicationStatus}
+          onDeleteJob={handleDeleteJob}
         />
       ) : (
-        <div className="text-center py-12">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Welcome to Job Board</h2>
-          <p className="text-gray-500 mb-6">
-            Your dashboard features will appear based on your account type.
-          </p>
-        </div>
+        <DashboardSkeleton />
       )}
     </div>
   );

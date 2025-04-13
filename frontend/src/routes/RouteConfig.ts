@@ -1,8 +1,8 @@
 import ApplicationDetailPage from '@/pages/jobseeker/ApplicationDetailPage';
-import JobDetailPage from '@/pages/employer/JobDetailPage';
+import JobDetailPage from '@/pages/JobDetailPage';
 import React, { lazy } from 'react';
 
-import OAuthCallbackPage from '@/pages/OAuthCallbackPage';
+import OAuthCallbackPage from '@/pages/auth/OAuthCallbackPage';
 
 // Define route types
 export interface RouteConfig {
@@ -18,18 +18,15 @@ export interface RouteConfig {
 }
 
 // Lazy load page components
-const LoginPage = lazy(() => import('@/pages/LoginPage'));
-const RegisterPage = lazy(() => import('@/pages/RegisterPage'));
-const VerifyEmailPage = lazy(() => import('@/pages/VerifyEmailPage'));
-const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPasswordPage'));
-const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'));
-const HomePage = lazy(() => import('@/pages/HomePage'));
-const AboutPage = lazy(() => import('@/pages/AboutPage'));
-const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
-const ApplicationsPage = lazy(() => import('@/pages/jobseeker/ApplicationsPage'))
-const ProfilePage = lazy(() => import('@/pages/jobseeker/ProfilePage'));
-const JobsPage = lazy(() => import('@/pages/employer/JobsPage'));
-const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+
+//auth pages
+const LoginPage = lazy(() => import('@/pages/auth/LoginPage'));
+const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
+const VerifyEmailPage = lazy(() => import('@/pages/auth/VerifyEmailPage'));
+const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('@/pages/auth/ResetPasswordPage'));
+
+// Company pages
 const CompanyProfilePage = lazy(() => import('@/pages/employer/CompanyProfilePage'));
 const CompaniesPage = lazy(() => import('@/pages/CompaniesPage'));
 const CompanyDetailPage = lazy(() => import('@/pages/CompanyDetailPage'));
@@ -39,6 +36,14 @@ const CreateJobPage = lazy(() => import('@/pages/employer/CreateJobPage'));
 const EditJobPage = lazy(() => import('@/pages/employer/EditJobPage'));
 const EmployerJobsPage = lazy(() => import('@/pages/employer/EmployerJobsPage'));
 const CompanyProfileEditPage = lazy(() => import('@/pages/employer/CompanyProfileEditPage'));
+
+const HomePage = lazy(() => import('@/pages/HomePage'));
+const AboutPage = lazy(() => import('@/pages/AboutPage'));
+const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
+const ApplicationsPage = lazy(() => import('@/pages/jobseeker/ApplicationsPage'))
+const ProfilePage = lazy(() => import('@/pages/jobseeker/ProfilePage'));
+const JobsPage = lazy(() => import('@/pages/JobsPage'));
+const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
 // Define routes
 export const routes: RouteConfig[] = [

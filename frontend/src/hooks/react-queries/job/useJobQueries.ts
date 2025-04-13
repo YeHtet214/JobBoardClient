@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import jobService from '../../../services/job.service';
-import type { CreateJobDto, UpdateJobDto } from '../../../types/job.types';
+import jobService, { JobSearchParams } from '@/services/job.service';
+import type { CreateJobDto, UpdateJobDto, JobsResponse } from '@/types/job.types';
+import { SortOption } from '@/contexts/JobsContext';
 
 // Query keys
 export const jobKeys = {
@@ -10,20 +11,54 @@ export const jobKeys = {
   details: () => [...jobKeys.all, 'detail'] as const,
   detail: (id: string) => [...jobKeys.details(), id] as const,
   company: (companyId: string) => [...jobKeys.all, 'company', companyId] as const,
+  search: (filters: Record<string, any>) => [...jobKeys.all, 'search', { filters }] as const,
 };
 
-// Queries
-export const useJobs = (filters?: Record<string, any>) => {
-  return useQuery({
-    queryKey: jobKeys.list(filters || {}),
+interface JobsSearchParams {
+  keyword?: string;
+  location?: string;
+  jobTypes?: string[];
+  experienceLevel?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: SortOption;
+  [key: string]: any; // Allow additional filter parameters
+}
+
+/** 
+ * Hook for fetching jobs with flexible filtering options
+ * 
+ * @param filters - Search parameters for jobs
+ * @param isSearch - Whether this is a search query
+ * @returns Query result with jobs data
+ */
+export const useJobs = (filters: JobsSearchParams = {}, isSearch = false) => {
+  const queryKey = isSearch 
+    ? jobKeys.search(filters)
+    : jobKeys.list(filters);
+    
+  return useQuery<JobsResponse>({
+    queryKey,
     queryFn: async () => {
-      // In a real app, you would pass filters to the API
       try {
-        const jobs = await jobService.getAllJobs();
-        return jobs || [];
+        // Create proper search params object
+        const searchParams: JobSearchParams = {
+          ...(filters.keyword !== undefined && { keyword: filters.keyword }),
+          ...(filters.location !== undefined && { location: filters.location }),
+          ...(filters.jobTypes?.length && { jobTypes: filters.jobTypes }),
+          ...(filters.experienceLevel && { 
+            experienceLevel: filters.experienceLevel === 'ANY' ? '' : filters.experienceLevel 
+          }),
+          ...(filters.page !== undefined && { page: filters.page }),
+          ...(filters.limit !== undefined && { limit: filters.limit }),
+          ...(filters.sortBy !== undefined && { sortBy: filters.sortBy }),
+        };
+
+        const result = await jobService.getAllJobs(searchParams);
+        return result;
       } catch (error) {
         console.error('Failed to fetch jobs:', error);
-        return [];
+        return { jobs: [], totalPages: 0, totalCount: 0, currentPage: 1 }; // Return empty data on error
       }
     },
   });

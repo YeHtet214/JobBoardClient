@@ -11,8 +11,8 @@ import './App.css';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 1,
+      staleTime: 1 * 60 * 1000, // 1 minutes
+      retry: 3,
     },
   },
 });

@@ -1,27 +1,27 @@
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/authContext';
+import { useAuth } from '@/contexts/authContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { UserRole } from '../types/auth.types';
+import { UserRole } from '@/types/auth.types';
 import * as Yup from 'yup';
 import { Formik, FormikHelpers, Field, ErrorMessage, FieldProps, FormikProps } from 'formik';
-import { Form } from '../components/forms/components';
-import AuthLayout from '../components/layouts/AuthLayout';
+import { Form } from '@/components/forms/components';
+import AuthLayout from '@/components/layouts/AuthLayout';
 
 // Shadcn UI components
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Checkbox } from "../components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue
-} from "../components/ui/select";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
+} from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
-import { Separator } from "../components/ui/separator";
+import { Separator } from "@/components/ui/separator";
 
 // Password regex pattern
 // At least 8 characters, 1 uppercase, 1 lowercase, 1 number, and 1 special character
