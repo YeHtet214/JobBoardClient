@@ -10,7 +10,9 @@ class AuthService extends ApiService {
     GOOGLE_CALLBACK: 'http://localhost:3000/api/auth/google/callback',
     LOGOUT: '/auth/logout',
     REFRESH_TOKEN: '/auth/refresh-token',
-    VERIFY_EMAIL: (token: string) => `/auth/verify-email/${token}`
+    VERIFY_EMAIL: (token: string) => `/auth/verify-email/${token}`,
+    FORGOT_PASSWORD: '/auth/forgot-password',
+    RESET_PASSWORD: '/auth/reset-password'
   };
 
   public async login(credentials: LoginRequest): Promise<User> {
@@ -98,8 +100,51 @@ class AuthService extends ApiService {
   }
 
   public async verifyEmail(token: string): Promise<VerifiedEmailResponse> {
-    const response = await this.get<VerifiedEmailResponse>(this.endpoints.VERIFY_EMAIL(token));
-    return response.data.data;
+    console.log(`Sending verification request to: ${this.endpoints.VERIFY_EMAIL(token)}`);
+    try {
+      const response = await this.get<any>(this.endpoints.VERIFY_EMAIL(token));
+      console.log('Raw verification response:', response);
+      return response.data;
+    } catch (error) {
+      console.error('Error in verifyEmail service call:', error);
+      throw error;
+    }
+  }
+
+  public async resendVerification(email: string): Promise<{message: string}> {
+    try {
+      const response = await this.post<{success: boolean, message: string}>('/auth/resend-verification', { email });
+      return { message: response.data.message };
+    } catch (error) {
+      console.error('Error in resendVerification service call:', error);
+      throw error;
+    }
+  }
+
+  public async forgotPassword(email: string): Promise<{message: string}> {
+    try {
+      const response = await this.post<{success: boolean, message: string}>(
+        this.endpoints.FORGOT_PASSWORD, 
+        { email }
+      );
+      return { message: response.data.message };
+    } catch (error) {
+      console.error('Error in forgotPassword service call:', error);
+      throw error;
+    }
+  }
+
+  public async resetPassword(token: string, newPassword: string): Promise<{message: string}> {
+    try {
+      const response = await this.post<{success: boolean, message: string}>(
+        this.endpoints.RESET_PASSWORD,
+        { token, newPassword }
+      );
+      return { message: response.data.message };
+    } catch (error) {
+      console.error('Error in resetPassword service call:', error);
+      throw error;
+    }
   }
 }
 

@@ -21,6 +21,8 @@ export interface RouteConfig {
 const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const RegisterPage = lazy(() => import('@/pages/RegisterPage'));
 const VerifyEmailPage = lazy(() => import('@/pages/VerifyEmailPage'));
+const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'));
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
@@ -56,12 +58,27 @@ export const routes: RouteConfig[] = [
     meta: { title: 'Register', description: 'Create a new account' }
   },
   {
+    path: '/forgot-password',
+    element: ForgotPasswordPage,
+    meta: { title: 'Forgot Password', description: 'Reset your password' }
+  },
+  {
+    path: '/reset-password/:token',
+    element: ResetPasswordPage,
+    meta: { title: 'Reset Password', description: 'Create a new password' }
+  },
+  {
     path: '/oauth/callback',
     element: OAuthCallbackPage,
     meta: { title: 'Google Callback' }
   },
   {
     path: '/verify-email/:token',
+    element: VerifyEmailPage,
+    meta: { title: 'Email Verification', description: 'Verify your email to continue your account registration.' }
+  },
+  {
+    path: '/verify-email',
     element: VerifyEmailPage,
     meta: { title: 'Email Verification', description: 'Verify your email to continue your account registration.' }
   },

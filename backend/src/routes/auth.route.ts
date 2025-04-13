@@ -1,6 +1,6 @@
 import { Router } from "express";
 import passport from 'passport';
-import { signUp, signIn, logout, refresh, verifyEmailToken } from "../controllers/auth.controller.js";
+import { signUp, signIn, logout, refresh, verifyEmailToken, resendVerification, forgotPassword, resetPasswordHandler } from "../controllers/auth.controller.js";
 import authorize from "../middleware/auth.middleware.js";
 import { generateTokens, storeRefreshToken } from "../services/auth.service.js";
 import { FRONTEND_URL } from "../config/env.config.js";
@@ -13,6 +13,9 @@ authRouter.post('/signin', signIn);
 authRouter.post('/refresh-token', refresh);
 authRouter.get('/verify-email/:token', verifyEmailToken);
 authRouter.post('/logout', authorize, logout);
+authRouter.post('/resend-verification', resendVerification);
+authRouter.post('/forgot-password', forgotPassword);
+authRouter.post('/reset-password', resetPasswordHandler);
 
 // Google OAuth routes
 authRouter.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));

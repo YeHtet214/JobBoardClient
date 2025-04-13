@@ -56,6 +56,8 @@ const RegisterPage: React.FC = () => {
     const { register, googleLogin } = useAuth();
     const navigate = useNavigate();
 
+    const [agreeTerms, setAgreeTerms] = useState(false);
+
     const initialValues = {
         email: '',
         password: '',
@@ -76,7 +78,12 @@ const RegisterPage: React.FC = () => {
             // Remove confirmPassword as it's not part of the RegisterRequest type
             const { confirmPassword, terms, ...registerData } = values;
             await register(registerData);
-            navigate('/login', { state: { message: 'Registration successful! Please log in.' } });
+            navigate('/verify-email', { 
+                state: { 
+                    email: values.email,
+                    message: 'Registration successful! Please verify your email to complete your registration.'
+                }
+            });
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred during registration');
         } finally {
@@ -140,6 +147,7 @@ const RegisterPage: React.FC = () => {
                                             placeholder="John"
                                             autoComplete="given-name"
                                             className={touched.firstName && errors.firstName ? "border-destructive" : ""}
+                                            disabled={isSubmitting}
                                         />
                                         <ErrorMessage name="firstName" component="div" className="text-sm text-destructive" />
                                     </div>
@@ -154,6 +162,7 @@ const RegisterPage: React.FC = () => {
                                             placeholder="Doe"
                                             autoComplete="family-name"
                                             className={touched.lastName && errors.lastName ? "border-destructive" : ""}
+                                            disabled={isSubmitting}
                                         />
                                         <ErrorMessage name="lastName" component="div" className="text-sm text-destructive" />
                                     </div>
@@ -169,6 +178,7 @@ const RegisterPage: React.FC = () => {
                                         placeholder="name@example.com"
                                         autoComplete="email"
                                         className={touched.email && errors.email ? "border-destructive" : ""}
+                                        disabled={isSubmitting}
                                     />
                                     <ErrorMessage name="email" component="div" className="text-sm text-destructive" />
                                 </div>
@@ -183,6 +193,7 @@ const RegisterPage: React.FC = () => {
                                         placeholder="••••••••"
                                         autoComplete="new-password"
                                         className={touched.password && errors.password ? "border-destructive" : ""}
+                                        disabled={isSubmitting}
                                     />
                                     <ErrorMessage name="password" component="div" className="text-sm text-destructive" />
                                 </div>
@@ -197,13 +208,14 @@ const RegisterPage: React.FC = () => {
                                         placeholder="••••••••"
                                         autoComplete="new-password"
                                         className={touched.confirmPassword && errors.confirmPassword ? "border-destructive" : ""}
+                                        disabled={isSubmitting}
                                     />
                                     <ErrorMessage name="confirmPassword" component="div" className="text-sm text-destructive" />
                                 </div>
 
                                 <div className="space-y-2">
                                     <Label htmlFor="role">I am a</Label>
-                                    <Field name="role">
+                                    <Field name="role" disabled={isSubmitting}>
                                         {({ field, form }: { 
                                             field: FieldProps<string>['field'], 
                                             form: FormikProps<typeof initialValues>
@@ -236,6 +248,9 @@ const RegisterPage: React.FC = () => {
                                         as={Checkbox}
                                         id="terms"
                                         name="terms"
+                                        disabled={isSubmitting}
+                                        value={agreeTerms.toString()}
+                                        onClick={() => { setAgreeTerms(!agreeTerms); console.log(agreeTerms)}}
                                     />
                                     <Label htmlFor="terms" className="text-sm font-normal">
                                         I agree to the <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
@@ -245,7 +260,7 @@ const RegisterPage: React.FC = () => {
                                 <Button 
                                     type="submit" 
                                     className="w-full" 
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || !agreeTerms}
                                 >
                                     {isSubmitting ? "Creating account..." : "Create Account"}
                                 </Button>

@@ -13,10 +13,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Mail } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // Login validation schema
 const loginSchema = Yup.object({
@@ -27,19 +28,52 @@ const loginSchema = Yup.object({
     .required('Password is required')
 });
 
+interface VerificationAlertType {
+  handleResendVerification: () => void;
+  resendingVerification: boolean;
+}
+
+const VerificationAlert = ({ handleResendVerification, resendingVerification }: VerificationAlertType) => (
+  <Alert className="block bg-amber-50 border-amber-200 mb-4 w-full">
+    <div className="flex items-center justify-between w-full">
+      <Mail className="h-4 w-4 text-amber-600 mr-2" />
+      <AlertDescription className="text-amber-800 flex-1">
+        Your email is not verified. Need a new verification email?
+      </AlertDescription>
+      <Button
+        variant="outline"
+        size="sm"
+        className="ml-2 border-amber-500 text-amber-700 hover:bg-amber-100 hover:text-amber-800"
+        onClick={handleResendVerification}
+        disabled={resendingVerification}
+      >
+        {resendingVerification ? (
+          <span className="flex items-center">
+            <LoadingSpinner size="sm" className="mr-1" /> Sending...
+          </span>
+        ) : (
+          "Resend"
+        )}
+      </Button>
+    </div>
+  </Alert>
+)
+
 const LoginPage: React.FC = () => {
   const [formError, setFormError] = React.useState<{
     email?: string;
     password?: string;
     general?: string;
   }>({});
-  
-  // Add a separate local loading state to handle form submission
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-  
-  const { login, googleLogin } = useAuth();
+
+  const { login, googleLogin, resendVerification } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // State to track if the user needs email verification
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState('');
+  const [resendingVerification, setResendingVerification] = useState(false);
 
   const initialValues: LoginRequest = {
     email: '',
@@ -49,22 +83,24 @@ const LoginPage: React.FC = () => {
   const handleSubmit = async (values: LoginRequest, { setSubmitting, setFieldError }: FormikHelpers<LoginRequest>) => {
     // Clear previous errors
     setFormError({});
-    
-    // Set our local loading state
-    setIsLoggingIn(true);
+    setNeedsVerification(false);
 
     try {
       await login(values.email, values.password);
       navigate('/');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred during login';
-      console.log("Login error:", errorMessage); // Add logging for debugging
 
       // More comprehensive error handling with better pattern matching
       if (errorMessage.toLowerCase().includes('email not found')) {
         setFieldError('email', 'Email not found');
       } else if (errorMessage.toLowerCase().includes('invalid password')) {
         setFieldError('password', 'Invalid Password');
+      } else if (errorMessage.toLowerCase().includes('verify your email')) {
+        // This is when a user tries to log in without verifying their email
+        setNeedsVerification(true);
+        setVerificationEmail(values.email);
+        setFormError({ general: 'Your email has not been verified yet. Please check your inbox or request a new verification email.' });
       } else {
         setFormError({ general: errorMessage });
         toast({
@@ -75,7 +111,6 @@ const LoginPage: React.FC = () => {
       }
     } finally {
       setSubmitting(false);
-      setIsLoggingIn(false);
     }
   };
 
@@ -87,12 +122,38 @@ const LoginPage: React.FC = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred during Google login';
       setFormError({ general: errorMessage });
-      
+
       toast({
         title: "Google Login Failed",
         description: errorMessage,
         variant: "destructive"
       });
+    }
+  };
+
+  // Function to handle resending verification email
+  const handleResendVerification = async () => {
+    if (!verificationEmail) return;
+
+    setResendingVerification(true);
+
+    try {
+      await resendVerification(verificationEmail);
+
+      toast({
+        title: "Verification Email Sent",
+        description: "A new verification email has been sent to your inbox. Please check and follow the instructions.",
+        variant: "default"
+      });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to resend verification email';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    } finally {
+      setResendingVerification(false);
     }
   };
 
@@ -119,26 +180,17 @@ const LoginPage: React.FC = () => {
             </div>
           )}
 
+          {needsVerification && (
+            <VerificationAlert resendingVerification={resendingVerification} handleResendVerification={handleResendVerification} />
+          )}
+
           <Formik
             initialValues={initialValues}
             validationSchema={loginSchema}
             onSubmit={handleSubmit}
-            validateOnBlur={true}
           >
-            {({ isSubmitting, touched, errors, submitForm, setFieldTouched }: FormikProps<LoginRequest>) => (
-              <Form className="space-y-4" onSubmit={(e?: FormEvent<HTMLFormElement>) => {
-                if (e) {
-                  // Prevent default form submission to avoid page reload
-                  e.preventDefault();
-                  
-                  // Touch all fields before submission to ensure validation runs
-                  setFieldTouched('email', true, false);
-                  setFieldTouched('password', true, false);
-                  
-                  // Use Formik's submitForm to handle the submission properly
-                  submitForm();
-                }
-              }}>
+            {({ errors, touched, isSubmitting }) => (
+              <Form className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Field
@@ -149,7 +201,7 @@ const LoginPage: React.FC = () => {
                     placeholder="name@example.com"
                     autoComplete="email"
                     className={(touched.email && errors.email) || formError.email ? "border-destructive" : ""}
-                    disabled={isLoggingIn}
+                    disabled={isSubmitting}
                   />
                   <ErrorMessage name="email" component="div" className="text-sm text-destructive" />
                   {formError.email && <div className="text-sm text-destructive">{formError.email}</div>}
@@ -170,7 +222,7 @@ const LoginPage: React.FC = () => {
                     placeholder="••••••••"
                     autoComplete="current-password"
                     className={(touched.password && errors.password) || formError.password ? "border-destructive" : ""}
-                    disabled={isLoggingIn}
+                    disabled={isSubmitting}
                   />
                   <ErrorMessage name="password" component="div" className="text-sm text-destructive" />
                   {formError.password && <div className="text-sm text-destructive">{formError.password}</div>}
@@ -181,7 +233,7 @@ const LoginPage: React.FC = () => {
                     as={Checkbox}
                     id="remember"
                     name="remember"
-                    disabled={isLoggingIn}
+                    disabled={isSubmitting}
                   />
                   <Label htmlFor="remember" className="text-sm font-normal">Remember me</Label>
                 </div>
@@ -189,9 +241,9 @@ const LoginPage: React.FC = () => {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isLoggingIn}
+                  disabled={isSubmitting}
                 >
-                  {isLoggingIn ? (
+                  {isSubmitting ? (
                     <span className="flex items-center justify-center">
                       <LoadingSpinner size="sm" className="mr-2" /> Signing in...
                     </span>
@@ -218,7 +270,6 @@ const LoginPage: React.FC = () => {
             variant="outline"
             className="w-full flex items-center justify-center gap-2"
             onClick={handleGoogleLogin}
-            disabled={isLoggingIn}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="w-5 h-5">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />

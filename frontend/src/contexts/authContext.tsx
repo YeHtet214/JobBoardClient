@@ -20,6 +20,7 @@ interface AuthContextType {
   register: (userData: any) => Promise<void>;
   logout: () => Promise<void>;
   verifyEmail: (token: string) => Promise<any>;
+  resendVerification: (email: string) => Promise<any>;
   googleLogin: () => Promise<void>;
   showSessionExpiredDialog: boolean;
   dismissSessionExpiredDialog: () => void;
@@ -154,6 +155,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const resendVerification = async (email: string) => {
+    try {
+      const response = await authService.resendVerification(email);
+      return response;
+    } catch (error) {
+      console.error('Resend verification error:', error);
+      throw error;
+    }
+  };
+
   const dismissSessionExpiredDialog = () => {
     setShowSessionExpiredDialog(false);
   };
@@ -174,6 +185,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     verifyEmail,
+    resendVerification,
     googleLogin,
     showSessionExpiredDialog,
     dismissSessionExpiredDialog

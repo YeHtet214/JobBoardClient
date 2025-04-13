@@ -43,7 +43,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
 
 // Check if a route is an auth route (login, register, verify-email)
 const isAuthRoute = (path: string): boolean => {
-  return ['/login', '/register', '/verify-email'].some(authPath =>
+  return ['/login', '/register', '/verify-email', '/forgot-password', '/reset-password'].some(authPath =>
     path === authPath || path.startsWith(`${authPath}/`)
   );
 };

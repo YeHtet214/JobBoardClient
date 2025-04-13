@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { userSignIn, userSignUp, refreshAccessToken, verifyEmail, userLogout } from "../services/auth.service.js";
-import { CustomError, RequestWithUser } from "../types/users.type.js";
-
-import jwt from "jsonwebtoken";
+import { userSignIn, userSignUp, refreshAccessToken, verifyEmail, userLogout, resendVerificationEmail, requestPasswordReset, resetPassword } from "../services/auth.service.js";
+import { CustomError } from "../types/error.type.js";
+import { RequestWithUser } from '../types/users.type.js';
 
 /**
  * Handles user sign-up.
@@ -15,14 +14,12 @@ export const signUp = async (req: Request, res: Response, next: NextFunction): P
   try {
     const { firstName, lastName, email, password, role } = req.body;
 
-    console.log("Body: ", req.body)
-
     const { accessToken, refreshToken, user } = await userSignUp(firstName, lastName, email, password, role);
 
-    res.status(201).json({ 
-      success: true, 
-      message: "Successfully signed up. Please check your email for verification.", 
-      data: { accessToken, refreshToken, user } 
+    res.status(201).json({
+      success: true,
+      message: "Successfully signed up. Please check your email for verification.",
+      data: { accessToken, refreshToken, user }
     });
   } catch (error) {
     next(error)
@@ -47,13 +44,13 @@ export const signIn = async (req: Request, res: Response, next: NextFunction) =>
       next(error);
     }
 
-    res.status(200).json({ 
-      success: true, 
-      message: "Successfully signed in", 
-      data: { user, accessToken, refreshToken } 
+    res.status(200).json({
+      success: true,
+      message: "Successfully signed in",
+      data: { user, accessToken, refreshToken }
     });
   } catch (error) {
-      next(error);
+    next(error);
   }
 }
 
@@ -83,8 +80,6 @@ export const verifyEmailToken = async (req: Request, res: Response, next: NextFu
   try {
     const { token } = req.params;
 
-    console.log("Verify Token: ", token);
-
     if (!token) {
       const error = new Error("Verification token is required") as CustomError;
       error.status = 400;
@@ -106,8 +101,6 @@ export const logout = async (req: RequestWithUser, res: Response, next: NextFunc
   try {
     // Get token from authorization header
     const token = req.headers['authorization']?.split(' ')[1];
-    console.log("req user: ", req.user, "headers: ", req.headers);
-    console.log("Logout Token", token);
 
     if (!token) {
       const error = new Error("Token required") as CustomError;
@@ -117,6 +110,72 @@ export const logout = async (req: RequestWithUser, res: Response, next: NextFunc
 
     const result = await userLogout(token);
     res.status(200).json({ success: true, message: result.message });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Resends verification email to the user
+ */
+export const resendVerification = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      const error = new Error("Email is required") as CustomError;
+      error.status = 400;
+      return next(error);
+    }
+
+    const result = await resendVerificationEmail(email);
+    
+    res.status(200).json({
+      success: true,
+      message: result.message
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      const error = new Error("Email is required") as CustomError;
+      error.status = 400;
+      return next(error);
+    }
+
+    const result = await requestPasswordReset(email);
+    
+    res.status(200).json({
+      success: true,
+      message: result.message
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export const resetPasswordHandler = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      const error = new Error("Token and new password are required") as CustomError;
+      error.status = 400;
+      return next(error);
+    }
+
+    const result = await resetPassword(token, newPassword);
+    
+    res.status(200).json({
+      success: true,
+      message: result.message
+    });
   } catch (error) {
     next(error);
   }

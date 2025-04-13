@@ -18,4 +18,4 @@ export interface RequestWithUser extends Request {
   files?: any[]; // For multiple file uploads
 }
 
-export type UserRole = 'EMPLOYER' | 'JOBSEEKER' | 'ADMIN';
+export type UserRole = 'EMPLOYER' | 'JOBSEEKER';
