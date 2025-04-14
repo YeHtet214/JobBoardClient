@@ -34,6 +34,7 @@ model User {
   postedJobs      Job[]            @relation("PostedJobs")
   applications    JobApplication[]
   savedJobs       SavedJob[]
+  jobViews        JobView[]
 
   @@index([email])
 }
@@ -98,6 +99,7 @@ model Job {
   updatedAt       DateTime         @updatedAt
   applications    JobApplication[]
   savedBy         SavedJob[]
+  viewedBy        JobView[]
 
   @@index([postedById])
   @@index([companyId])
@@ -128,7 +130,7 @@ model JobApplication {
 
 enum ApplicationStatus {
   PENDING
-  REVIEWED
+  INTERVIEW
   ACCEPTED
   REJECTED
 }
@@ -143,6 +145,19 @@ model SavedJob {
 
   @@unique([jobId, userId])
   @@index([userId])
+}
+
+model JobView {
+  id        String   @id @default(uuid())
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  jobId     String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([jobId])
+  @@index([createdAt])
 }
 
 model RefreshToken {
