@@ -1,14 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, User, Building } from 'lucide-react';
+import Progress from '@/components/ui/Progress';
 
 interface CompletionItem {
   completed: boolean;
@@ -35,7 +36,7 @@ const ProfileCompletionCard: React.FC<ProfileCompletionCardProps> = ({
   isJobSeeker = true
 }) => {
   const navigate = useNavigate();
-  
+
   return (
     <Card>
       <CardHeader>
@@ -45,18 +46,7 @@ const ProfileCompletionCard: React.FC<ProfileCompletionCardProps> = ({
       <CardContent>
         <div className="space-y-4">
           {completionPercentage < 100 && (
-            <div>
-              <div className="flex justify-between mb-2">
-                <p className="text-sm font-medium">Profile completion</p>
-                <p className="text-sm font-medium">{completionPercentage}%</p>
-              </div>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-jobboard-purple rounded-full" 
-                  style={{ width: `${completionPercentage}%` }}
-                ></div>
-              </div>
-            </div>
+            <Progress value={completionPercentage} />
           )}
 
           <ul className="space-y-3">

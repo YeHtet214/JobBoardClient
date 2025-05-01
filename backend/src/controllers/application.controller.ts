@@ -1,13 +1,13 @@
 import { NextFunction, Response } from "express";
 import { RequestWithUser } from "../types/users.type.js";
 import { createApplicationDto, updateApplicationDto } from "../types/application.type.js";
-import { 
-  fetchAllApplicationsByJobId, 
-  fetchApplicationById, 
-  postNewApplication, 
-  updateApplicationById, 
-  deleteExistingApplication 
-} from "../services/application.service.js";
+import {
+    fetchAllApplicationsByJobId,
+    fetchApplicationById,
+    postNewApplication,
+    updateApplicationById,
+    deleteExistingApplication
+} from "../services/application/application.service.js";
 import { matchedData } from "express-validator";
 
 export const getAllApplicationsByJobId = async (req: RequestWithUser, res: Response, next: NextFunction) => {
@@ -32,7 +32,7 @@ export const getApplicationById = async (req: RequestWithUser, res: Response, ne
         // Get validated data
         const validatedData = matchedData(req);
         const id = validatedData.id;
-        
+
         const application = await fetchApplicationById(id);
 
         res.status(200).json({
@@ -49,14 +49,14 @@ export const createNewApplication = async (req: RequestWithUser, res: Response, 
     try {
         // Get validated data
         const validatedData = matchedData(req, { locations: ['params', 'body'] });
-        
+
         const applicationData: createApplicationDto = {
             jobId: validatedData.jobId,
             resumeUrl: validatedData.resumeUrl,
             coverLetter: validatedData.coverLetter,
             applicantId: req.user.userId
         }
-        
+
         const application = await postNewApplication(applicationData);
 
         res.status(201).json({
@@ -73,13 +73,13 @@ export const updateApplication = async (req: RequestWithUser, res: Response, nex
     try {
         // Get validated data
         const validatedData = matchedData(req, { locations: ['params', 'body'] });
-        
+
         const applicationData: updateApplicationDto = {
             id: validatedData.id,
             resumeUrl: validatedData.resumeUrl,
             coverLetter: validatedData.coverLetter
         }
-        
+
         const application = await updateApplicationById(applicationData);
 
         res.status(200).json({

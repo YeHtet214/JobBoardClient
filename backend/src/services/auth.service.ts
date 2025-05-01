@@ -5,11 +5,11 @@ import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 
 import { UserRole } from '../types/users.type.js';
-import { CustomError } from '../types/error.type.js';
+import { BadRequestError, NotFoundError, UnauthorizedError, ConflictError, InternalServerError } from '../middleware/errorHandler.js';
 import { JWT_SECRET, REFRESH_TOKEN_SECRET, SMTP_CONFIG, SMTP_FROM_EMAIL, FRONTEND_URL } from "../config/env.config.js";
 
 const SALT_ROUNDS = 10;
-const ACCESS_TOKEN_EXPIRY = '15m';
+const ACCESS_TOKEN_EXPIRY = '24h';
 const REFRESH_TOKEN_EXPIRY = '7d';
 
 const transporter = nodemailer.createTransport(SMTP_CONFIG);
@@ -96,16 +96,19 @@ export const userSignUp = async (
   password: string,
   role: UserRole
 ) => {
+  // Validate required fields
+  if (!firstName || !lastName || !email || !password || !role) {
+    throw new BadRequestError('All fields are required');
+  }
+
   const existingUser = await checkUserExists(email);
 
   if (existingUser) {
-    const error = new Error('User already exists') as CustomError;
-    error.status = 409;
-    throw error;
+    throw new ConflictError('User with this email already exists');
   }
 
   const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-  const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+  const verificationToken = crypto.randomBytes(32).toString('hex');
 
   const user = await prisma.user.create({
     data: {
@@ -114,69 +117,91 @@ export const userSignUp = async (
       email,
       passwordHash: hashedPassword,
       role,
-      emailVerificationToken,
-      isEmailVerified: false
+      emailVerificationToken: verificationToken
     }
   });
 
+  await sendVerificationEmail(email, verificationToken);
+
   const { accessToken, refreshToken } = generateTokens(user.id);
   await storeRefreshToken(user.id, refreshToken);
-  await sendVerificationEmail(email, emailVerificationToken);
 
-  return { accessToken, refreshToken, user };
+  return {
+    accessToken,
+    refreshToken,
+    user: {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      isEmailVerified: user.isEmailVerified
+    }
+  };
 }
 
 export const userSignIn = async (email: string, password: string) => {
+  // Validate required fields
+  if (!email || !password) {
+    throw new BadRequestError('Email and password are required');
+  }
+
   const user = await checkUserExists(email);
 
   if (!user) {
-    const error = new Error('Email not Found') as CustomError;
-    error.status = 401;
-    throw error;
+    throw new UnauthorizedError('Invalid credentials');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
 
   if (!isPasswordValid) {
-    const error = new Error('Invalid Password') as CustomError;
-    error.status = 401;
-    throw error;
+    throw new UnauthorizedError('Invalid credentials');
   }
 
   if (!user.isEmailVerified) {
-    const error = new Error('Please verify your email before signing in. Or use another email address') as CustomError;
-    error.status = 403;
-    throw error;
+    throw new UnauthorizedError('Please verify your email before signing in');
   }
 
   const { accessToken, refreshToken } = generateTokens(user.id);
   await storeRefreshToken(user.id, refreshToken);
 
-  return { accessToken, refreshToken, user };
+  return {
+    user: {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      isEmailVerified: user.isEmailVerified
+    },
+    accessToken,
+    refreshToken
+  };
 }
 
 export const refreshAccessToken = async (refreshToken: string) => {
-  try {
-    // Verify refresh token
-    const decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET as string) as { userId: string };
+  if (!refreshToken) {
+    throw new BadRequestError('Refresh token is required');
+  }
 
-    // Check if refresh token exists and is valid
-    const storedToken = await prisma.refreshToken.findFirst({
-      where: {
-        token: refreshToken,
-        userId: decoded.userId,
-        expiresAt: {
-          gt: new Date()
-        }
+  // Find the refresh token in the database
+  const storedToken = await prisma.refreshToken.findFirst({
+    where: {
+      token: refreshToken,
+      expiresAt: {
+        gt: new Date()
       }
-    });
-
-    if (!storedToken) {
-      const error = new Error('Invalid refresh token') as CustomError;
-      error.status = 401;
-      throw error;
     }
+  });
 
+  if (!storedToken) {
+    throw new UnauthorizedError('Invalid or expired refresh token');
+  }
+
+  try {
+    // Verify the refresh token
+    const decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET as string) as { userId: string };
+    
     // Generate new access token
     const accessToken = jwt.sign(
       { userId: decoded.userId },
@@ -186,29 +211,31 @@ export const refreshAccessToken = async (refreshToken: string) => {
 
     return { accessToken };
   } catch (error) {
-    const customError = new Error('Invalid refresh token') as CustomError;
-    customError.status = 401;
-    throw customError;
+    throw new UnauthorizedError('Invalid refresh token');
   }
 }
 
 export const userLogout = async (token: string) => {
   if (!token) {
-    console.log("Logout Token not inlcude")
-    const error = new Error('Token required') as CustomError;
-    error.status = 400;
-    throw error;
+    throw new BadRequestError('Token is required');
   }
 
   try {
+    // Verify the access token to get the user ID
     const decoded = jwt.verify(token, JWT_SECRET as string) as { userId: string };
+    
+    if (!decoded || !decoded.userId) {
+      throw new UnauthorizedError('Invalid token');
+    }
 
-    // Delete all refresh tokens for the user
+    // Delete all refresh tokens for this user (effectively logging them out everywhere)
     await prisma.refreshToken.deleteMany({
-      where: { userId: decoded.userId }
+      where: {
+        userId: decoded.userId
+      }
     });
 
-    // Add token to blacklist
+    // Add token to blacklist to prevent reuse
     await prisma.blacklistedToken.create({
       data: {
         token,
@@ -216,84 +243,98 @@ export const userLogout = async (token: string) => {
       }
     });
 
-    return { message: 'Successfully logged out' };
+    return { message: 'Logged out successfully' };
   } catch (error) {
-    const customError = new Error('Invalid token') as CustomError;
-    customError.status = 401;
-    throw customError;
+    // If the token is invalid or expired
+    if (error instanceof jwt.JsonWebTokenError) {
+      throw new UnauthorizedError('Invalid token');
+    }
+    
+    // For any other unexpected error
+    throw new InternalServerError('Error during logout process');
   }
 }
 
 export const verifyEmail = async (token: string) => {
-  try {
-    // First, try to find a user with this verification token
-    const user = await prisma.user.findFirst({
-      where: { emailVerificationToken: token }
-    });
-
-    // If we found a user with this token, verify them
-    if (user) {
-      console.log("Found user with verification token:", user.email);
-      
-      // If already verified, just return success
-      if (user.isEmailVerified) {
-        return { message: 'Your email has already been verified. You can now log in to your account.' };
-      }
-
-      // Verify the user
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          isEmailVerified: true,
-          emailVerificationToken: null
-        }
-      });
-
-      // Store the used token in a table for future reference
-      await prisma.blacklistedToken.create({
-        data: {
-          token,
-          expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year (or however long you want to remember it)
-        }
-      });
-
-      return { message: 'Email verified successfully' };
-    }
-
-    // If no user has this token, check if it's a previously used token
-    const usedToken = await prisma.blacklistedToken.findFirst({
-      where: { token }
-    });
-
-    if (usedToken) {
-      // This was a valid token that was already used
-      return { message: 'Your email has already been verified. You can now log in to your account.' };
-    }
-
-    // Token is invalid (never existed or expired)
-    throw new Error('Invalid verification token');
-  } catch (error: any) {
-    console.log("Verification error:", error.message);
-    const customError = new Error(error.message || 'Invalid verification token') as CustomError;
-    customError.status = 400;
-    throw customError;
+  if (!token) {
+    throw new BadRequestError('Verification token is required');
   }
-};
+
+  // First check if token is already in blacklist (previously used)
+  const blacklistedToken = await prisma.blacklistedToken.findFirst({
+    where: { token }
+  });
+
+  // If token is blacklisted, it means it was already used for verification
+  if (blacklistedToken) {
+    return { message: 'Your email has already been verified. Please log in.' };
+  }
+
+  // Find user with this verification token
+  const user = await prisma.user.findFirst({
+    where: {
+      emailVerificationToken: token
+    }
+  });
+
+  if (!user) {
+    throw new BadRequestError('Invalid verification token');
+  }
+
+  // Check if email is already verified
+  if (user.isEmailVerified) {
+    return { message: 'Email already verified. Please log in.' };
+  }
+
+  // Verify the email
+  await prisma.user.update({
+    where: {
+      id: user.id
+    },
+    data: {
+      isEmailVerified: true,
+      emailVerificationToken: null
+    }
+  });
+
+  // Add the token to blacklist to prevent reuse
+  await prisma.blacklistedToken.create({
+    data: {
+      token,
+      expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year
+    }
+  });
+
+  // Create profile for JOB_SEEKER only
+  if (user.role === 'JOBSEEKER') {
+    try {
+      // Create a job seeker profile
+      await prisma.$executeRaw`
+        INSERT INTO "JobSeekerProfile" ("userId", "createdAt", "updatedAt")
+        VALUES (${user.id}, NOW(), NOW())
+      `;
+    } catch (error) {
+      console.error('Error creating job seeker profile:', error);
+      // Don't throw here, as email verification succeeded
+    }
+  }
+
+  return { message: 'Email verified successfully. You can now log in.' };
+}
 
 export const resendVerificationEmail = async (email: string) => {
+  if (!email) {
+    throw new BadRequestError('Email is required');
+  }
+
   const user = await checkUserExists(email);
 
   if (!user) {
-    const error = new Error('User not found') as CustomError;
-    error.status = 404;
-    throw error;
+    throw new NotFoundError('User not found');
   }
 
-  // Check if the user is already verified
   if (user.isEmailVerified) {
-    const error = new Error('Email already verified') as CustomError;
-    error.status = 400;
-    throw error;
+    throw new BadRequestError('Email is already verified');
   }
 
   // Generate a new verification token
@@ -315,12 +356,14 @@ export const resendVerificationEmail = async (email: string) => {
 }
 
 export const requestPasswordReset = async (email: string) => {
+  if (!email) {
+    throw new BadRequestError('Email is required');
+  }
+
   const user = await checkUserExists(email);
 
   if (!user) {
-    const error = new Error('User not found') as CustomError;
-    error.status = 404;
-    throw error;
+    throw new NotFoundError('User not found');
   }
 
   const resetToken = crypto.randomBytes(32).toString('hex');
@@ -375,6 +418,10 @@ export const requestPasswordReset = async (email: string) => {
 }
 
 export const resetPassword = async (token: string, newPassword: string) => {
+  if (!token || !newPassword) {
+    throw new BadRequestError('Token and new password are required');
+  }
+
   const user = await prisma.user.findFirst({
     where: {
       resetPasswordToken: token,
@@ -385,9 +432,7 @@ export const resetPassword = async (token: string, newPassword: string) => {
   });
 
   if (!user) {
-    const error = new Error('Invalid or expired reset token') as CustomError;
-    error.status = 400;
-    throw error;
+    throw new BadRequestError('Invalid or expired reset token');
   }
 
   const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
@@ -398,6 +443,14 @@ export const resetPassword = async (token: string, newPassword: string) => {
       passwordHash: hashedPassword,
       resetPasswordToken: null,
       resetPasswordExpiry: null
+    }
+  });
+
+  // Blacklist the token to prevent reuse
+  await prisma.blacklistedToken.create({
+    data: {
+      token,
+      expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000) // 1 year
     }
   });
 

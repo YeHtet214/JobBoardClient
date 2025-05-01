@@ -1,7 +1,7 @@
-import prisma from "../prisma/client.js";
-import { CustomError } from "../types/error.type.js";
-import { CreateJobDto, JobType } from "../types/job.type.js";
-import { fetchUserById } from "./user.service.js";
+import prisma from "../../prisma/client.js";
+import { BadRequestError, NotFoundError, ForbiddenError } from "../../middleware/errorHandler.js";
+import { CreateJobDto, JobType } from "../../types/job.type.js";
+import { fetchUserById } from "../user.service.js";
 
 // Define search params interface to match frontend
 export interface JobSearchParams {
@@ -122,6 +122,10 @@ export const fetchAllJobs = async (params?: JobSearchParams) => {
 }
 
 export const fetchJobById = async (id: string) => {
+    if (!id) {
+        throw new BadRequestError('Job ID is required');
+    }
+
     const job = await prisma.job.findUnique({
         where: { id },
         include: {
@@ -143,23 +147,31 @@ export const fetchJobById = async (id: string) => {
     });
 
     if (!job) {
-        const error = new Error('No job found') as CustomError;
-        error.status = 404;
-        throw error;
+        throw new NotFoundError('Job not found');
     }
 
     return job;
 }
 
 export const fetchJobsByCompanyId = async (companyId: string, params?: JobSearchParams) => {
+    if (!companyId) {
+        throw new BadRequestError('Company ID is required');
+    }
+
     const {
         page = 1,
         limit = 10,
-        sortBy = 'date_desc'
+        sortBy = 'date_desc' // Default to newest first
     } = params || {};
 
     // Calculate pagination
     const skip = (page - 1) * limit;
+
+    // Build the where clause
+    const where = {
+        companyId,
+        isActive: true,
+    };
 
     // Determine sort order
     let orderBy: any = {};
@@ -170,20 +182,25 @@ export const fetchJobsByCompanyId = async (companyId: string, params?: JobSearch
         case 'date_asc':
             orderBy = { createdAt: 'asc' };
             break;
+        case 'salary_desc':
+            orderBy = { salaryMax: 'desc' };
+            break;
+        case 'salary_asc':
+            orderBy = { salaryMin: 'asc' };
+            break;
         default:
             orderBy = { createdAt: 'desc' };
     }
 
-    // Get total count
-    const totalCount = await prisma.job.count({
-        where: { companyId, isActive: true }
-    });
+    // Get total count for pagination
+    const totalCount = await prisma.job.count({ where });
 
     // Calculate total pages
     const totalPages = Math.ceil(totalCount / limit);
 
+    // Fetch jobs with pagination and sorting
     const jobs = await prisma.job.findMany({
-        where: { companyId, isActive: true },
+        where,
         orderBy,
         skip,
         take: limit,
@@ -205,15 +222,6 @@ export const fetchJobsByCompanyId = async (companyId: string, params?: JobSearch
         }
     });
 
-    console.log("Company jobs: ", jobs);
-
-    if (!jobs || jobs.length === 0) {
-        const error = new Error('No jobs found for this company') as CustomError;
-        error.status = 404;
-        throw error;
-    }
-
-    // Return in the format expected by the frontend
     return {
         jobs,
         totalPages,
@@ -234,64 +242,98 @@ export const getSearchSuggestions = async (
     type: 'keyword' | 'location' | 'all' = 'all',
     limit: number = 5
 ): Promise<string[]> => {
-    if (!term || term.length < 2) {
-        return [];
+    if (!term) {
+        throw new BadRequestError('Search term is required');
     }
 
-    try {
-        let suggestions: string[] = [];
+    let keywordSuggestions: string[] = [];
+    let locationSuggestions: string[] = [];
 
-        if (type === 'keyword' || type === 'all') {
-            // Get title suggestions
-            const titleSuggestions = await prisma.job.findMany({
+    // Get job title/description suggestions
+    if (type === 'keyword' || type === 'all') {
+        // First, search for matches in job titles
+        const titleMatches = await prisma.job.findMany({
+            where: {
+                title: {
+                    contains: term,
+                    mode: 'insensitive'
+                },
+                isActive: true
+            },
+            select: {
+                title: true,
+            },
+            distinct: ['title'],
+            take: limit
+        });
+
+        keywordSuggestions = titleMatches.map(job => job.title);
+
+        // If we need more suggestions, search in required skills
+        if (keywordSuggestions.length < limit) {
+            const skillsMatches = await prisma.job.findMany({
                 where: {
-                    title: {
-                        contains: term,
-                        mode: 'insensitive'
+                    requiredSkills: {
+                        has: term // This assumes requiredSkills is an array
                     },
                     isActive: true
                 },
                 select: {
-                    title: true
+                    requiredSkills: true
                 },
-                distinct: ['title'],
-                take: limit
+                take: limit - keywordSuggestions.length
             });
 
-            suggestions = [...suggestions, ...titleSuggestions.map(job => job.title)];
+            // Extract skills that match the term
+            const skillSuggestions = skillsMatches.flatMap(job => 
+                job.requiredSkills.filter(skill => 
+                    skill.toLowerCase().includes(term.toLowerCase())
+                )
+            );
+
+            // Add unique skills to suggestions
+            keywordSuggestions = [...new Set([...keywordSuggestions, ...skillSuggestions])];
         }
-
-        if (type === 'location' || type === 'all') {
-            // Get location suggestions
-            const locationSuggestions = await prisma.job.findMany({
-                where: {
-                    location: {
-                        contains: term,
-                        mode: 'insensitive'
-                    },
-                    isActive: true
-                },
-                select: {
-                    location: true
-                },
-                distinct: ['location'],
-                take: limit
-            });
-
-            suggestions = [...suggestions, ...locationSuggestions.map(job => job.location)];
-        }
-
-        // Remove duplicates and limit results
-        const uniqueSuggestions = [...new Set(suggestions)];
-        return uniqueSuggestions.slice(0, limit);
-    } catch (error) {
-        console.error('Error fetching search suggestions:', error);
-        return [];
     }
-}
+
+    // Get location suggestions
+    if (type === 'location' || type === 'all') {
+        const locationMatches = await prisma.job.findMany({
+            where: {
+                location: {
+                    contains: term,
+                    mode: 'insensitive'
+                },
+                isActive: true
+            },
+            select: {
+                location: true
+            },
+            distinct: ['location'],
+            take: limit
+        });
+
+        locationSuggestions = locationMatches
+            .map(job => job.location)
+            .filter(location => location !== null && location !== '') as string[];
+    }
+
+    // Combine and limit results
+    let suggestions: string[];
+    if (type === 'keyword') {
+        suggestions = keywordSuggestions;
+    } else if (type === 'location') {
+        suggestions = locationSuggestions;
+    } else {
+        suggestions = [...keywordSuggestions, ...locationSuggestions];
+    }
+
+    // Deduplicate and limit
+    return [...new Set(suggestions)].slice(0, limit);
+};
 
 // Define the type for job create parameters
-export type JobCreateData = {
+export interface JobCreateData {
     title: string;
     description: string;
     companyId: string;
@@ -303,37 +345,47 @@ export type JobCreateData = {
     requiredSkills: string[];
     experienceLevel?: string;
     expiresAt?: Date | string;
-};
+}
 
 // Define the type for job update parameters
-export type UpdateJobDto = Partial<Omit<CreateJobDto, 'companyId'>> & {
+export interface UpdateJobDto extends Partial<JobCreateData> {
     isActive?: boolean;
-};
+}
 
-// Business logic functions
 /**
  * Validates and processes job data before creation
  */
 export const createJob = async (jobData: Partial<CreateJobDto> & { postedById: string }) => {
     // Validate required fields
-    if (!jobData.title || !jobData.description || !jobData.companyId || !jobData.type) {
-        const error = new Error('Missing required fields: title, description, companyId, and type are required') as CustomError;
-        error.status = 400;
-        throw error;
+    if (!jobData.title || !jobData.description || !jobData.companyId || !jobData.type || !jobData.postedById) {
+        throw new BadRequestError('Missing required job fields');
     }
 
     // Validate job type
     if (!['FULL_TIME', 'PART_TIME', 'CONTRACT'].includes(jobData.type)) {
-        const error = new Error('Invalid job type. Must be one of: FULL_TIME, PART_TIME, CONTRACT') as CustomError;
-        error.status = 400;
-        throw error;
+        throw new BadRequestError('Invalid job type. Must be one of: FULL_TIME, PART_TIME, CONTRACT');
     }
 
-    // Process and transform the data
+    // Validate salary if provided
+    if (jobData.salaryMin && jobData.salaryMax && Number(jobData.salaryMin) > Number(jobData.salaryMax)) {
+        throw new BadRequestError('Minimum salary cannot be greater than maximum salary');
+    }
+
+    // Fetch the user's company
+    const userCompany = await prisma.company.findFirst({
+        where: { ownerId: jobData.postedById },
+        select: { id: true }
+    });
+    
+    if (!userCompany) {
+        throw new BadRequestError("You need to create a company before posting a job");
+    }
+
+    // Process and transform the job data
     const processedData: JobCreateData = {
         title: jobData.title,
         description: jobData.description,
-        companyId: jobData.companyId,
+        companyId: userCompany.id,
         postedById: jobData.postedById,
         location: jobData.location,
         type: jobData.type as JobType,
@@ -352,6 +404,14 @@ export const createJob = async (jobData: Partial<CreateJobDto> & { postedById: s
  * Validates and processes job update data
  */
 export const updateJob = async (jobId: string, updateData: Partial<UpdateJobDto>, userId: string) => {
+    if (!jobId) {
+        throw new BadRequestError('Job ID is required');
+    }
+
+    if (!userId) {
+        throw new BadRequestError('User ID is required');
+    }
+
     // Check if job exists and user has permission
     const existingJob = await fetchJobById(jobId);
 
@@ -359,16 +419,12 @@ export const updateJob = async (jobId: string, updateData: Partial<UpdateJobDto>
 
     // Verify ownership
     if (existingJob.postedById !== userId || userRole !== 'EMPLOYER') {
-        const error = new Error('You don\'t have permission to update this job') as CustomError;
-        error.status = 403;
-        throw error;
+        throw new ForbiddenError('You don\'t have permission to update this job');
     }
 
     // Validate job type if provided
     if (updateData.type && !['FULL_TIME', 'PART_TIME', 'CONTRACT'].includes(updateData.type)) {
-        const error = new Error('Invalid job type. Must be one of: FULL_TIME, PART_TIME, CONTRACT') as CustomError;
-        error.status = 400;
-        throw error;
+        throw new BadRequestError('Invalid job type. Must be one of: FULL_TIME, PART_TIME, CONTRACT');
     }
 
     // Process and transform the update data
@@ -428,20 +484,20 @@ const updateExistingJob = async (id: string, data: UpdateJobDto) => {
 }
 
 export const deleteExistingJob = async (id: string, userId: string) => {
-    const existingJob = await fetchJobById(id);
-
-    if (!existingJob) {
-        const error = new Error('Job not found') as CustomError;
-        error.status = 404;
-        throw error;
+    if (!id) {
+        throw new BadRequestError('Job ID is required');
     }
+
+    if (!userId) {
+        throw new BadRequestError('User ID is required');
+    }
+
+    const existingJob = await fetchJobById(id);
 
     const userRole = (await fetchUserById(userId))?.role;
 
     if (existingJob.postedById !== userId || userRole !== 'EMPLOYER') {
-        const error = new Error('You don\'t have permission to update this job') as CustomError;
-        error.status = 403;
-        throw error;
+        throw new ForbiddenError('You don\'t have permission to delete this job');
     }
 
     return prisma.job.delete({ where: { id } });

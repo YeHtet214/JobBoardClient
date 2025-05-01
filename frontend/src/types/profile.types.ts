@@ -2,7 +2,7 @@ export interface Profile {
   id: string;
   userId: string;
   bio: string;
-  skills?: string[];
+  skills: string[];
   education: Education[];
   experience: Experience[];
   resumeUrl?: string;
@@ -45,5 +45,10 @@ export interface CreateProfileDto {
   githubUrl?: string;
   portfolioUrl?: string;
 }
+
+export interface ProfileCompletionItemType {
+  completed: boolean;
+  text: string;
+};
 
 export interface UpdateProfileDto extends Partial<CreateProfileDto> {}

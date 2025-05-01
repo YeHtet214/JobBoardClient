@@ -1,5 +1,5 @@
 import prisma from "../prisma/client.js";
-import { CustomError } from "../types/error.type.js";
+import { BadRequestError, NotFoundError, ConflictError } from "../middleware/errorHandler.js";
 import { CreateCompanyDto, UpdateCompanyDto } from "../types/company.type.js";
 
 export const fetchAllCompanies = async () => {
@@ -8,39 +8,46 @@ export const fetchAllCompanies = async () => {
 }
 
 export const getExistingCompany = async (id: string) => {
+    if (!id) {
+        throw new BadRequestError('Company ID is required');
+    }
+
     const company = await prisma.company.findUnique({ where: { id } });
     if (!company) {
-        const error = new Error('Company not found') as CustomError;
-        error.status = 404;
-        throw error;
+        throw new NotFoundError('Company not found');
     }
     return company;
 }
 
 export const getCompanyByOwnerId = async (ownerId: string) => {
+    if (!ownerId) {
+        throw new BadRequestError('Owner ID is required');
+    }
+
     const company = await prisma.company.findFirst({
         where: { ownerId }
     });
 
     if (!company) {
-        const error = new Error('Company not found') as CustomError;
-        error.status = 404;
-        throw error;
+        throw new NotFoundError('Company not found');
     }
 
     return company;
 }
 
 export const createNewCompany = async (companyData: CreateCompanyDto) => {
+    if (!companyData.name || !companyData.ownerId) {
+        throw new BadRequestError('Company name and owner ID are required');
+    }
+
     const existingCompany = await prisma.company.findFirst({
         where: { ownerId: companyData.ownerId }
     });
 
     if (existingCompany) {
-        const error = new Error('Employer already has a company profile') as CustomError;
-        error.status = 409;
-        throw error;
+        throw new ConflictError('Employer already has a company profile');
     }
+    
     const company = await prisma.company.create({
         data: companyData
     });
@@ -48,6 +55,13 @@ export const createNewCompany = async (companyData: CreateCompanyDto) => {
 }
 
 export const updateExistingCompany = async (id: string, data: UpdateCompanyDto) => {
+    if (!id) {
+        throw new BadRequestError('Company ID is required');
+    }
+    
+    // First check if company exists
+    await getExistingCompany(id);
+    
     const company = await prisma.company.update({
         where: { id },
         data
@@ -56,6 +70,13 @@ export const updateExistingCompany = async (id: string, data: UpdateCompanyDto) 
 }
 
 export const deleteExistingCompany = async (id: string) => {
+    if (!id) {
+        throw new BadRequestError('Company ID is required');
+    }
+    
+    // First check if company exists
+    await getExistingCompany(id);
+    
     const company = await prisma.company.delete({ where: { id } });
     return company;
 }

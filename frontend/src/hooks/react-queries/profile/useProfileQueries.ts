@@ -1,36 +1,53 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
 import { profileService } from '@/services/profile.service';
 import { CreateProfileDto, Profile, UpdateProfileDto } from '@/types/profile.types';
 import { useToast } from '@/components/ui/use-toast';
 
-export const PROFILE_QUERY_KEY = 'profile';
+// Query keys
+export const profileKeys = {
+  all: ['profile'] as const,
+  details: () => [...profileKeys.all, 'details'] as const,
+  resume: () => [...profileKeys.all, 'resume'] as const,
+};
 
-export const useProfileQuery = () => {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  // Get profile data
-  const { data: profile, isLoading, error, refetch } = useQuery({
-    queryKey: [PROFILE_QUERY_KEY],
+/**
+ * Hook for fetching the current user's profile
+ * 
+ * @param options - Optional query options
+ * @returns Query result with profile data
+ */
+export const useProfile = (options?: Omit<UseQueryOptions<Profile | null, Error>, 'queryKey' | 'queryFn'>) => {
+  return useQuery<Profile | null, Error>({
+    queryKey: profileKeys.details(),
     queryFn: async () => {
       try {
         return await profileService.getMyProfile();
       } catch (error: any) {
-        // If profile doesn't exist yet, return null instead of throwing
+        // If profile doesn't exist yet, return null instead of throwing error
         if (error.response?.status === 404) {
           return null;
         }
         throw error;
       }
     },
+    ...options
   });
+};
 
-  // Create profile
-  const createProfileMutation = useMutation({
+/**
+ * Hook for creating a new profile
+ * 
+ * @returns Mutation for creating a profile
+ */
+export const useCreateProfile = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
     mutationFn: (profileData: CreateProfileDto) =>
       profileService.createProfile(profileData),
     onSuccess: (data) => {
-      queryClient.setQueryData([PROFILE_QUERY_KEY], data);
+      queryClient.setQueryData(profileKeys.details(), data);
       toast({
         title: "Success",
         description: "Profile created successfully",
@@ -46,13 +63,22 @@ export const useProfileQuery = () => {
       console.error('Error creating profile:', error);
     }
   });
+};
 
-  // Update profile
-  const updateProfileMutation = useMutation({
+/**
+ * Hook for updating an existing profile
+ * 
+ * @returns Mutation for updating a profile
+ */
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
     mutationFn: (profileData: UpdateProfileDto) =>
       profileService.updateProfile(profileData),
     onSuccess: (data) => {
-      queryClient.setQueryData([PROFILE_QUERY_KEY], data);
+      queryClient.setQueryData(profileKeys.details(), data);
       toast({
         title: "Success",
         description: "Profile updated successfully",
@@ -68,13 +94,22 @@ export const useProfileQuery = () => {
       console.error('Error updating profile:', error);
     }
   });
+};
 
-  // Upload resume
-  const uploadResumeMutation = useMutation({
+/**
+ * Hook for uploading a resume
+ * 
+ * @returns Mutation for uploading a resume
+ */
+export const useUploadResume = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
     mutationFn: (file: File) => profileService.uploadResume(file),
     onSuccess: (resumeUrl) => {
       // Update the profile with the new resume URL
-      queryClient.setQueryData<Profile>([PROFILE_QUERY_KEY], (oldData) => {
+      queryClient.setQueryData<Profile | null>(profileKeys.details(), (oldData) => {
         if (!oldData) return null;
         return { ...oldData, resumeUrl };
       });
@@ -94,6 +129,16 @@ export const useProfileQuery = () => {
       console.error('Error uploading resume:', error);
     }
   });
+};
+
+/**
+ * @deprecated Use individual hooks instead: useProfile, useCreateProfile, useUpdateProfile, useUploadResume
+ */
+export const useProfileQuery = <T = Profile>() => {
+  const { data: profile, isLoading, error, refetch } = useProfile();
+  const createProfileMutation = useCreateProfile();
+  const updateProfileMutation = useUpdateProfile();
+  const uploadResumeMutation = useUploadResume();
 
   return {
     profile,

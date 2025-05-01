@@ -1,11 +1,7 @@
 import { useState } from 'react';
-import { Field, FieldArray, ErrorMessage } from 'formik';
-import { Textarea } from '../../components/ui/textarea';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Button } from '../../components/ui/button';
-import { Badge } from '../../components/ui/badge';
-import { X, Plus, User } from 'lucide-react';
+import { FieldArray, FormikProps } from 'formik';
+import { Badge } from '@/components/ui/badge';
+import { X, Plus } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -13,10 +9,11 @@ import {
   CardFooter,
   CardHeader,
   CardTitle
-} from '../../components/ui/card';
-import { FormikProps } from 'formik';
-import { Profile } from '../../types/profile.types';
-import LoadingSpinner from '../ui/LoadingSpinner';
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Profile } from '@/types/profile.types';
+import { TextareaField, InputField } from '@/components/forms';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface BasicInfoTabProps {
   formik: FormikProps<Profile>;
@@ -37,20 +34,17 @@ const BasicInfoTab = ({ formik, isSaving, onTabChange }: BasicInfoTabProps) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6 px-0 md:px-6">
-        <div className="space-y-2">
-          <Label htmlFor="bio">Bio</Label>
-          <Field
-            as={Textarea}
-            id="bio"
-            name="bio"
-            placeholder="Write a brief introduction about yourself..."
-            className="min-h-32"
-          />
-          <ErrorMessage name="bio" component="div" className="text-red-500 text-sm" />
-        </div>
+        <TextareaField
+          formik={true}
+          name="bio"
+          label="Bio"
+          placeholder="Write a brief introduction about yourself..."
+          className="min-h-32"
+          rows={6}
+        />
 
         <div className="space-y-2">
-          <Label htmlFor="skills">Skills</Label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Skills</label>
           <div className="flex flex-wrap gap-2 mb-3">
             <FieldArray
               name="skills"
@@ -77,12 +71,16 @@ const BasicInfoTab = ({ formik, isSaving, onTabChange }: BasicInfoTabProps) => {
           </div>
 
           <div className="flex gap-2">
-            <Input
+            <InputField
+              formik={false}
+              name="newSkill"
+              label=""
               type="text"
               value={newSkill}
               onChange={(e) => setNewSkill(e.target.value)}
               placeholder="Add a skill..."
               className="flex-1"
+              errors={{}}
             />
             <Button
               type="button"
@@ -93,11 +91,11 @@ const BasicInfoTab = ({ formik, isSaving, onTabChange }: BasicInfoTabProps) => {
                   setNewSkill('');
                 }
               }}
+              className="mt-1"
             >
               <Plus className="h-4 w-4 mr-1" /> Add
             </Button>
           </div>
-          <ErrorMessage name="skills" component="div" className="text-red-500 text-sm" />
         </div>
       </CardContent>
       <CardFooter className="flex justify-between px-0 md:px-6">

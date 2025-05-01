@@ -52,7 +52,6 @@ export const useMyCompany = () => {
     queryFn: async () => {
       try {
         const company = await companyService.getMyCompany();
-        console.log("Company: ", company)
         return company || null;
       } catch (error) {
         // 404 means the company doesn't exist yet, which is fine

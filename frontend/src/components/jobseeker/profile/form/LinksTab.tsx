@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Field, ErrorMessage } from 'formik';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Button } from '../../components/ui/button';
-import { Separator } from '../../components/ui/separator';
+import { Field, ErrorMessage, FormikProps } from 'formik';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { FileText, Github, Linkedin, Globe, Upload, AlertCircle } from 'lucide-react';
 import {
   Card,
@@ -12,10 +12,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle
-} from '../../components/ui/card';
-import { FormikProps } from 'formik';
-import { Profile } from '../../types/profile.types';
-import LoadingSpinner from '../ui/LoadingSpinner';
+} from '@/components/ui/card';
+import { Profile } from '@/types/profile.types';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface LinksTabProps {
   formik: FormikProps<Profile>;

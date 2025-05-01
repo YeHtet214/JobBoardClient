@@ -6,9 +6,26 @@ import { Job } from '@/types/job.types';
 import { AlertCircle, Search } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import JobSorting from './JobSorting';
+import { useAuth } from '@/contexts/authContext';
+import { useBatchJobSavedStatus } from '@/hooks/react-queries/job';
 
 const JobList: React.FC = () => {
   const { jobs, isLoading, error, keyword, location, jobTypes, experienceLevel, totalCount } = useJobsContext();
+  const { isAuthenticated, currentUser } = useAuth();
+
+  console.log("isAuthenticated: ", isAuthenticated);
+  console.log("Current User: ", currentUser);
+  
+  // Check if user is a job seeker for saved job functionality
+  const isJobSeeker = currentUser?.role === 'JOBSEEKER';
+  
+  // Get all job IDs for batch checking saved status
+  const jobIds = jobs.map(job => job.id);
+  
+  // Use the batch hook to check if jobs are saved in a single request
+  const { data: savedJobsStatus = {} } = useBatchJobSavedStatus(
+    isAuthenticated && isJobSeeker ? jobIds : []
+  );
 
   // Check if any filters are applied
   const hasFilters = keyword || location || jobTypes.length > 0 || experienceLevel !== 'ANY';
@@ -82,8 +99,9 @@ const JobList: React.FC = () => {
         {jobs.map((job: Job) => (
           <JobCard 
             key={job.id} 
-            job={job} 
-            isCompact={false} 
+            job={job}
+            isCompact={false}
+            savedStatus={isJobSeeker && isAuthenticated ? savedJobsStatus[job.id] : undefined}
           />
         ))}
       </div>

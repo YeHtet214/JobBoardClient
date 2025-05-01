@@ -8,9 +8,10 @@ import {
     deleteExistingJob,
     JobSearchParams,
     getSearchSuggestions
-} from '../services/job.service.js';
+} from '../services/job/job.service.js';
 import { RequestWithUser } from '../types/users.type.js';
 import prisma from '../prisma/client.js';
+import { BadRequestError } from '../middleware/errorHandler.js';
 
 // Public controllers - no authentication required
 export const getAllJobs = async (req: Request, res: Response, next: NextFunction) => {
@@ -100,11 +101,7 @@ export const getSearchSuggestionsHandler = async (req: Request, res: Response, n
         const { term, type, limit } = req.query;
         
         if (!term) {
-            return res.status(400).json({
-                success: false,
-                message: "Search term is required",
-                data: []
-            });
+            throw new BadRequestError("Search term is required");
         }
         
         const suggestions = await getSearchSuggestions(
@@ -135,20 +132,13 @@ export const createJobHandler = async (req: RequestWithUser, res: Response, next
         });
         
         if (!userCompany) {
-            return res.status(400).json({
-                success: false,
-                message: "You need to create a company before posting a job"
-            });
+            throw new BadRequestError("You need to create a company before posting a job");
         }
-
-        console.log("User Id: ", userId);
-        console.log("Create Job: ", req.body);
         
         // Pass request body, user ID, and company ID to the service
         const newJob = await createJob({
             ...req.body,
             postedById: userId,
-            companyId: userCompany.id
         });
         
         res.status(201).json({

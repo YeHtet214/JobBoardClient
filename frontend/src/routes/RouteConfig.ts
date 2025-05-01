@@ -37,10 +37,13 @@ const EditJobPage = lazy(() => import('@/pages/employer/EditJobPage'));
 const EmployerJobsPage = lazy(() => import('@/pages/employer/EmployerJobsPage'));
 const CompanyProfileEditPage = lazy(() => import('@/pages/employer/CompanyProfileEditPage'));
 
+// Jobseeker pages
+const SavedJobsPage = lazy(() => import('@/pages/jobseeker/SavedJobsPage'));
+const ApplicationsPage = lazy(() => import('@/pages/jobseeker/ApplicationsPage'))
+
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
-const ApplicationsPage = lazy(() => import('@/pages/jobseeker/ApplicationsPage'))
 const ProfilePage = lazy(() => import('@/pages/jobseeker/ProfilePage'));
 const JobsPage = lazy(() => import('@/pages/JobsPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
@@ -162,7 +165,7 @@ export const routes: RouteConfig[] = [
     meta: { title: 'Edit Job', description: 'Edit an existing job posting' }
   },
   {
-    path: '/applications',
+    path: '/jobs/:id/apply',
     element: ApplicationsPage,
     requiresAuth: true,
     allowedRoles: ['JOBSEEKER'],
@@ -177,7 +180,7 @@ export const routes: RouteConfig[] = [
   },
   {
     path: '/saved-jobs',
-    element: JobsPage,
+    element: SavedJobsPage,
     requiresAuth: true,
     allowedRoles: ['JOBSEEKER'],
     meta: { title: 'Saved Jobs', description: 'View your saved jobs' }

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useState } from 'react';
 import { Job } from '@/types/job.types';
 import { useSearchParams } from 'react-router-dom';
 import { useJobsData } from '@/hooks/react-queries/job';

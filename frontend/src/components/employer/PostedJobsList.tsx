@@ -33,11 +33,13 @@ const PostedJobsList: React.FC<PostedJobsListProps> = ({
   onDeleteJob,
   emptyStateMessage = "You haven't posted any jobs yet."
 }) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
+
+  console.log("Posted jobs: ", postedJobs);
 
   return (
     <div>
-      {postedJobs.length > 0 ? (
+      {postedJobs?.length > 0 ? (
         <div className="space-y-4">
           {postedJobs.map((job) => (
             <div
@@ -48,7 +50,7 @@ const PostedJobsList: React.FC<PostedJobsListProps> = ({
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium text-sm truncate">{job.title}</h4>
                   <div className="flex items-center gap-3 mt-2">
-                    <span className="text-xs text-gray-500">Posted {formatDate(job.postedAt)}</span>
+                    <span className="text-xs text-gray-500">Posted {formatDate(job.postedDate)}</span>
                     {getJobStatusBadge(job.status)}
                   </div>
                   <p className="text-xs text-gray-500 mt-2">
@@ -59,7 +61,7 @@ const PostedJobsList: React.FC<PostedJobsListProps> = ({
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => navigate(`/employer/jobs/${job.id}`)}
+                    onClick={() => navigate(`/jobs/${job.id}`)}
                   >
                     View
                   </Button>
@@ -72,10 +74,10 @@ const PostedJobsList: React.FC<PostedJobsListProps> = ({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => navigate(`/employer/jobs/${job.id}/edit`)}>
+                        <DropdownMenuItem onClick={() => navigate(`/jobs/${job.id}/edit`)}>
                           Edit Job
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate(`/employer/jobs/${job.id}/applications`)}>
+                        <DropdownMenuItem onClick={() => navigate(`/jobs/${job.id}/applications`)}>
                           View Applications
                         </DropdownMenuItem>
                         <AlertDialog>

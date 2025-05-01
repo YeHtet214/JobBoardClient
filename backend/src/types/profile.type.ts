@@ -57,3 +57,8 @@ export interface ProfileResponse {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface ProfileCompletionItemType {
+  completed: boolean;
+  text: string;
+};

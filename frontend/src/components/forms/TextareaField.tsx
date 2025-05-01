@@ -10,15 +10,15 @@ type TextareaFieldProps = {
   disabled?: boolean;
   required?: boolean;
 } & (
-  | { formik: true }
-  | {
+    | { formik: true }
+    | {
       formik?: false;
       value: string;
       onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
       onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
       errors?: Record<string, { message: string }> | undefined;
     }
-);
+  );
 
 const TextareaField: React.FC<TextareaFieldProps> = (props) => {
   const {
@@ -47,9 +47,8 @@ const TextareaField: React.FC<TextareaFieldProps> = (props) => {
           placeholder={placeholder}
           rows={rows}
           disabled={disabled}
-          className={`mt-1 block w-full px-3 py-2 border ${
-            hasError ? 'border-red-500' : 'border-gray-300'
-          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${className}`}
+          className={`mt-1 block w-full px-3 py-2 border ${hasError ? 'border-red-500' : 'border-gray-300'
+            } rounded-md shadow-sm focus:outline-none focus:ring-jobboard-darkblue focus:border-jobboard-darkblue ${className}`}
           {...field}
         />
         {hasError && <p className="mt-1 text-sm text-red-600">{meta.error}</p>}
@@ -74,9 +73,8 @@ const TextareaField: React.FC<TextareaFieldProps> = (props) => {
           onBlur={onBlur}
           rows={rows}
           disabled={disabled}
-          className={`mt-1 block w-full px-3 py-2 border ${
-            hasError ? 'border-red-500' : 'border-gray-300'
-          } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${className}`}
+          className={`mt-1 block w-full px-3 py-2 border ${hasError ? 'border-red-500' : 'border-gray-300'
+            } rounded-md shadow-sm focus:outline-none focus:ring-jobboard-darkblue focus:border-jobboard-darkblue ${className}`}
         />
         {hasError && <p className="mt-1 text-sm text-red-600">{errors[name]?.message}</p>}
       </div>

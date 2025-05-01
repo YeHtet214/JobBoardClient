@@ -8,6 +8,7 @@ import {
   deleteExistingCompany,
   getCompanyByOwnerId
 } from '../services/company.service.js';
+import { ForbiddenError } from '../middleware/errorHandler.js';
 
 export const getAllCompanies = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -37,15 +38,13 @@ export const getCurrentCompany = async (req: RequestWithUser, res: Response, nex
     
     try {
       const company = await getCompanyByOwnerId(userId);
-
-      console.log("Current Company: ", company);
+      
       return res.status(200).json({ 
         success: true, 
         message: 'Company fetched successfully', 
         data: company 
       });
     } catch (error: any) {
-      // If company not found, return 404 with appropriate message
       if (error.status === 404) {
         return res.status(404).json({ 
           success: false, 
@@ -53,7 +52,6 @@ export const getCurrentCompany = async (req: RequestWithUser, res: Response, nex
           data: null
         });
       }
-      // For other errors, pass to the error middleware
       throw error;
     }
   } catch (error) {
@@ -89,10 +87,7 @@ export const updateCompany = async (req: RequestWithUser, res: Response, next: N
     const existingCompany = await getExistingCompany(id);
 
     if (existingCompany.ownerId !== req.user.userId) {
-      return res.status(403).json({
-        success: false,
-        message: "You don't have permission to update this company"
-      });
+      throw new ForbiddenError("You don't have permission to update this company");
     }
 
     const company = await updateExistingCompany(id, {
@@ -118,10 +113,7 @@ export const deleteCompany = async (req: RequestWithUser, res: Response, next: N
     const existingCompany = await getExistingCompany(id);
 
     if (existingCompany.ownerId !== req.user.userId) {
-      return res.status(403).json({
-        success: false,
-        message: "You don't have permission to delete this company"
-      });
+      throw new ForbiddenError("You don't have permission to delete this company");
     }
 
     const company = await deleteExistingCompany(id);

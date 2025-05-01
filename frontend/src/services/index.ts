@@ -119,6 +119,8 @@ axiosInstance.interceptors.response.use((response) => {
                 localStorage.setItem('accessToken', newAccessToken);
                 localStorage.setItem('refreshToken', newRefreshToken);
 
+                console.log("Access Token: ", newAccessToken, "Refresh Token: ", newRefreshToken);
+
                 // Update the original request
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
@@ -147,6 +149,8 @@ axiosInstance.interceptors.response.use((response) => {
                     subscribeTokenRefresh((token) => resolve(token));
                 });
 
+                console.log("New token: ", newToken);
+
                 // Update request and retry
                 originalRequest.headers.Authorization = `Bearer ${newToken}`;
                 return axiosInstance(originalRequest);
@@ -155,6 +159,7 @@ axiosInstance.interceptors.response.use((response) => {
             }
         } else {
             // If refresh token is expired or not available
+            console.log("Just to remove refresh Token: ", refreshToken)
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
 

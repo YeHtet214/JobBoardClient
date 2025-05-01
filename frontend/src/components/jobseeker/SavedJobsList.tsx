@@ -14,11 +14,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { formatDate } from '@/utils/dashboard.utils';
-import { SavedJob } from '@/types/dashboard.types';
+import { SavedJobWithDetails } from '@/types/saved-job.types';
 
 interface SavedJobsListProps {
-  savedJobs: SavedJob[];
-  onRemoveSavedJob?: (job: SavedJob) => void;
+  savedJobs: SavedJobWithDetails[];
+  onRemoveSavedJob?: (job: SavedJobWithDetails) => void;
   emptyStateMessage?: string;
 }
 
@@ -33,24 +33,24 @@ const SavedJobsList: React.FC<SavedJobsListProps> = ({
     <div>
       {savedJobs.length > 0 ? (
         <div className="space-y-4">
-          {savedJobs.map((job) => (
+          {savedJobs.map((savedJob) => (
             <div
-              key={job.id}
+              key={savedJob.id}
               className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-medium text-sm truncate">{job.title}</h4>
-                  <p className="text-xs text-gray-500 mt-1">{job.companyName}</p>
+                  <h4 className="font-medium text-sm truncate">{savedJob.job.title}</h4>
+                  <p className="text-xs text-gray-500 mt-1">{savedJob.job.company?.name}</p>
                   <div className="flex items-center mt-2">
-                    <span className="text-xs text-gray-500">Saved {formatDate(job.savedAt)}</span>
+                    <span className="text-xs text-gray-500">Saved {formatDate(savedJob.createdAt)}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => navigate(`/jobs/${job.jobId}`)}
+                    onClick={() => navigate(`/jobs/${savedJob.job.id}`)}
                   >
                     View
                   </Button>
@@ -66,13 +66,13 @@ const SavedJobsList: React.FC<SavedJobsListProps> = ({
                         <AlertDialogHeader>
                           <AlertDialogTitle>Remove Saved Job</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Are you sure you want to remove {job.title} at {job.companyName} from your saved jobs?
+                            Are you sure you want to remove {savedJob.job.title} at {savedJob.job.company?.name} from your saved jobs?
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
-                            onClick={() => onRemoveSavedJob(job)}
+                            onClick={() => onRemoveSavedJob(savedJob)}
                             className="bg-red-500 hover:bg-red-600"
                           >
                             Remove

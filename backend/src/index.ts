@@ -12,6 +12,7 @@ import jobRouter from './routes/job.route.js';
 import applicationRouter from './routes/application.route.js';
 import userRouter from './routes/user.route.js';
 import dashboardRouter from './routes/dashboard.routes.js';
+import savedJobRouter from './routes/saved-job.route.js';
 
 import errorHandler from './middleware/error.middleware.js';
 
@@ -57,6 +58,7 @@ app.use('/api/companies', companyRouter);
 app.use('/api/jobs', jobRouter);
 app.use('/api/applications', applicationRouter);
 app.use('/api/dashboard', dashboardRouter);
+app.use('/api/saved-jobs', savedJobRouter);
 
 app.use(errorHandler);
 

@@ -1,6 +1,6 @@
-import prisma from "../prisma/client.js"
-import { CustomError } from "../types/error.type.js";
-import { createApplicationDto, updateApplicationDto } from "../types/application.type.js";
+import prisma from "../../prisma/client.js"
+import { CustomError } from "../../types/error.type.js";
+import { createApplicationDto, updateApplicationDto } from "../../types/application.type.js";
 
 export const fetchAllApplicationsByJobId = async (jobId: string) => {
     const applications = await prisma.jobApplication.findMany({

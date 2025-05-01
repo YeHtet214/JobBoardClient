@@ -19,7 +19,7 @@ class ApplicationService extends ApiService {
     return response.data.data;
   }
 
-  public async getApplicationsForJob(jobId: string): Promise<Application[]> {
+  public async getApplicationsByJobId(jobId: string): Promise<Application[]> {
     const response = await this.get<Application[]>(this.endpoints.JOB_APPLICATIONS(jobId));
     return response.data.data;
   }
@@ -29,7 +29,7 @@ class ApplicationService extends ApiService {
     return response.data.data;
   }
 
-  public async updateApplicationStatus(id: string, updateData: UpdateApplicationDto): Promise<Application> {
+  public async updateApplication(id: string, updateData: UpdateApplicationDto): Promise<Application> {
     const response = await this.put<Application>(this.endpoints.DETAIL(id), updateData);
     return response.data.data;
   }

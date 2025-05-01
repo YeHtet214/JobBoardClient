@@ -28,8 +28,6 @@ authRouter.get('/google/callback', passport.authenticate('google', {
             // User will be available from passport
             const user = req.user as User;
 
-            console.log("user: ", user);
-
             if (!user || !user.id) {
                 return res.redirect(`${FRONTEND_URL}/login?error=authentication_failed`);
             }

@@ -25,8 +25,8 @@ const CompaniesPageContent: React.FC = () => {
 
   // Get current user and check if they have a company
   const { currentUser } = useAuth();
-  const { data: userCompany } = useMyCompany();
   const isEmployer = currentUser?.role === 'EMPLOYER';
+  const { data: userCompany } = isEmployer ? useMyCompany() : { data: null };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);

@@ -1,8 +1,8 @@
 import { Field, FieldArray, ErrorMessage } from 'formik';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
-import { Button } from '../../components/ui/button';
-import { Textarea } from '../../components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { X, Plus, GraduationCap } from 'lucide-react';
 import {
   Card,
@@ -11,10 +11,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle
-} from '../../components/ui/card';
+} from '@/components/ui/card';
 import { FormikProps } from 'formik';
-import { Profile } from '../../types/profile.types';
-import LoadingSpinner from '../ui/LoadingSpinner';
+import { Profile } from '@/types/profile.types';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface EducationTabProps {
   formik: FormikProps<Profile>;

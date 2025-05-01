@@ -3,7 +3,6 @@ import {
   JobSeekerDashboardData, 
   EmployerDashboardData, 
   JobApplication, 
-  SavedJob, 
   RecentActivity,
   PostedJob,
   ReceivedApplication,
@@ -17,13 +16,10 @@ class DashboardService extends ApiService {
     EMPLOYER_DASHBOARD: '/dashboard/employer',
     JOBSEEKER_APPLICATIONS: '/dashboard/jobseeker/applications',
     JOBSEEKER_SAVED_JOBS: '/dashboard/jobseeker/saved-jobs',
-    JOBSEEKER_ACTIVITY: '/dashboard/jobseeker/activity',
     EMPLOYER_POSTED_JOBS: '/dashboard/employer/jobs',
     EMPLOYER_APPLICATIONS: '/dashboard/employer/applications',
     EMPLOYER_ACTIVITY: '/dashboard/employer/activity',
     APPLICATION_DETAIL: (id: string) => `/dashboard/applications/${id}`,
-    SAVED_JOB: (id: string) => `/dashboard/saved-jobs/${id}`,
-    POSTED_JOB: (id: string) => `/dashboard/jobs/${id}`,
     COMPANY_PROFILE_COMPLETION: '/dashboard/employer/profile-completion',
   };
 
@@ -36,20 +32,6 @@ class DashboardService extends ApiService {
   public async getJobSeekerApplications(): Promise<JobApplication[]> {
     const response = await this.get<JobApplication[]>(this.endpoints.JOBSEEKER_APPLICATIONS);
     return response.data.data;
-  }
-
-  public async getJobSeekerSavedJobs(): Promise<SavedJob[]> {
-    const response = await this.get<SavedJob[]>(this.endpoints.JOBSEEKER_SAVED_JOBS);
-    return response.data.data;
-  }
-
-  public async getJobSeekerActivity(): Promise<RecentActivity[]> {
-    const response = await this.get<RecentActivity[]>(this.endpoints.JOBSEEKER_ACTIVITY);
-    return response.data.data;
-  }
-
-  public async removeSavedJob(id: string): Promise<void> {
-    await this.delete<void>(this.endpoints.SAVED_JOB(id));
   }
 
   public async withdrawApplication(id: string): Promise<void> {
@@ -83,10 +65,6 @@ class DashboardService extends ApiService {
       statusData
     );
     return response.data.data;
-  }
-
-  public async deletePostedJob(id: string): Promise<void> {
-    await this.delete<void>(this.endpoints.POSTED_JOB(id));
   }
 
   public async getCompanyProfileCompletion(): Promise<{ complete: boolean; percentage: number }> {

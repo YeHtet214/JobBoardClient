@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Card, 
@@ -23,58 +23,132 @@ import ProfileCompletionCard from '../dashboard/ProfileCompletionCard';
 import PostedJobsList from './PostedJobsList';
 import ReceivedApplicationsList from './ReceivedApplicationsList';
 import { getEmployerActivityIcon } from '@/utils/dashboard.utils';
+import DashboardContainer from '../dashboard/DashboardContainer';
+import { useAuth } from '@/contexts/authContext';
+import { useToast } from '@/components/ui/use-toast';
+import {
+  useEmployerDashboard,
+  useUpdateApplicationStatus,
+  useDeletePostedJob
+} from '@/hooks/react-queries/dashboard';
+import { UpdateApplicationStatusDto } from '@/types/dashboard.types';
 
-interface EmployerDashboardProps {
-  stats: EmployerStats;
-  postedJobs: PostedJob[];
-  applications: ReceivedApplication[];
-  recentActivity: EmployerActivity[];
-  companyProfileComplete: boolean;
-  companyProfilePercentage: number;
-  onUpdateApplicationStatus?: (application: ReceivedApplication, status: ReceivedApplication['status']) => void;
-  onDeleteJob?: (job: PostedJob) => void;
-}
-
-const EmployerDashboard: React.FC<EmployerDashboardProps> = ({
-  stats,
-  postedJobs,
-  applications,
-  recentActivity,
-  companyProfileComplete,
-  companyProfilePercentage,
-  onUpdateApplicationStatus,
-  onDeleteJob
-}) => {
+const EmployerDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
+  const { toast } = useToast();
+
+  const [stats, setStats] = useState<EmployerStats | null>(null);
+  const [postedJobs, setPostedJobs] = useState<PostedJob[]>([]);
+  const [applications, setApplications] = useState<ReceivedApplication[]>([]);
+  const [recentActivity, setRecentActivity] = useState<EmployerActivity[]>([]);
+  const [companyProfileComplete, setCompanyProfileComplete] = useState<boolean>(false);
+  const [companyProfilePercentage, setCompanyProfilePercentage] = useState<number>(0);
+
+  // Employer query and mutations - only fetch if user is an EMPLOYER
+  const { 
+    data: employerData, 
+    isLoading, 
+    error, 
+    refetch 
+  } = useEmployerDashboard({
+    enabled: currentUser?.role === 'EMPLOYER'
+  });
+
+  const { mutate: updateApplicationStatus } = useUpdateApplicationStatus();
+  const { mutate: deletePostedJob } = useDeletePostedJob();
+
+  // Load dashboard data on component mount
+  useEffect(() => {
+    if (employerData) {
+      setStats(employerData.stats);
+      setPostedJobs(employerData.jobs);
+      setApplications(employerData.applications);
+      setRecentActivity(employerData.recentActivity);
+      setCompanyProfileComplete(employerData.company);
+      setCompanyProfilePercentage(employerData.companyProfilePercentage);
+    }
+  }, [employerData]);
+
+  console.log(employerData);
+
+  // Handle employer actions
+  const handleUpdateApplicationStatus = useCallback((
+    application: ReceivedApplication, 
+    status: ReceivedApplication['status']
+  ) => {
+    const statusData: UpdateApplicationStatusDto = { status };
+    updateApplicationStatus(
+      { id: application.id, statusData },
+      {
+        onSuccess: () => {
+          toast({
+            title: "Status updated",
+            description: `Application status updated to ${status.toLowerCase()}.`,
+          });
+        },
+        onError: () => {
+          toast({
+            title: "Error",
+            description: "Failed to update application status. Please try again.",
+            variant: "destructive"
+          });
+        }
+      }
+    );
+  }, [updateApplicationStatus, toast]);
+
+  const handleDeleteJob = useCallback((job: PostedJob) => {
+    deletePostedJob(job.id, {
+      onSuccess: () => {
+        toast({
+          title: "Job deleted",
+          description: `${job.title} has been deleted.`,
+        });
+      },
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to delete job. Please try again.",
+          variant: "destructive"
+        });
+      }
+    });
+  }, [deletePostedJob, toast]);
 
   return (
-    <div>
+    <DashboardContainer
+      isLoading={isLoading}
+      error={error}
+      refetch={refetch}
+      title="Employer Dashboard"
+    >
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:!grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <DashboardStatCard
           title="Active Jobs"
-          value={stats.activeJobs}
-          icon={<Briefcase className="h-6 w-6 text-jobboard-darkblue" />}
-          borderColorClass="border-l-jobboard-darkblue"
+          value={stats?.activeJobs || 0}
+          icon={<Briefcase className="h-6 w-6 text-jobboard-blue" />}
+          borderColorClass="border-l-jobboard-blue"
         />
         
         <DashboardStatCard
           title="Total Applications"
-          value={stats.totalApplications}
+          value={stats?.totalApplications || 0}
           icon={<FileText className="h-6 w-6 text-jobboard-purple" />}
           borderColorClass="border-l-jobboard-purple"
         />
         
         <DashboardStatCard
           title="Interview Invitations"
-          value={stats.interviewInvitations}
+          value={stats?.interviewInvitations || 0}
           icon={<UserCheck className="h-6 w-6 text-jobboard-green" />}
           borderColorClass="border-l-jobboard-green"
         />
         
         <DashboardStatCard
           title="Reviewing"
-          value={stats.reviewingApplications}
+          value={stats?.reviewingApplications || 0}
           icon={<Plus className="h-6 w-6 text-jobboard-red" />}
           borderColorClass="border-l-jobboard-red"
         />
@@ -118,11 +192,11 @@ const EmployerDashboard: React.FC<EmployerDashboardProps> = ({
                 </CardHeader>
                 <CardContent>
                   <PostedJobsList
-                    postedJobs={postedJobs}
-                    onDeleteJob={onDeleteJob}
+                    postedJobs={postedJobs || []}
+                    onDeleteJob={handleDeleteJob}
                   />
                 </CardContent>
-                {postedJobs.length > 0 && (
+                {postedJobs?.length > 0 && (
                   <CardFooter className="flex justify-center">
                     <Button variant="outline" onClick={() => navigate('/employer/jobs')}>
                       View All Jobs
@@ -142,11 +216,11 @@ const EmployerDashboard: React.FC<EmployerDashboardProps> = ({
                 </CardHeader>
                 <CardContent>
                   <ReceivedApplicationsList
-                    applications={applications}
-                    onUpdateApplicationStatus={onUpdateApplicationStatus}
+                    applications={applications || []}
+                    onUpdateApplicationStatus={handleUpdateApplicationStatus}
                   />
                 </CardContent>
-                {applications.length > 0 && (
+                {applications?.length > 0 && (
                   <CardFooter className="flex justify-center">
                     <Button variant="outline" onClick={() => navigate('/employer/applications')}>
                       View All Applications
@@ -161,7 +235,7 @@ const EmployerDashboard: React.FC<EmployerDashboardProps> = ({
         {/* Sidebar Section */}
         <div>
           <ActivityFeed
-            activities={recentActivity}
+            activities={recentActivity || []}
             title="Recent Activity"
             description="Recent activity on your job postings"
             getActivityIcon={getEmployerActivityIcon}
@@ -187,7 +261,7 @@ const EmployerDashboard: React.FC<EmployerDashboardProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </DashboardContainer>
   );
 };
 

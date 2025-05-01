@@ -19,7 +19,28 @@ export interface CreateApplicationDto {
   resumeUrl?: string;
 }
 
-export interface UpdateApplicationDto {
-  status?: ApplicationStatus;
-  notes?: string;
+export interface UpdateApplicationDto extends Partial<Application> {
+  status: ApplicationStatus;
+}
+
+export interface ApplicationFormValues {
+    // Personal info
+    fullName: string;
+    email: string;
+    phone: string;
+
+    // Resume
+    resume: File | null;
+    useExistingResume: boolean;
+
+    // Cover letter
+    coverLetter: string;
+
+    // Additional questions
+    availability: string;
+    expectedSalary: string;
+    additionalInfo: string;
+
+    // Terms
+    acceptTerms: boolean;
 }

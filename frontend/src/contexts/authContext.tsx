@@ -8,7 +8,7 @@ import {
 } from '@/hooks/react-queries/auth';
 import { useCurrentUser } from '@/hooks/react-queries/user';
 import authService from '@/services/auth.service';
-import { User } from '@/types/auth.types';
+import { User } from '@/types/user.types';
 import { isTokenExpired } from '@/utils/jwt';
 
 interface AuthContextType {

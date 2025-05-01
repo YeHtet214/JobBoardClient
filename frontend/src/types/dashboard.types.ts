@@ -9,16 +9,6 @@ export interface JobApplication {
   jobId: string;
 }
 
-export interface SavedJob {
-  id: string;
-  title: string;
-  companyName: string;
-  location: string;
-  savedAt: string; // ISO date string
-  logo?: string;
-  jobId: string;
-}
-
 export interface RecentActivity {
   id: string;
   type: 'VIEW' | 'APPLY' | 'SAVE' | 'MESSAGE';
@@ -39,7 +29,6 @@ export interface JobSeekerStats {
 export interface JobSeekerDashboardData {
   stats: JobSeekerStats;
   applications: JobApplication[];
-  savedJobs: SavedJob[];
   recentActivity: RecentActivity[];
 }
 
@@ -51,7 +40,7 @@ export interface PostedJob {
   type: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT';
   applicationsCount: number;
   status: 'ACTIVE' | 'EXPIRED' | 'DRAFT';
-  postedAt: string; // ISO date string
+  postedDate: string; // ISO date string
   expiresAt: string; // ISO date string
 }
 
@@ -86,15 +75,14 @@ export interface EmployerStats {
 
 export interface EmployerDashboardData {
   stats: EmployerStats;
-  postedJobs: PostedJob[];
+  jobs: PostedJob[];
   applications: ReceivedApplication[];
   recentActivity: EmployerActivity[];
-  companyProfileComplete: boolean;
+  company: boolean;
   companyProfilePercentage: number;
 }
 
 // DTO types for API operations
 export interface UpdateApplicationStatusDto {
   status: ReceivedApplication['status'];
-  notes?: string;
 }

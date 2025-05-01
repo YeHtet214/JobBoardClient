@@ -1,28 +1,25 @@
 import { Router } from 'express';
 import authorize from '../middleware/auth.middleware.js';
-import { checkRole } from '../middleware/role.middleware.js';
-import { UserRole } from '@prisma/client';
-import { 
+import { jobseekerOnly, employerOnly } from '../middleware/role.middleware.js';
+import {
   getJobSeekerDashboard,
   getEmployerDashboard,
-  removeSavedJob,
   withdrawApplication,
   updateApplicationStatusHandler,
-  deleteJob,
   getCompanyProfile
 } from '../controllers/dashboard.controller.js';
 
 const dashboardRouter = Router();
 
+dashboardRouter.use(authorize);
+
 // Job seeker routes
-dashboardRouter.get('/jobseeker', authorize, checkRole([UserRole.JOBSEEKER]), getJobSeekerDashboard);
-dashboardRouter.delete('/saved-jobs/:id', authorize, checkRole([UserRole.JOBSEEKER]), removeSavedJob);
-dashboardRouter.delete('/applications/:id', authorize, checkRole([UserRole.JOBSEEKER]), withdrawApplication);
+dashboardRouter.get('/jobseeker', jobseekerOnly, getJobSeekerDashboard);
+dashboardRouter.delete('/jobseeker/applications/:id', jobseekerOnly, withdrawApplication);
 
 // Employer routes
-dashboardRouter.get('/employer', authorize, checkRole([UserRole.EMPLOYER]), getEmployerDashboard);
-dashboardRouter.put('/applications/:id', authorize, checkRole([UserRole.EMPLOYER]), updateApplicationStatusHandler);
-dashboardRouter.delete('/jobs/:id', authorize, checkRole([UserRole.EMPLOYER]), deleteJob);
-dashboardRouter.get('/employer/profile-completion', authorize, checkRole([UserRole.EMPLOYER]), getCompanyProfile);
+dashboardRouter.get('/employer', employerOnly, getEmployerDashboard);
+dashboardRouter.put('/employer/applications/:id', employerOnly, updateApplicationStatusHandler);
+dashboardRouter.get('/employer/profile-completion', employerOnly, getCompanyProfile);
 
 export default dashboardRouter;
