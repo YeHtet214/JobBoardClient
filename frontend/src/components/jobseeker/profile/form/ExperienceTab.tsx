@@ -1,8 +1,4 @@
-import { Field, FieldArray, ErrorMessage } from 'formik';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { FieldArray, FormikProps } from 'formik';
 import { X, Plus, Briefcase } from 'lucide-react';
 import {
   Card,
@@ -12,18 +8,19 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { FormikProps } from 'formik';
-import { Profile } from '@/types/profile.types';
+import { Button } from '@/components/ui/button';
+import { InputFieldWithLabel, TextareaField, CheckboxField } from '@/components/forms';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { ProfileFormValues } from './ProfileEditForm';
 
 interface ExperienceTabProps {
-  formik: FormikProps<Profile>;
+  formik: FormikProps<ProfileFormValues>;
   isSaving: boolean;
   onTabChange: (tab: string) => void;
 }
 
 const ExperienceTab = ({ formik, isSaving, onTabChange }: ExperienceTabProps) => {
-  const { values, handleChange } = formik;
+  const { values } = formik;
 
   return (
     <Card className="border-none shadow-none">
@@ -55,89 +52,65 @@ const ExperienceTab = ({ formik, isSaving, onTabChange }: ExperienceTabProps) =>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                      <div className="space-y-2">
-                        <Label htmlFor={`experience.${index}.company`}>Company</Label>
-                        <Field
-                          as={Input}
-                          id={`experience.${index}.company`}
-                          name={`experience.${index}.company`}
-                          placeholder="e.g. Google"
-                        />
-                        <ErrorMessage name={`experience.${index}.company`} component="div" className="text-red-500 text-sm" />
-                      </div>
+                      <InputFieldWithLabel
+                        formik={true}
+                        name={`experience.${index}.company`}
+                        label="Company"
+                        placeholder="e.g. Google Inc."
+                      />
 
-                      <div className="space-y-2">
-                        <Label htmlFor={`experience.${index}.position`}>Position</Label>
-                        <Field
-                          as={Input}
-                          id={`experience.${index}.position`}
-                          name={`experience.${index}.position`}
-                          placeholder="e.g. Software Engineer"
-                        />
-                        <ErrorMessage name={`experience.${index}.position`} component="div" className="text-red-500 text-sm" />
-                      </div>
+                      <InputFieldWithLabel
+                        formik={true}
+                        name={`experience.${index}.position`}
+                        label="Position"
+                        placeholder="e.g. Software Engineer"
+                      />
 
-                      <div className="space-y-2">
-                        <Label htmlFor={`experience.${index}.location`}>Location (Optional)</Label>
-                        <Field
-                          as={Input}
-                          id={`experience.${index}.location`}
-                          name={`experience.${index}.location`}
-                          placeholder="e.g. San Francisco, CA"
-                        />
-                      </div>
+                      <InputFieldWithLabel
+                        formik={true}
+                        name={`experience.${index}.location`}
+                        label="Location (Optional)"
+                        placeholder="e.g. San Francisco, CA"
+                      />
 
                       <div className="space-y-2 col-span-2 flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          id={`experience.${index}.isCurrent`}
+                        <CheckboxField
+                          formik={true}
                           name={`experience.${index}.isCurrent`}
-                          checked={values.experience[index].isCurrent}
-                          onChange={handleChange}
-                          className="mr-1"
+                          label="I currently work here"
                         />
-                        <Label htmlFor={`experience.${index}.isCurrent`}>I currently work here</Label>
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor={`experience.${index}.startDate`}>Start Date</Label>
-                        <Field
-                          as={Input}
-                          type="date"
-                          id={`experience.${index}.startDate`}
-                          name={`experience.${index}.startDate`}
-                        />
-                        <ErrorMessage name={`experience.${index}.startDate`} component="div" className="text-red-500 text-sm" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor={`experience.${index}.endDate`}>End Date</Label>
-                        <Field
-                          as={Input}
-                          type="date"
-                          id={`experience.${index}.endDate`}
-                          name={`experience.${index}.endDate`}
-                        />
-                        <ErrorMessage name={`experience.${index}.endDate`} component="div" className="text-red-500 text-sm" />
-                      </div>
+                      <InputFieldWithLabel
+                        formik={true}
+                        name={`experience.${index}.startDate`}
+                        label="Start Date"
+                        type="text"
+                        placeholder="YYYY-MM-DD"
+                      />
+                      
+                      <InputFieldWithLabel
+                        formik={true}
+                        name={`experience.${index}.endDate`}
+                        label="End Date"
+                        type="text"
+                        placeholder="YYYY-MM-DD"
+                      />
 
-                      <div className="space-y-2 col-span-2">
-                        <Label htmlFor={`experience.${index}.description`}>Description</Label>
-                        <Field
-                          as={Textarea}
-                          id={`experience.${index}.description`}
-                          name={`experience.${index}.description`}
-                          placeholder="Describe your role, responsibilities, and achievements..."
-                          className="min-h-20"
-                        />
-                        <ErrorMessage name={`experience.${index}.description`} component="div" className="text-red-500 text-sm" />
-                      </div>
+                      <TextareaField
+                        formik={true}
+                        name={`experience.${index}.description`}
+                        label="Description"
+                        placeholder="Describe your responsibilities, achievements, and skills used in this role..."
+                        className="min-h-32 col-span-2"
+                      />
                     </div>
                   </div>
                 ))
               ) : (
                 <div className="text-center py-8">
                   <Briefcase className="mx-auto h-12 w-12 text-gray-300" />
-                  <p className="mt-4 text-gray-500">No work experience added yet. Add your first work experience.</p>
+                  <p className="mt-4 text-gray-500">No work experience added yet. Add your first job.</p>
                 </div>
               )}
 
@@ -155,7 +128,7 @@ const ExperienceTab = ({ formik, isSaving, onTabChange }: ExperienceTabProps) =>
                   description: ''
                 })}
               >
-                <Plus className="h-4 w-4 mr-2" /> Add Work Experience
+                <Plus className="h-4 w-4 mr-2" /> Add Experience
               </Button>
             </div>
           )}
@@ -170,8 +143,15 @@ const ExperienceTab = ({ formik, isSaving, onTabChange }: ExperienceTabProps) =>
             Next
           </Button>
         </div>
-        <Button type="submit" disabled={isSaving} className="bg-jobboard-darkblue hover:bg-jobboard-darkblue/90">
-          {isSaving ? <LoadingSpinner size="sm" /> : 'Save Profile'}
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? (
+            <span className="flex items-center">
+              <LoadingSpinner size="sm" className="mr-2" />
+              Saving...
+            </span>
+          ) : (
+            "Save"
+          )}
         </Button>
       </CardFooter>
     </Card>

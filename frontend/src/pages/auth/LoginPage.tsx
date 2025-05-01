@@ -3,15 +3,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/authContext';
 import { LoginRequest } from '@/types/auth.types';
 import * as Yup from 'yup';
-import { Formik, FormikHelpers, Field, ErrorMessage } from 'formik';
-import { Form } from '@/components/form';
+import { Formik, FormikHelpers } from 'formik';
+import { Form, InputFieldWithLabel, PasswordFieldWithLabel, SwitchFieldWithLabel, SubmitButton } from '@/components/forms';
 import AuthLayout from '@/components/layouts/AuthLayout';
 
 // Shadcn UI components with correct import paths
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, Mail } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -78,6 +75,7 @@ const LoginPage: React.FC = () => {
   const initialValues: LoginRequest = {
     email: '',
     password: '',
+    remember: false
   };
 
   const handleSubmit = async (values: LoginRequest, { setSubmitting, setFieldError }: FormikHelpers<LoginRequest>) => {
@@ -189,56 +187,42 @@ const LoginPage: React.FC = () => {
             validationSchema={loginSchema}
             onSubmit={handleSubmit}
           >
-            {({ errors, touched, isSubmitting }) => (
+            {({ isSubmitting }) => (
               <Form className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Field
-                    as={Input}
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="name@example.com"
-                    autoComplete="email"
-                    className={(touched.email && errors.email) || formError.email ? "border-destructive" : ""}
-                    disabled={isSubmitting}
-                  />
-                  <ErrorMessage name="email" component="div" className="text-sm text-destructive" />
-                  {formError.email && <div className="text-sm text-destructive">{formError.email}</div>}
-                </div>
+                <InputFieldWithLabel
+                  formik={true}
+                  name="email"
+                  label="Email"
+                  type="email"
+                  placeholder="name@example.com"
+                  autoComplete="email"
+                  required
+                  disabled={isSubmitting}
+                />
 
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Link to="/forgot-password" className="text-sm font-medium text-primary hover:underline">
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <Field
-                    as={Input}
-                    id="password"
+                <div className="space-y-2 relative">
+                  <PasswordFieldWithLabel
+                    formik={true}
                     name="password"
-                    type="password"
+                    label="Password"
                     placeholder="••••••••"
                     autoComplete="current-password"
-                    className={(touched.password && errors.password) || formError.password ? "border-destructive" : ""}
+                    required
                     disabled={isSubmitting}
                   />
-                  <ErrorMessage name="password" component="div" className="text-sm text-destructive" />
-                  {formError.password && <div className="text-sm text-destructive">{formError.password}</div>}
+                  <Link to="/forgot-password" className="text-sm font-medium text-primary opacity-70 hover:opacity-100 hover:underline absolute top-0 right-0">
+                    Forgot password?
+                  </Link>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <Field
-                    as={Checkbox}
-                    id="remember"
-                    name="remember"
-                    disabled={isSubmitting}
-                  />
-                  <Label htmlFor="remember" className="text-sm font-normal">Remember me</Label>
-                </div>
+                <SwitchFieldWithLabel
+                  formik={true}
+                  name="remember"
+                  label="Remember me"
+                  disabled={isSubmitting}
+                />
 
-                <Button
+                <SubmitButton
                   type="submit"
                   className="w-full"
                   disabled={isSubmitting}
@@ -250,7 +234,7 @@ const LoginPage: React.FC = () => {
                   ) : (
                     "Sign in"
                   )}
-                </Button>
+                </SubmitButton>
               </Form>
             )}
           </Formik>

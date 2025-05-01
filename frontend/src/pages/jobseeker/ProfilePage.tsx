@@ -11,7 +11,7 @@ import { useProfile, useCreateProfile, useUpdateProfile, useUploadResume } from 
 
 import ProfileOverview from '@/components/jobseeker/profile/ProfileOverview';
 import ProfileTabs from '@/components/jobseeker/profile/ProfileTabs';
-import ProfileEditForm from '@/components/jobseeker/profile/form/ProfileEditForm';
+import ProfileEditForm, { ProfileFormValues } from '@/components/jobseeker/profile/form/ProfileEditForm';
 
 const initialProfile: Profile = {
   id: '',
@@ -53,7 +53,7 @@ const ProfilePage = () => {
     console.log("Profile changed: ", profile);
   }, [profile]);
 
-  const handleSubmit = async (values: Profile) => {
+  const handleSubmit = async (values: ProfileFormValues) => {
     try {
       if (profile?.id) {
         await updateProfile(values);

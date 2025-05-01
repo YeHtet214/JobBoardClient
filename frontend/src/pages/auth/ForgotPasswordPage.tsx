@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import * as Yup from 'yup';
-import { Formik, FormikHelpers, Field, ErrorMessage } from 'formik';
-import { Form } from '@/components/forms/components';
+import { Formik, FormikHelpers } from 'formik';
+import { Form, InputFieldWithLabel, SubmitButton } from '@/components/forms';
 import AuthLayout from '@/components/layouts/AuthLayout';
 
 // Shadcn UI components
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, Mail, ArrowLeft } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
@@ -102,8 +99,8 @@ const ForgotPasswordPage: React.FC = () => {
               validationSchema={forgotPasswordSchema}
               onSubmit={handleSubmit}
             >
-              {({ isSubmitting, touched, errors }) => (
-                <Form className="space-y-4">
+              {({ isSubmitting }) => (
+                <Form>
                   {formError && (
                     <Alert className="bg-destructive/15 border-destructive/30">
                       <AlertCircle className="h-4 w-4 text-destructive mr-2" />
@@ -111,23 +108,18 @@ const ForgotPasswordPage: React.FC = () => {
                     </Alert>
                   )}
 
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Field
-                      as={Input}
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="name@example.com"
-                      autoComplete="email"
-                      className={(touched.email && errors.email) ? "border-destructive" : ""}
-                      disabled={isSubmitting}
-                    />
-                    <ErrorMessage name="email" component="div" className="text-sm text-destructive" />
-                  </div>
+                  <InputFieldWithLabel
+                    formik={true}
+                    name="email"
+                    label="Email"
+                    type="email"
+                    placeholder="name@example.com"
+                    autoComplete="email"
+                    required
+                    disabled={isSubmitting}
+                  />
 
-                  <Button
-                    type="submit"
+                  <SubmitButton
                     className="w-full"
                     disabled={isSubmitting}
                   >
@@ -138,7 +130,7 @@ const ForgotPasswordPage: React.FC = () => {
                     ) : (
                       "Send Reset Link"
                     )}
-                  </Button>
+                  </SubmitButton>
                 </Form>
               )}
             </Formik>

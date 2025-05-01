@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { FieldArray, FormikProps } from 'formik';
+import { FormikProps } from 'formik';
+import { FieldArray } from 'formik';
 import { Badge } from '@/components/ui/badge';
 import { X, Plus } from 'lucide-react';
 import {
@@ -11,19 +11,33 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Profile } from '@/types/profile.types';
-import { TextareaField, InputField } from '@/components/forms';
+import { TextareaField, InputFieldWithLabel } from '@/components/forms';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { ProfileFormValues } from './ProfileEditForm';
 
 interface BasicInfoTabProps {
-  formik: FormikProps<Profile>;
+  formik: FormikProps<ProfileFormValues>;
   isSaving: boolean;
   onTabChange: (tab: string) => void;
 }
 
 const BasicInfoTab = ({ formik, isSaving, onTabChange }: BasicInfoTabProps) => {
-  const [newSkill, setNewSkill] = useState('');
   const { values, setFieldValue } = formik;
+
+  // Function to handle adding a new skill
+  const handleAddSkill = () => {
+    // Get the new skill value from formik (could be defined in initialValues)
+    const skillToAdd = values.newSkill?.trim();
+
+    // Add the skill if it's not empty and not already in the list
+    if (skillToAdd && (!values.skills || !values.skills.includes(skillToAdd))) {
+      // Update the skills array
+      setFieldValue('skills', [...(values.skills || []), skillToAdd]);
+
+      // Clear the input field
+      setFieldValue('newSkill', '');
+    }
+  };
 
   return (
     <Card className="border-none shadow-none">
@@ -71,26 +85,18 @@ const BasicInfoTab = ({ formik, isSaving, onTabChange }: BasicInfoTabProps) => {
           </div>
 
           <div className="flex gap-2">
-            <InputField
-              formik={false}
+            <InputFieldWithLabel
+              formik={true}
               name="newSkill"
               label=""
               type="text"
-              value={newSkill}
-              onChange={(e) => setNewSkill(e.target.value)}
               placeholder="Add a skill..."
               className="flex-1"
-              errors={{}}
             />
             <Button
               type="button"
               variant="outline"
-              onClick={() => {
-                if (newSkill.trim()) {
-                  setFieldValue('skills', [...(values.skills || []), newSkill.trim()]);
-                  setNewSkill('');
-                }
-              }}
+              onClick={handleAddSkill}
               className="mt-1"
             >
               <Plus className="h-4 w-4 mr-1" /> Add
@@ -102,8 +108,15 @@ const BasicInfoTab = ({ formik, isSaving, onTabChange }: BasicInfoTabProps) => {
         <Button type="button" variant="outline" onClick={() => onTabChange('education')}>
           Next
         </Button>
-        <Button type="submit" disabled={isSaving} className="bg-jobboard-darkblue hover:bg-jobboard-darkblue/90">
-          {isSaving ? <LoadingSpinner size="sm" /> : 'Save Profile'}
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? (
+            <span className="flex items-center">
+              <LoadingSpinner size="sm" className="mr-2" />
+              Saving...
+            </span>
+          ) : (
+            "Save"
+          )}
         </Button>
       </CardFooter>
     </Card>

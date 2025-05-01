@@ -1,7 +1,9 @@
 import React from 'react';
 import { useField, useFormikContext } from 'formik';
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
 
-type InputFieldProps = {
+type InputFieldWithLabelProps = {
     name: string;
     label: string;
     type?: 'text' | 'email' | 'password' | 'number' | 'tel';
@@ -21,7 +23,7 @@ type InputFieldProps = {
       }
 );
 
-const InputField: React.FC<InputFieldProps> = (props) => {
+const InputFieldWithLabel: React.FC<InputFieldWithLabelProps> = (props) => {
     const { 
         label, 
         name, 
@@ -42,13 +44,13 @@ const InputField: React.FC<InputFieldProps> = (props) => {
             // Formik version
             const [field, meta] = useField(name);
             const hasError = meta.touched && meta.error;
-
+        
             return (
                 <div className="mb-4">
-                    <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+                    <Label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
                         {label} {required && <span className="text-red-500">*</span>}
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         type={type}
                         id={name}
                         placeholder={placeholder}
@@ -69,10 +71,10 @@ const InputField: React.FC<InputFieldProps> = (props) => {
             console.warn(`InputField with name "${name}" is marked as a Formik field but no Formik context was found.`);
             return (
                 <div className="mb-4">
-                    <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+                    <Label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
                         {label} {required && <span className="text-red-500">*</span>}
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         type={type}
                         id={name}
                         name={name}
@@ -88,13 +90,14 @@ const InputField: React.FC<InputFieldProps> = (props) => {
         // Non-Formik version
         const { value, onChange, onBlur, errors } = props;
         const hasError = errors && errors[name];
-
+        
+        console.log("Non formik")
         return (
             <div className="mb-4">
-                <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+                <Label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
                     {label} {required && <span className="text-red-500">*</span>}
-                </label>
-                <input
+                </Label>
+                <Input
                     type={type}
                     id={name}
                     name={name}
@@ -116,4 +119,4 @@ const InputField: React.FC<InputFieldProps> = (props) => {
     }
 };
 
-export default InputField;
+export default InputFieldWithLabel;

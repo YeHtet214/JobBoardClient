@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { Field, ErrorMessage, FormikProps } from 'formik';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { FormikProps } from 'formik';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { FileText, Github, Linkedin, Globe, Upload, AlertCircle } from 'lucide-react';
@@ -13,11 +11,12 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { Profile } from '@/types/profile.types';
+import { InputFieldWithLabel } from '@/components/forms';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { ProfileFormValues } from './ProfileEditForm';
 
 interface LinksTabProps {
-  formik: FormikProps<Profile>;
+  formik: FormikProps<ProfileFormValues>;
   isSaving: boolean;
   onTabChange: (tab: string) => void;
   onResumeUpload: (file: File) => Promise<void>;
@@ -57,18 +56,14 @@ const LinksTab = ({
     }
   };
 
-  const handleResumeUpload = async () => {
-    if (!resumeFile) {
-      setResumeUploadError('Please select a file to upload');
-      return;
-    }
-
-    try {
-      await onResumeUpload(resumeFile);
-      setResumeFile(null);
-    } catch (error) {
-      console.error('Error in resume upload handler:', error);
-      setResumeUploadError('Failed to upload resume. Please try again.');
+  const handleUploadClick = async () => {
+    if (resumeFile) {
+      try {
+        await onResumeUpload(resumeFile);
+        setResumeFile(null);
+      } catch (error) {
+        setResumeUploadError('Failed to upload resume. Please try again.');
+      }
     }
   };
 
@@ -77,150 +72,147 @@ const LinksTab = ({
       <CardHeader className="px-0 md:px-6">
         <CardTitle className="text-xl md:text-2xl text-jobboard-darkblue">Links & Resume</CardTitle>
         <CardDescription className="text-gray-500">
-          Add your professional links and upload your resume
+          Add your professional profiles and resume
         </CardDescription>
       </CardHeader>
+
       <CardContent className="space-y-6 px-0 md:px-6">
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <Linkedin className="h-5 w-5 text-jobboard-purple" />
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="linkedInUrl">LinkedIn Profile</Label>
-              <Field
-                as={Input}
-                id="linkedInUrl"
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Professional Links</h3>
+          
+          <div className="grid grid-cols-1 gap-4">
+            <div className="flex items-center gap-2">
+              <Linkedin className="h-5 w-5 text-[#0077B5]" />
+              <InputFieldWithLabel
+                formik={true}
                 name="linkedInUrl"
+                label="LinkedIn Profile"
                 placeholder="https://linkedin.com/in/yourprofile"
+                className="flex-1"
               />
-              <ErrorMessage name="linkedInUrl" component="div" className="text-red-500 text-sm" />
             </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <Github className="h-5 w-5 text-jobboard-purple" />
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="githubUrl">GitHub Profile</Label>
-              <Field
-                as={Input}
-                id="githubUrl"
+            
+            <div className="flex items-center gap-2">
+              <Github className="h-5 w-5" />
+              <InputFieldWithLabel
+                formik={true}
                 name="githubUrl"
+                label="GitHub Profile"
                 placeholder="https://github.com/yourusername"
+                className="flex-1"
               />
-              <ErrorMessage name="githubUrl" component="div" className="text-red-500 text-sm" />
             </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <Globe className="h-5 w-5 text-jobboard-purple" />
-            <div className="flex-1 space-y-2">
-              <Label htmlFor="portfolioUrl">Portfolio Website</Label>
-              <Field
-                as={Input}
-                id="portfolioUrl"
+            
+            <div className="flex items-center gap-2">
+              <Globe className="h-5 w-5 text-blue-500" />
+              <InputFieldWithLabel
+                formik={true}
                 name="portfolioUrl"
+                label="Portfolio Website"
                 placeholder="https://yourportfolio.com"
+                className="flex-1"
               />
-              <ErrorMessage name="portfolioUrl" component="div" className="text-red-500 text-sm" />
-            </div>
-          </div>
-
-          <Separator className="my-4" />
-
-          <div className="space-y-4">
-            <Label className="text-base font-semibold">Resume</Label>
-
-            {values && values.resumeUrl ? (
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border rounded-md bg-gray-50 gap-3">
-                <div className="flex items-center">
-                  <FileText className="h-5 w-5 text-jobboard-purple mr-3 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <span className="text-sm font-medium block">Current Resume</span>
-                    <span className="text-xs text-gray-500 truncate block">
-                      {values.resumeUrl.split('/').pop()}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    onClick={() => window.open(values.resumeUrl, '_blank')}
-                    className="w-full sm:w-auto"
-                  >
-                    View
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="p-4 border rounded-md bg-gray-50 text-center">
-                <AlertCircle className="h-8 w-8 text-amber-500 mx-auto mb-2" />
-                <p className="text-sm text-gray-600">No resume uploaded yet.</p>
-                <p className="text-xs text-gray-500 mt-1">Upload your resume to increase your chances of getting hired.</p>
-              </div>
-            )}
-
-            <div className="space-y-2 mt-4">
-              <Label htmlFor="resume" className="text-sm font-medium">Upload New Resume</Label>
-              <div className="flex flex-col gap-3">
-                <Input
-                  id="resume"
-                  type="file"
-                  accept=".pdf,.doc,.docx"
-                  onChange={handleResumeFileChange}
-                  className="cursor-pointer"
-                />
-
-                {resumeUploadError && (
-                  <div className="text-sm text-red-500 flex items-center gap-1 mt-1">
-                    <AlertCircle className="h-4 w-4" />
-                    {resumeUploadError}
-                  </div>
-                )}
-
-                <p className="text-xs text-gray-500">Accepted formats: PDF, DOC, DOCX. Max size: 5MB</p>
-
-                {resumeFile && (
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 p-2 bg-gray-100 rounded-md">
-                    <div className="flex items-center flex-1 min-w-0">
-                      <FileText className="h-4 w-4 text-jobboard-purple mr-2 flex-shrink-0" />
-                      <span className="text-sm truncate">{resumeFile.name}</span>
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      {(resumeFile.size / 1024 / 1024).toFixed(2)} MB
-                    </span>
-                  </div>
-                )}
-
-                <Button
-                  type="button"
-                  onClick={handleResumeUpload}
-                  disabled={isResumeUploading || !resumeFile}
-                  className={`mt-2 w-full sm:w-auto ${!resumeFile ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  {isResumeUploading ? (
-                    <>
-                      <LoadingSpinner size="sm" className="mr-2" />
-                      Uploading...
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload Resume
-                    </>
-                  )}
-                </Button>
-              </div>
             </div>
           </div>
         </div>
+
+        <Separator />
+
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Resume</h3>
+          
+          <div className="border border-dashed rounded-lg p-4 bg-gray-50">
+            {values.resumeUrl ? (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <FileText className="h-8 w-8 text-jobboard-darkblue" />
+                  <div>
+                    <p className="font-medium">Resume uploaded</p>
+                    <p className="text-sm text-gray-500 truncate max-w-xs">{values.resumeUrl.split('/').pop()}</p>
+                  </div>
+                </div>
+                <a 
+                  href={values.resumeUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-white border rounded-md shadow-sm text-sm font-medium hover:bg-gray-50 focus:outline-none"
+                >
+                  View Resume
+                </a>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center p-4">
+                <Upload className="h-12 w-12 text-gray-300 mb-2" />
+                <p className="mb-4 text-center">Upload your resume (PDF, DOC, or DOCX up to 5MB)</p>
+                
+                <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
+                  <div className="flex-1">
+                    <input
+                      type="file"
+                      id="resumeUpload"
+                      className="hidden"
+                      accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      onChange={handleResumeFileChange}
+                    />
+                    <label
+                      htmlFor="resumeUpload"
+                      className="w-full px-4 py-2 bg-white border rounded-md shadow-sm text-sm font-medium hover:bg-gray-50 focus:outline-none cursor-pointer flex items-center justify-center"
+                    >
+                      Select File
+                    </label>
+                  </div>
+                  
+                  {resumeFile && (
+                    <Button 
+                      type="button" 
+                      onClick={handleUploadClick}
+                      disabled={isResumeUploading}
+                      className="flex-1"
+                    >
+                      {isResumeUploading ? (
+                        <span className="flex items-center">
+                          <LoadingSpinner size="sm" className="mr-2" />
+                          Uploading...
+                        </span>
+                      ) : (
+                        "Upload"
+                      )}
+                    </Button>
+                  )}
+                </div>
+                
+                {resumeFile && !resumeUploadError && (
+                  <p className="mt-2 text-sm text-gray-500">
+                    Selected: {resumeFile.name} ({(resumeFile.size / 1024 / 1024).toFixed(2)} MB)
+                  </p>
+                )}
+                
+                {resumeUploadError && (
+                  <div className="mt-2 flex items-center text-red-500 text-sm">
+                    <AlertCircle className="h-4 w-4 mr-1" />
+                    {resumeUploadError}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
       </CardContent>
+
       <CardFooter className="flex justify-between px-0 md:px-6">
         <Button type="button" variant="outline" onClick={() => onTabChange('experience')}>
           Previous
         </Button>
-        <Button type="submit" disabled={isSaving} className="bg-jobboard-darkblue hover:bg-jobboard-darkblue/90">
-          {isSaving ? <LoadingSpinner size="sm" /> : 'Save Profile'}
+        
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? (
+            <span className="flex items-center">
+              <LoadingSpinner size="sm" className="mr-2" />
+              Saving...
+            </span>
+          ) : (
+            "Save"
+          )}
         </Button>
       </CardFooter>
     </Card>

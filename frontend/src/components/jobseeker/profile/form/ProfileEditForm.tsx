@@ -8,11 +8,16 @@ import EducationTab from '@/components/jobseeker/profile/form/EducationTab';
 import ExperienceTab from '@/components/jobseeker/profile/form/ExperienceTab';
 import LinksTab from '@/components/jobseeker/profile/form/LinksTab';
 
+// Extended profile type for form fields
+export interface ProfileFormValues extends Profile {
+  newSkill?: string; // Form-specific field for adding new skills
+}
+
 interface ProfileEditFormProps {
-  profile: Profile;
+  profile: ProfileFormValues;
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  handleSubmit: (values: Profile) => Promise<void>;
+  handleSubmit: (values: ProfileFormValues) => Promise<void>;
   handleResumeUpload: (file: File) => Promise<void>;
   isCreating: boolean;
   isUpdating: boolean;
@@ -65,6 +70,19 @@ const ProfileEditForm = ({
   isUpdating,
   isUploading
 }: ProfileEditFormProps) => {
+  // Create the extended initial values
+  const initialValues: ProfileFormValues = {
+    ...profile,
+    newSkill: '' // Add the form-specific field
+  };
+
+  // Custom submit handler that strips form-specific fields before submitting
+  const handleFormSubmit = async (values: ProfileFormValues) => {
+    // Extract only the Profile fields (omitting newSkill)
+    const { newSkill, ...profileData } = values;
+    await handleSubmit(profileData);
+  };
+
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       <TabsList className="w-full mb-8">
@@ -87,9 +105,9 @@ const ProfileEditForm = ({
       </TabsList>
 
       <Formik
-        initialValues={profile}
+        initialValues={initialValues}
         validationSchema={ProfileValidationSchema}
-        onSubmit={handleSubmit}
+        onSubmit={handleFormSubmit}
         enableReinitialize
       >
         {(formik) => (

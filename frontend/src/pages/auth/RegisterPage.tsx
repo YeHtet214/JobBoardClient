@@ -1,24 +1,21 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/authContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { UserRole } from '@/types/auth.types';
+import { UserRole } from '@/types/user.types';
 import * as Yup from 'yup';
-import { Formik, FormikHelpers, Field, ErrorMessage, FieldProps, FormikProps } from 'formik';
-import { Form } from '@/components/forms/components';
+import { Formik, FormikHelpers } from 'formik';
+import { 
+  Form, 
+  InputFieldWithLabel, 
+  PasswordFieldWithLabel, 
+  SelectFieldWithLabel,
+  SwitchFieldWithLabel,
+  SubmitButton
+} from '@/components/forms';
 import AuthLayout from '@/components/layouts/AuthLayout';
 
 // Shadcn UI components
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { 
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue
-} from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -55,8 +52,6 @@ const RegisterPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const { register, googleLogin } = useAuth();
     const navigate = useNavigate();
-
-    const [agreeTerms, setAgreeTerms] = useState(false);
 
     const initialValues = {
         email: '',
@@ -113,157 +108,100 @@ const RegisterPage: React.FC = () => {
             imageSrc="/auth-background.svg"
             imagePosition="left"
         >
-            <Card className="border-border/40 shadow-lg">
+            <Card className="w-full max-w-md">
                 <CardHeader className="space-y-1">
-                    <CardTitle className="text-2xl font-bold text-center">Create Your Account</CardTitle>
-                    <CardDescription className="text-center text-muted-foreground">
-                        Enter your information to create an account
-                    </CardDescription>
-                </CardHeader>
-                
-                <CardContent className="space-y-4">
+                    <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+                    <CardDescription>Enter your information to create an account</CardDescription>
                     {error && (
-                        <div className="bg-destructive/15 text-destructive flex items-center p-3 rounded-md text-sm" role="alert">
+                        <div className="flex items-center p-2 mt-2 text-sm text-destructive bg-destructive/20 rounded">
                             <AlertCircle className="h-4 w-4 mr-2" />
-                            <span>{error}</span>
+                            {error}
                         </div>
                     )}
-                    
+                </CardHeader>
+
+                <CardContent className="space-y-4">
                     <Formik
                         initialValues={initialValues}
                         validationSchema={registerSchema}
                         onSubmit={handleSubmit}
                     >
-                        {({ isSubmitting, touched, errors }) => (
-                            <Form className="space-y-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="firstName">First Name</Label>
-                                        <Field
-                                            as={Input}
-                                            id="firstName"
-                                            name="firstName"
-                                            type="text"
-                                            placeholder="John"
-                                            autoComplete="given-name"
-                                            className={touched.firstName && errors.firstName ? "border-destructive" : ""}
-                                            disabled={isSubmitting}
-                                        />
-                                        <ErrorMessage name="firstName" component="div" className="text-sm text-destructive" />
-                                    </div>
+                        {({ isSubmitting }) => (
+                            <Form>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <InputFieldWithLabel
+                                        formik={true}
+                                        name="firstName"
+                                        label="First Name"
+                                        placeholder="John"
+                                        required
+                                        disabled={isSubmitting}
+                                    />
                                     
-                                    <div className="space-y-2">
-                                        <Label htmlFor="lastName">Last Name</Label>
-                                        <Field
-                                            as={Input}
-                                            id="lastName"
-                                            name="lastName"
-                                            type="text"
-                                            placeholder="Doe"
-                                            autoComplete="family-name"
-                                            className={touched.lastName && errors.lastName ? "border-destructive" : ""}
-                                            disabled={isSubmitting}
-                                        />
-                                        <ErrorMessage name="lastName" component="div" className="text-sm text-destructive" />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="email">Email</Label>
-                                    <Field
-                                        as={Input}
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        placeholder="name@example.com"
-                                        autoComplete="email"
-                                        className={touched.email && errors.email ? "border-destructive" : ""}
+                                    <InputFieldWithLabel
+                                        formik={true}
+                                        name="lastName"
+                                        label="Last Name"
+                                        placeholder="Doe"
+                                        required
                                         disabled={isSubmitting}
                                     />
-                                    <ErrorMessage name="email" component="div" className="text-sm text-destructive" />
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="password">Password</Label>
-                                    <Field
-                                        as={Input}
-                                        id="password"
-                                        name="password"
-                                        type="password"
-                                        placeholder="••••••••"
-                                        autoComplete="new-password"
-                                        className={touched.password && errors.password ? "border-destructive" : ""}
-                                        disabled={isSubmitting}
-                                    />
-                                    <ErrorMessage name="password" component="div" className="text-sm text-destructive" />
-                                </div>
+                                <InputFieldWithLabel
+                                    formik={true}
+                                    name="email"
+                                    label="Email"
+                                    type="email"
+                                    placeholder="name@example.com"
+                                    autoComplete="email"
+                                    required
+                                    disabled={isSubmitting}
+                                />
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                                    <Field
-                                        as={Input}
-                                        id="confirmPassword"
-                                        name="confirmPassword"
-                                        type="password"
-                                        placeholder="••••••••"
-                                        autoComplete="new-password"
-                                        className={touched.confirmPassword && errors.confirmPassword ? "border-destructive" : ""}
-                                        disabled={isSubmitting}
-                                    />
-                                    <ErrorMessage name="confirmPassword" component="div" className="text-sm text-destructive" />
-                                </div>
+                                <PasswordFieldWithLabel
+                                    formik={true}
+                                    name="password"
+                                    label="Password"
+                                    placeholder="••••••••"
+                                    autoComplete="new-password"
+                                    required
+                                    disabled={isSubmitting}
+                                />
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="role">I am a</Label>
-                                    <Field name="role" disabled={isSubmitting}>
-                                        {({ field, form }: { 
-                                            field: FieldProps<string>['field'], 
-                                            form: FormikProps<typeof initialValues>
-                                        }) => (
-                                            <Select
-                                                defaultValue={field.value}
-                                                onValueChange={(value) => form.setFieldValue('role', value)}
-                                            >
-                                                <SelectTrigger 
-                                                    id="role"
-                                                    className={touched.role && errors.role ? "border-destructive" : "w-full"}
-                                                >
-                                                    <SelectValue placeholder="Select your role" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {roleOptions.map((option) => (
-                                                        <SelectItem key={option.value} value={option.value}>
-                                                            {option.label}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        )}
-                                    </Field>
-                                    <ErrorMessage name="role" component="div" className="text-sm text-destructive" />
-                                </div>
+                                <PasswordFieldWithLabel
+                                    formik={true}
+                                    name="confirmPassword"
+                                    label="Confirm Password"
+                                    placeholder="••••••••"
+                                    autoComplete="new-password"
+                                    required
+                                    disabled={isSubmitting}
+                                />
 
-                                <div className="flex items-center space-x-2">
-                                    <Field
-                                        as={Checkbox}
-                                        id="terms"
-                                        name="terms"
-                                        disabled={isSubmitting}
-                                        value={agreeTerms.toString()}
-                                        onClick={() => { setAgreeTerms(!agreeTerms); console.log(agreeTerms)}}
-                                    />
-                                    <Label htmlFor="terms" className="text-sm font-normal">
-                                        I agree to the <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
-                                    </Label>
-                                </div>
+                                <SelectFieldWithLabel
+                                    formik={true}
+                                    name="role"
+                                    label="I am a..."
+                                    options={roleOptions}
+                                    placeholder="Select your role"
+                                    required
+                                    disabled={isSubmitting}
+                                />
 
-                                <Button 
-                                    type="submit" 
-                                    className="w-full" 
-                                    disabled={isSubmitting || !agreeTerms}
+                                <SwitchFieldWithLabel
+                                    formik={true}
+                                    name="terms"
+                                    label={`I agree to the Terms of Service and Privacy Policy`}
+                                    disabled={isSubmitting}
+                                />
+
+                                <SubmitButton
+                                    className="w-full"
+                                    disabled={isSubmitting}
                                 >
                                     {isSubmitting ? "Creating account..." : "Create Account"}
-                                </Button>
+                                </SubmitButton>
                             </Form>
                         )}
                     </Formik>

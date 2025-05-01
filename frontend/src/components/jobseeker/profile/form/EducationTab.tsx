@@ -1,8 +1,4 @@
-import { Field, FieldArray, ErrorMessage } from 'formik';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { FieldArray, FormikProps } from 'formik';
 import { X, Plus, GraduationCap } from 'lucide-react';
 import {
   Card,
@@ -12,18 +8,19 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { FormikProps } from 'formik';
-import { Profile } from '@/types/profile.types';
+import { Button } from '@/components/ui/button';
+import { InputFieldWithLabel, TextareaField, CheckboxField } from '@/components/forms';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { ProfileFormValues } from './ProfileEditForm';
 
 interface EducationTabProps {
-  formik: FormikProps<Profile>;
+  formik: FormikProps<ProfileFormValues>;
   isSaving: boolean;
   onTabChange: (tab: string) => void;
 }
 
 const EducationTab = ({ formik, isSaving, onTabChange }: EducationTabProps) => {
-  const { values, handleChange } = formik;
+  const { values } = formik;
 
   return (
     <Card className="border-none shadow-none">
@@ -55,82 +52,58 @@ const EducationTab = ({ formik, isSaving, onTabChange }: EducationTabProps) => {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                      <div className="space-y-2">
-                        <Label htmlFor={`education.${index}.institution`}>Institution</Label>
-                        <Field
-                          as={Input}
-                          id={`education.${index}.institution`}
-                          name={`education.${index}.institution`}
-                          placeholder="e.g. Harvard University"
-                        />
-                        <ErrorMessage name={`education.${index}.institution`} component="div" className="text-red-500 text-sm" />
-                      </div>
+                      <InputFieldWithLabel
+                        formik={true}
+                        name={`education.${index}.institution`}
+                        label="Institution"
+                        placeholder="e.g. Harvard University"
+                      />
 
-                      <div className="space-y-2">
-                        <Label htmlFor={`education.${index}.degree`}>Degree</Label>
-                        <Field
-                          as={Input}
-                          id={`education.${index}.degree`}
-                          name={`education.${index}.degree`}
-                          placeholder="e.g. Bachelor of Science"
-                        />
-                        <ErrorMessage name={`education.${index}.degree`} component="div" className="text-red-500 text-sm" />
-                      </div>
+                      <InputFieldWithLabel
+                        formik={true}
+                        name={`education.${index}.degree`}
+                        label="Degree"
+                        placeholder="e.g. Bachelor of Science"
+                      />
 
-                      <div className="space-y-2">
-                        <Label htmlFor={`education.${index}.fieldOfStudy`}>Field of Study</Label>
-                        <Field
-                          as={Input}
-                          id={`education.${index}.fieldOfStudy`}
-                          name={`education.${index}.fieldOfStudy`}
-                          placeholder="e.g. Computer Science"
-                        />
-                        <ErrorMessage name={`education.${index}.fieldOfStudy`} component="div" className="text-red-500 text-sm" />
-                      </div>
+                      <InputFieldWithLabel
+                        formik={true}
+                        name={`education.${index}.fieldOfStudy`}
+                        label="Field of Study"
+                        placeholder="e.g. Computer Science"
+                      />
 
                       <div className="space-y-2 col-span-2 flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          id={`education.${index}.isCurrent`}
+                        <CheckboxField
+                          formik={true} 
                           name={`education.${index}.isCurrent`}
-                          checked={values.education[index].isCurrent}
-                          onChange={handleChange}
-                          className="mr-1"
+                          label="I currently study here"
                         />
-                        <Label htmlFor={`education.${index}.isCurrent`}>I currently study here</Label>
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor={`education.${index}.startDate`}>Start Date</Label>
-                        <Field
-                          as={Input}
-                          type="date"
-                          id={`education.${index}.startDate`}
-                          name={`education.${index}.startDate`}
-                        />
-                        <ErrorMessage name={`education.${index}.startDate`} component="div" className="text-red-500 text-sm" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor={`education.${index}.endDate`}>End Date</Label>
-                        <Field
-                          as={Input}
-                          type="date"
-                          id={`education.${index}.endDate`}
-                          name={`education.${index}.endDate`}
-                        />
-                        <ErrorMessage name={`education.${index}.endDate`} component="div" className="text-red-500 text-sm" />
-                      </div>
+                      <InputFieldWithLabel
+                        formik={true}
+                        name={`education.${index}.startDate`}
+                        label="Start Date"
+                        type="text"
+                        placeholder="YYYY-MM-DD"
+                      />
+                      
+                      <InputFieldWithLabel
+                        formik={true}
+                        name={`education.${index}.endDate`}
+                        label="End Date"
+                        type="text"
+                        placeholder="YYYY-MM-DD"
+                      />
 
-                      <div className="space-y-2 col-span-2">
-                        <Label htmlFor={`education.${index}.description`}>Description (Optional)</Label>
-                        <Field
-                          as={Textarea}
-                          id={`education.${index}.description`}
-                          name={`education.${index}.description`}
-                          placeholder="Add more details about your education..."
-                          className="min-h-20"
-                        />
-                      </div>
+                      <TextareaField
+                        formik={true}
+                        name={`education.${index}.description`}
+                        label="Description (Optional)"
+                        placeholder="Add more details about your education..."
+                        className="min-h-20 col-span-2"
+                      />
                     </div>
                   </div>
                 ))
@@ -170,8 +143,15 @@ const EducationTab = ({ formik, isSaving, onTabChange }: EducationTabProps) => {
             Next
           </Button>
         </div>
-        <Button type="submit" disabled={isSaving} className="bg-jobboard-darkblue hover:bg-jobboard-darkblue/90">
-          {isSaving ? <LoadingSpinner size="sm" /> : 'Save Profile'}
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? (
+            <span className="flex items-center">
+              <LoadingSpinner size="sm" className="mr-2" />
+              Saving...
+            </span>
+          ) : (
+            "Save"
+          )}
         </Button>
       </CardFooter>
     </Card>

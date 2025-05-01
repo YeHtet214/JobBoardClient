@@ -14,7 +14,7 @@ const Form: React.FC<FormProps> = ({ children, onSubmit, className = '' }) => {
 
   if (isFormikForm) {
     return (
-      <FormikForm className={`space-y-6 ${className}`}>
+      <FormikForm className={`space-y-4 ${className}`}>
         {children}
       </FormikForm>
     );
