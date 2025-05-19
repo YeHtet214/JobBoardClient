@@ -3,14 +3,14 @@ import ApplicationService from '@/services/application.service';
 import { CreateApplicationDto, UpdateApplicationDto } from '@/types/application.types';
 import { useToast } from '@/components/ui/use-toast';
 
-export const useMyApplications = () => {
+export const useMyApplications = (userId: string) => {
   return useQuery({
-    queryKey: ['myApplications'],
-    queryFn: () => ApplicationService.getMyApplications(),
+    queryKey: ['myApplications', userId],
+    queryFn: () => ApplicationService.getMyApplications(userId),
   });
 };
 
-export const useApplication = (id: string) => {
+export const useApplicationById = (id: string) => {
   return useQuery({
     queryKey: ['application', id],
     queryFn: () => ApplicationService.getApplicationById(id),

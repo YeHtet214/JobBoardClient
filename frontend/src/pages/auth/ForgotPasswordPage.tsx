@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import * as Yup from 'yup';
 import { Formik, FormikHelpers } from 'formik';
 import { Form, InputFieldWithLabel, SubmitButton } from '@/components/forms';
 import AuthLayout from '@/components/layouts/AuthLayout';
+import { ForgotPasswordSchema } from '@/schemas/validation/auth.schema';
 
 // Shadcn UI components
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,13 +14,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // API service
 import AuthService from '@/services/auth.service';
-
-// Validation schema
-const forgotPasswordSchema = Yup.object({
-  email: Yup.string()
-    .email('Invalid email address')
-    .required('Email is required'),
-});
 
 interface ForgotPasswordRequest {
   email: string;
@@ -68,6 +61,8 @@ const ForgotPasswordPage: React.FC = () => {
     <AuthLayout
       title="Forgot Your Password?"
       subtitle="Don't worry, we'll help you reset it"
+      imageSrc="/auth-background.svg"
+      imagePosition="left"
     >
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
@@ -96,7 +91,7 @@ const ForgotPasswordPage: React.FC = () => {
           ) : (
             <Formik
               initialValues={initialValues}
-              validationSchema={forgotPasswordSchema}
+              validationSchema={ForgotPasswordSchema}
               onSubmit={handleSubmit}
             >
               {({ isSubmitting }) => (

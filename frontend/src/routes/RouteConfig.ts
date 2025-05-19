@@ -35,17 +35,20 @@ const CompanyDetailPage = lazy(() => import('@/pages/CompanyDetailPage'));
 const CreateJobPage = lazy(() => import('@/pages/employer/CreateJobPage'));
 const EditJobPage = lazy(() => import('@/pages/employer/EditJobPage'));
 const EmployerJobsPage = lazy(() => import('@/pages/employer/EmployerJobsPage'));
+const EmployerApplicationListPage = lazy(() => import('@/pages/employer/EmployerApplicationListPage'));
 const CompanyProfileEditPage = lazy(() => import('@/pages/employer/CompanyProfileEditPage'));
 
 // Jobseeker pages
 const SavedJobsPage = lazy(() => import('@/pages/jobseeker/SavedJobsPage'));
-const ApplicationsPage = lazy(() => import('@/pages/jobseeker/ApplicationsPage'))
+const ApplyJobPage = lazy(() => import('@/pages/jobseeker/ApplyJobPage'))
 
 const HomePage = lazy(() => import('@/pages/HomePage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const ProfilePage = lazy(() => import('@/pages/jobseeker/ProfilePage'));
 const JobsPage = lazy(() => import('@/pages/JobsPage'));
+const ApplicationListPage = lazy(() => import('@/pages/ApplicationsListPage'));
+const ApplicationDetailPage = lazy(() => import('@/pages/jobseeker/ApplicationDetailPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
 // Define routes
@@ -165,8 +168,22 @@ export const routes: RouteConfig[] = [
     meta: { title: 'Edit Job', description: 'Edit an existing job posting' }
   },
   {
+    path: '/employer/applications',
+    element: EmployerApplicationListPage,
+    requiresAuth: true,
+    allowedRoles: ['EMPLOYER'],
+    meta: { title: 'All Applications', description: 'View and manage all job applications' }
+  },
+  {
     path: '/jobs/:id/apply',
-    element: ApplicationsPage,
+    element: ApplyJobPage,
+    requiresAuth: true,
+    allowedRoles: ['JOBSEEKER'],
+    meta: { title: 'My Applications', description: 'View and manage your job applications' }
+  },
+  {
+    path: '/applications',
+    element: ApplicationListPage,
     requiresAuth: true,
     allowedRoles: ['JOBSEEKER'],
     meta: { title: 'My Applications', description: 'View and manage your job applications' }

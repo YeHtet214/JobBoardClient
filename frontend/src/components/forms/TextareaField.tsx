@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { useField } from 'formik';
 
 type TextareaFieldProps = {
   name: string;
-  label: string;
+  label: ReactNode; // Accepts both string and JSX/HTML content
   placeholder?: string;
   className?: string;
   rows?: number;

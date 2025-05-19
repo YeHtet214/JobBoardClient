@@ -16,7 +16,7 @@ datasource db {
 model User {
   id              String           @id @default(uuid())
   email           String           @unique
-  passwordHash    String
+  passwordHash    String?
   firstName       String
   lastName        String?
   role            UserRole
@@ -67,11 +67,13 @@ model Company {
   owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId     String   @unique
   name        String
-  description String?
+  description String
   logo        String?
   website     String?
-  location    String?
-  industry    String?
+  location    String
+  industry    String
+  foundedYear String
+  size        String?
   jobs        Job[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

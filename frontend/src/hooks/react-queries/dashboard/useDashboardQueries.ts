@@ -2,11 +2,12 @@ import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstac
 import DashboardService from '@/services/dashboard.service';
 import JobService from '@/services/job.service';
 import {
-  UpdateApplicationStatusDto,
   ReceivedApplication,
   JobSeekerDashboardData,
   EmployerDashboardData
 } from '@/types/dashboard.types';
+import { UpdateApplicationDto, Application } from '@/types/application.types';
+import ApplicationService from '@/services/application.service';
 
 // Query keys
 export const dashboardKeys = {
@@ -40,7 +41,7 @@ export const useWithdrawApplication = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => DashboardService.withdrawApplication(id),
+    mutationFn: (id: string) => ApplicationService.withdrawApplication(id),
     onSuccess: () => {
       // Invalidate job seeker dashboard and applications queries
       queryClient.invalidateQueries({ queryKey: dashboardKeys.jobseeker });
@@ -71,9 +72,9 @@ export const useUpdateApplicationStatus = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, statusData }: { id: string; statusData: UpdateApplicationStatusDto }) =>
-      DashboardService.updateApplicationStatus(id, statusData),
-    onSuccess: (updatedApplication: ReceivedApplication) => {
+    mutationFn: ({ id, statusData }: { id: string; statusData: UpdateApplicationDto }) =>
+      ApplicationService.updateApplication(id, statusData),
+    onSuccess: (updatedApplication: Application) => {
       // Invalidate employer dashboard and specific application
       queryClient.invalidateQueries({ queryKey: dashboardKeys.employer });
       queryClient.invalidateQueries({ queryKey: dashboardKeys.receivedApplications });

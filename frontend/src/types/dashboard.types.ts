@@ -51,7 +51,7 @@ export interface ReceivedApplication {
   applicantName: string;
   applicantId: string;
   status: 'PENDING' | 'REVIEWING' | 'INTERVIEW' | 'REJECTED' | 'ACCEPTED';
-  appliedAt: string; // ISO date string
+  applied: string;
   applicantEmail?: string;
   applicantPhone?: string;
   resumeUrl?: string;

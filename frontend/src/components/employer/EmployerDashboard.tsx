@@ -17,13 +17,13 @@ import {
   UserCheck
 } from 'lucide-react';
 import { PostedJob, ReceivedApplication, EmployerActivity, EmployerStats } from '@/types/dashboard.types';
-import DashboardStatCard from '../dashboard/DashboardStatCard';
-import ActivityFeed from '../dashboard/ActivityFeed';
-import ProfileCompletionCard from '../dashboard/ProfileCompletionCard';
-import PostedJobsList from './PostedJobsList';
-import ReceivedApplicationsList from './ReceivedApplicationsList';
+import DashboardStatCard from '@/components/dashboard/DashboardStatCard';
+import ActivityFeed from '@/components/dashboard/ActivityFeed';
+import ProfileCompletionCard from '@/components/dashboard/ProfileCompletionCard';
+import PostedJobsList from '@/components/employer/PostedJobsList';
+import ReceivedApplicationsList from '@/components/employer/ReceivedApplicationsList';
 import { getEmployerActivityIcon } from '@/utils/dashboard.utils';
-import DashboardContainer from '../dashboard/DashboardContainer';
+import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import { useAuth } from '@/contexts/authContext';
 import { useToast } from '@/components/ui/use-toast';
 import {
@@ -69,8 +69,6 @@ const EmployerDashboard: React.FC = () => {
       setCompanyProfilePercentage(employerData.companyProfilePercentage);
     }
   }, [employerData]);
-
-  console.log(employerData);
 
   // Handle employer actions
   const handleUpdateApplicationStatus = useCallback((

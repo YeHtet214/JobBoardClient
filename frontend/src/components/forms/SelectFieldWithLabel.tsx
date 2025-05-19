@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { useField, useFormikContext } from 'formik';
 import { Label } from '@/components/ui/label';
 import {
@@ -16,7 +16,7 @@ type SelectOption = {
 
 type SelectFieldWithLabelProps = {
   name: string;
-  label: string;
+  label: ReactNode; // Accepts both string and JSX/HTML content
   options: SelectOption[];
   placeholder?: string;
   className?: string;

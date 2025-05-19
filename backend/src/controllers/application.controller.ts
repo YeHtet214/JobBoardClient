@@ -6,9 +6,27 @@ import {
     fetchApplicationById,
     postNewApplication,
     updateApplicationById,
-    deleteExistingApplication
+    deleteExistingApplication,
+    fetchAllApplicationsByUserId
 } from "../services/application/application.service.js";
 import { matchedData } from "express-validator";
+
+export const getAllApplicationsByUserId = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+        const validatedData = matchedData(req, { locations: ['params', 'body'] });
+        const userId = validatedData.userId;
+
+        const applications = await fetchAllApplicationsByUserId(userId);
+
+        res.status(200).json({
+            success: true,
+            message: "Applications fetched successfully",
+            data: applications
+        });
+    } catch (error) {
+        next(error);
+    }
+}
 
 export const getAllApplicationsByJobId = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
@@ -50,6 +68,8 @@ export const createNewApplication = async (req: RequestWithUser, res: Response, 
         // Get validated data
         const validatedData = matchedData(req, { locations: ['params', 'body'] });
 
+        console.log("validatedData", validatedData);
+
         const applicationData: createApplicationDto = {
             jobId: validatedData.jobId,
             resumeUrl: validatedData.resumeUrl,
@@ -74,10 +94,14 @@ export const updateApplication = async (req: RequestWithUser, res: Response, nex
         // Get validated data
         const validatedData = matchedData(req, { locations: ['params', 'body'] });
 
+        console.log("Validated Data: ", validatedData)
+        console.log("body: ", req.body);
+
         const applicationData: updateApplicationDto = {
             id: validatedData.id,
             resumeUrl: validatedData.resumeUrl,
-            coverLetter: validatedData.coverLetter
+            coverLetter: validatedData.coverLetter,
+            status: validatedData.status
         }
 
         const application = await updateApplicationById(applicationData);

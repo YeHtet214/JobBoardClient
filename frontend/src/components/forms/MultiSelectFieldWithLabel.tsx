@@ -26,15 +26,15 @@ type MultiSelectFieldWithLabelProps = {
   allowCreation?: boolean;
   creationLabel?: string;
 } & (
-  | { formik: true }
-  | {
+    | { formik: true }
+    | {
       formik?: false;
       value: string[];
       onChange: (value: string[]) => void;
       onBlur?: () => void;
       errors?: Record<string, { message: string }> | undefined;
     }
-);
+  );
 
 const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (props) => {
   const {
@@ -59,7 +59,7 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
   if ('formik' in props && props.formik) {
     // Check if we're inside a Formik context
     const formik = useFormikContext();
-    
+
     if (formik) {
       // Formik version
       const [field, meta, helpers] = useField(name);
@@ -70,15 +70,15 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
         const newValues = selectedValues.includes(value)
           ? selectedValues.filter(v => v !== value)
           : [...selectedValues, value];
-        
+
         // Check if we're over the max items limit
         if (maxItems && !selectedValues.includes(value) && selectedValues.length >= maxItems) {
           return;
         }
-        
+
         helpers.setValue(newValues);
         helpers.setTouched(true);
-        
+
         if (allowCreation && value === search && !options.find(o => o.value === search)) {
           setSearch('');
         }
@@ -95,12 +95,12 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
         if (!search || selectedValues.includes(search) || options.find(o => o.value === search)) {
           return;
         }
-        
+
         // Check if we're over the max items limit
         if (maxItems && selectedValues.length >= maxItems) {
           return;
         }
-        
+
         helpers.setValue([...selectedValues, search]);
         helpers.setTouched(true);
         setSearch('');
@@ -113,11 +113,11 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
       );
 
       // Check if current search could be a new option
-      const canCreateOption = 
-        allowCreation && 
-        search && 
-        !options.find(option => 
-          option.value === search || 
+      const canCreateOption =
+        allowCreation &&
+        search &&
+        !options.find(option =>
+          option.value === search ||
           option.label.toLowerCase() === search.toLowerCase()
         );
 
@@ -126,20 +126,19 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
           <Label htmlFor={name} className="block text-sm font-medium mb-1">
             {label} {required && <span className="text-red-500">*</span>}
           </Label>
-          
+
           {description && (
             <p className="text-sm text-muted-foreground mb-2">{description}</p>
           )}
-          
+
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 role="combobox"
                 aria-expanded={open}
-                className={`w-full justify-between h-auto min-h-10 ${
-                  hasError ? 'border-red-500' : ''
-                }`}
+                className={`w-full justify-between h-auto min-h-10 ${hasError ? 'border-red-500' : ''
+                  }`}
                 disabled={disabled}
                 onClick={() => setOpen(!open)}
               >
@@ -152,7 +151,7 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
                         className="mr-1 mb-1"
                       >
                         {options.find(option => option.value === value)?.label || value}
-                        <button
+                        <span
                           className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                           onMouseDown={e => {
                             e.preventDefault();
@@ -161,7 +160,7 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
                           onClick={e => handleRemove(value, e)}
                         >
                           <X className="h-3 w-3" />
-                        </button>
+                        </span>
                       </Badge>
                     ))
                   ) : (
@@ -173,8 +172,8 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
             </PopoverTrigger>
             <PopoverContent className="w-full p-0" align="start">
               <Command ref={commandRef} className="w-full">
-                <CommandInput 
-                  placeholder="Search options..." 
+                <CommandInput
+                  placeholder="Search options..."
                   value={search}
                   onValueChange={setSearch}
                   className="h-9"
@@ -226,7 +225,7 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
               </Command>
             </PopoverContent>
           </Popover>
-          
+
           {hasError && (
             <p className="mt-1 text-sm text-red-600">{meta.error}</p>
           )}
@@ -240,11 +239,11 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
           <Label htmlFor={name} className="block text-sm font-medium mb-1">
             {label} {required && <span className="text-red-500">*</span>}
           </Label>
-          
+
           {description && (
             <p className="text-sm text-muted-foreground mb-2">{description}</p>
           )}
-          
+
           <Button
             variant="outline"
             className="w-full justify-between h-auto min-h-10"
@@ -266,15 +265,15 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
       const newValues = selectedValues.includes(value)
         ? selectedValues.filter(v => v !== value)
         : [...selectedValues, value];
-      
+
       // Check if we're over the max items limit
       if (maxItems && !selectedValues.includes(value) && selectedValues.length >= maxItems) {
         return;
       }
-      
+
       onChange(newValues);
       if (onBlur) onBlur();
-      
+
       if (allowCreation && value === search && !options.find(o => o.value === search)) {
         setSearch('');
       }
@@ -291,12 +290,12 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
       if (!search || selectedValues.includes(search) || options.find(o => o.value === search)) {
         return;
       }
-      
+
       // Check if we're over the max items limit
       if (maxItems && selectedValues.length >= maxItems) {
         return;
       }
-      
+
       onChange([...selectedValues, search]);
       if (onBlur) onBlur();
       setSearch('');
@@ -309,11 +308,11 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
     );
 
     // Check if current search could be a new option
-    const canCreateOption = 
-      allowCreation && 
-      search && 
-      !options.find(option => 
-        option.value === search || 
+    const canCreateOption =
+      allowCreation &&
+      search &&
+      !options.find(option =>
+        option.value === search ||
         option.label.toLowerCase() === search.toLowerCase()
       );
 
@@ -322,20 +321,19 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
         <Label htmlFor={name} className="block text-sm font-medium mb-1">
           {label} {required && <span className="text-red-500">*</span>}
         </Label>
-        
+
         {description && (
           <p className="text-sm text-muted-foreground mb-2">{description}</p>
         )}
-        
+
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               role="combobox"
               aria-expanded={open}
-              className={`w-full justify-between h-auto min-h-10 ${
-                hasError ? 'border-red-500' : ''
-              }`}
+              className={`w-full justify-between h-auto min-h-10 ${hasError ? 'border-red-500' : ''
+                }`}
               disabled={disabled}
               onClick={() => setOpen(!open)}
             >
@@ -369,8 +367,8 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
           </PopoverTrigger>
           <PopoverContent className="w-full p-0" align="start">
             <Command ref={commandRef} className="w-full">
-              <CommandInput 
-                placeholder="Search options..." 
+              <CommandInput
+                placeholder="Search options..."
                 value={search}
                 onValueChange={setSearch}
                 className="h-9"
@@ -422,7 +420,7 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
             </Command>
           </PopoverContent>
         </Popover>
-        
+
         {hasError && (
           <p className="mt-1 text-sm text-red-600">{errors[name]?.message}</p>
         )}

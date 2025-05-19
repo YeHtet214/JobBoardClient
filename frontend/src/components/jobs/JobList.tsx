@@ -1,5 +1,4 @@
 import React from 'react';
-import { useJobsContext } from '@/contexts/JobsContext';
 import JobCard from './JobCard';
 import Pagination from './Pagination';
 import { Job } from '@/types/job.types';
@@ -7,15 +6,12 @@ import { AlertCircle, Search } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import JobSorting from './JobSorting';
 import { useAuth } from '@/contexts/authContext';
-import { useBatchJobSavedStatus } from '@/hooks/react-queries/job';
+import { useBatchJobSavedStatus, useJobsData } from '@/hooks/react-queries/job';
 
 const JobList: React.FC = () => {
-  const { jobs, isLoading, error, keyword, location, jobTypes, experienceLevel, totalCount } = useJobsContext();
+  const { jobs, isLoading, error, keyword, location, jobTypes, experienceLevel, totalCount } = useJobsData();
   const { isAuthenticated, currentUser } = useAuth();
 
-  console.log("isAuthenticated: ", isAuthenticated);
-  console.log("Current User: ", currentUser);
-  
   // Check if user is a job seeker for saved job functionality
   const isJobSeeker = currentUser?.role === 'JOBSEEKER';
   
@@ -95,7 +91,7 @@ const JobList: React.FC = () => {
       </div>
 
       {/* Job listings - Responsive Grid Layout with !important */}
-      <div className="grid grid-cols-1 md:!grid-cols-2 lg:!grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 lg:!grid-cols-2 gap-4 mb-8">
         {jobs.map((job: Job) => (
           <JobCard 
             key={job.id} 

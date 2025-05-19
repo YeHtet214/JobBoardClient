@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { useField, useFormikContext } from 'formik';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 
 type InputFieldWithLabelProps = {
     name: string;
-    label: string;
+    label: ReactNode; // Accepts both string and JSX/HTML content
     type?: 'text' | 'email' | 'password' | 'number' | 'tel';
     placeholder?: string;
     className?: string;
@@ -39,7 +39,7 @@ const InputFieldWithLabel: React.FC<InputFieldWithLabelProps> = (props) => {
     if ('formik' in props && props.formik) {
         // Check if we're inside a Formik context
         const formik = useFormikContext();
-        
+
         if (formik) {
             // Formik version
             const [field, meta] = useField(name);
@@ -47,8 +47,10 @@ const InputFieldWithLabel: React.FC<InputFieldWithLabelProps> = (props) => {
         
             return (
                 <div className="mb-4">
-                    <Label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
-                        {label} {required && <span className="text-red-500">*</span>}
+                    <Label htmlFor={name} className="block text-sm font-medium mb-1">
+                        <div className="relative inline-block">
+                            {label} {required && <span className="text-red-500 absolute -right-2 top-1/2 transform -translate-y-1/2">*</span>}
+                        </div>
                     </Label>
                     <Input
                         type={type}
@@ -60,6 +62,7 @@ const InputFieldWithLabel: React.FC<InputFieldWithLabelProps> = (props) => {
                             hasError ? 'border-red-500' : 'border-gray-300'
                         } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${className}`}
                         {...field}
+                        {...props}
                     />
                     {hasError && (
                         <p className="mt-1 text-sm text-red-600">{meta.error}</p>
@@ -71,17 +74,19 @@ const InputFieldWithLabel: React.FC<InputFieldWithLabelProps> = (props) => {
             console.warn(`InputField with name "${name}" is marked as a Formik field but no Formik context was found.`);
             return (
                 <div className="mb-4">
-                    <Label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
-                        {label} {required && <span className="text-red-500">*</span>}
+                    <Label htmlFor={name} className="block text-sm font-medium mb-1">
+                        <div className="relative inline-block">
+                            {label} {required && <span className="text-red-500 absolute -right-2 top-1/2 transform -translate-y-1/2">*</span>}
+                        </div>
                     </Label>
                     <Input
                         type={type}
                         id={name}
-                        name={name}
                         placeholder={placeholder}
                         disabled={disabled}
                         autoComplete={autoComplete}
                         className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${className}`}
+                        {...props}
                     />
                 </div>
             );
@@ -91,16 +96,16 @@ const InputFieldWithLabel: React.FC<InputFieldWithLabelProps> = (props) => {
         const { value, onChange, onBlur, errors } = props;
         const hasError = errors && errors[name];
         
-        console.log("Non formik")
         return (
             <div className="mb-4">
-                <Label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
-                    {label} {required && <span className="text-red-500">*</span>}
+                <Label htmlFor={name} className="block text-sm font-medium mb-1">
+                    <div className="relative inline-block">
+                        {label} {required && <span className="text-red-500 absolute -right-2 top-1/2 transform -translate-y-1/2">*</span>}
+                    </div>
                 </Label>
                 <Input
                     type={type}
                     id={name}
-                    name={name}
                     placeholder={placeholder}
                     value={value}
                     onChange={onChange}

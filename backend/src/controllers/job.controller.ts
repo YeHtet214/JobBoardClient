@@ -126,12 +126,12 @@ export const createJobHandler = async (req: RequestWithUser, res: Response, next
         const userId = req.user.userId;
         
         // Fetch the user's company
-        const userCompany = await prisma.company.findFirst({
+        const company = await prisma.company.findFirst({
             where: { ownerId: userId },
             select: { id: true }
         });
         
-        if (!userCompany) {
+        if (!company) {
             throw new BadRequestError("You need to create a company before posting a job");
         }
         
@@ -139,6 +139,7 @@ export const createJobHandler = async (req: RequestWithUser, res: Response, next
         const newJob = await createJob({
             ...req.body,
             postedById: userId,
+            companyId: company.id
         });
         
         res.status(201).json({

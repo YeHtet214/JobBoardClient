@@ -16,9 +16,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <aside className={`bg-white rounded-lg shadow-md p-5 ${className}`}>
+    <aside className={`bg-card rounded-lg shadow-md p-5 ${className}`}>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+        <h3 className="text-lg font-semibold text-jobboard-darkblue">{title}</h3>
         {collapsible && (
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)}

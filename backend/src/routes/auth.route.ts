@@ -34,7 +34,6 @@ authRouter.get('/google/callback', passport.authenticate('google', {
 
             // Generate tokens
             const { accessToken, refreshToken } = generateTokens(user.id);
-            console.log("Access Token: ", accessToken)
 
             // Store refresh token in database
             await storeRefreshToken(user.id, refreshToken);

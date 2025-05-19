@@ -30,6 +30,7 @@ const ReceivedApplicationsList: React.FC<ReceivedApplicationsListProps> = ({
     { label: "Accept Candidate", value: "ACCEPTED" }
   ];
 
+
   return (
     <div>
       {applications.length > 0 ? (
@@ -47,7 +48,7 @@ const ReceivedApplicationsList: React.FC<ReceivedApplicationsListProps> = ({
                   </div>
                   <p className="text-xs text-gray-500 mt-1">Applied for: {application.jobTitle}</p>
                   <div className="flex items-center gap-3 mt-2">
-                    <span className="text-xs text-gray-500">Received {formatDate(application.appliedAt)}</span>
+                    <span className="text-xs text-gray-500">Received {formatDate(application.applied)}</span>
                     {getEmployerStatusBadge(application.status)}
                   </div>
                 </div>

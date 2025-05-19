@@ -6,6 +6,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import SessionExpiredModal from './components/auth/SessionExpiredModal';
 import { Toaster } from './components/ui/toaster';
 import './App.css';
+import { ThemeProvider } from './components/ThemeProvider';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -22,11 +23,13 @@ const App = () => {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <Router>
-            <SessionExpiredModal />
-            <AppRoutes />
-            <Toaster />
-          </Router>
+          <ThemeProvider>
+            <Router>
+              <SessionExpiredModal />
+              <AppRoutes />
+              <Toaster />
+            </Router>
+          </ThemeProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>

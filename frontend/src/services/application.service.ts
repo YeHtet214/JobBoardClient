@@ -5,12 +5,12 @@ class ApplicationService extends ApiService {
   private endpoints = {
     ALL: '/applications',
     DETAIL: (id: string) => `/applications/${id}`,
-    MY_APPLICATIONS: '/applications/me',
-    JOB_APPLICATIONS: (jobId: string) => `/applications/job/${jobId}`
+    MY_APPLICATIONS: (userId: string) => `/applications/users/${userId}`,
+    JOB_APPLICATIONS: (jobId: string) => `/applications/jobs/${jobId}`
   };
 
-  public async getMyApplications(): Promise<Application[]> {
-    const response = await this.get<Application[]>(this.endpoints.MY_APPLICATIONS);
+  public async getMyApplications(userId: string): Promise<Application[]> {
+    const response = await this.get<Application[]>(this.endpoints.MY_APPLICATIONS(userId));
     return response.data.data;
   }
 
@@ -25,7 +25,7 @@ class ApplicationService extends ApiService {
   }
 
   public async createApplication(applicationData: CreateApplicationDto): Promise<Application> {
-    const response = await this.post<Application>(this.endpoints.ALL, applicationData);
+    const response = await this.post<Application>(this.endpoints.JOB_APPLICATIONS(applicationData.jobId), applicationData);
     return response.data.data;
   }
 

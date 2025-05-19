@@ -12,6 +12,7 @@ export interface updateApplicationDto {
     id: string;
     resumeUrl?: string;
     coverLetter?: string;
+    status?: ApplicationStatus;
 }
 
 export interface applicationResponse {

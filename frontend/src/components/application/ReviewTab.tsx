@@ -1,14 +1,6 @@
 import React from 'react';
 import { FormikProps } from 'formik';
 import { ApplicationFormValues } from '@/types/application.types';
-// import { 
-//   FormControl,
-//   FormItem, 
-//   FormLabel, 
-//   FormMessage 
-// } from '@/components/ui/form';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { 
   Card, 
   CardContent,
@@ -22,6 +14,7 @@ import {
   HelpCircle, 
   ClipboardList 
 } from 'lucide-react';
+import { CheckboxField } from '../forms';
 
 interface ReviewTabProps {
   formik: FormikProps<ApplicationFormValues>;
@@ -30,7 +23,7 @@ interface ReviewTabProps {
 }
 
 const ReviewTab: React.FC<ReviewTabProps> = ({ formik, jobTitle, companyName }) => {
-  const { values, errors, touched, handleChange } = formik;
+  const { values } = formik;
 
   return (
     <div className="space-y-4">
@@ -155,28 +148,13 @@ const ReviewTab: React.FC<ReviewTabProps> = ({ formik, jobTitle, companyName }) 
 
         {/* Terms and Conditions */}
         <div className="space-y-2">
-          {/* <FormItem className={`${touched.acceptTerms && errors.acceptTerms ? 'error' : ''}`}>
             <div className="flex items-center space-x-2">
-              <FormControl>
-                <Checkbox
-                  id="acceptTerms"
-                  name="acceptTerms"
-                  checked={values.acceptTerms}
-                  onCheckedChange={() => formik.setFieldValue('acceptTerms', !values.acceptTerms)}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <Label htmlFor="acceptTerms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  I confirm that all the information provided is accurate and complete
-                </Label>
-              </div>
+              <CheckboxField
+                name="acceptTerms"
+                label="I confirm that all the information provided is accurate and complete"
+                formik={true}
+              />
             </div>
-            {touched.acceptTerms && errors.acceptTerms && (
-              <FormMessage className="text-red-500 text-xs mt-1">
-                {errors.acceptTerms as string}
-              </FormMessage>
-            )}
-          </FormItem> */}
         </div>
       </div>
     </div>

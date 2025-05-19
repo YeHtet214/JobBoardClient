@@ -7,7 +7,6 @@ import {
   PostedJob,
   ReceivedApplication,
   EmployerActivity,
-  UpdateApplicationStatusDto
 } from '@/types/dashboard.types';
 
 class DashboardService extends ApiService {
@@ -34,10 +33,6 @@ class DashboardService extends ApiService {
     return response.data.data;
   }
 
-  public async withdrawApplication(id: string): Promise<void> {
-    await this.delete<void>(this.endpoints.APPLICATION_DETAIL(id));
-  }
-
   // Employer dashboard methods
   public async getEmployerDashboardData(): Promise<EmployerDashboardData> {
     const response = await this.get<EmployerDashboardData>(this.endpoints.EMPLOYER_DASHBOARD);
@@ -56,14 +51,6 @@ class DashboardService extends ApiService {
 
   public async getEmployerActivity(): Promise<EmployerActivity[]> {
     const response = await this.get<EmployerActivity[]>(this.endpoints.EMPLOYER_ACTIVITY);
-    return response.data.data;
-  }
-
-  public async updateApplicationStatus(id: string, statusData: UpdateApplicationStatusDto): Promise<ReceivedApplication> {
-    const response = await this.put<ReceivedApplication>(
-      this.endpoints.APPLICATION_DETAIL(id), 
-      statusData
-    );
     return response.data.data;
   }
 

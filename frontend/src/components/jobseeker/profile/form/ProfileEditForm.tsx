@@ -1,12 +1,12 @@
 import { Profile } from '@/types/profile.types';
 import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, BookOpen, Building, Link } from 'lucide-react';
 import BasicInfoTab from '@/components/jobseeker/profile/form/BasicInfoTab';
 import EducationTab from '@/components/jobseeker/profile/form/EducationTab';
 import ExperienceTab from '@/components/jobseeker/profile/form/ExperienceTab';
 import LinksTab from '@/components/jobseeker/profile/form/LinksTab';
+import { ProfileValidationSchema } from '@/schemas/validation/profile.shcema';
 
 // Extended profile type for form fields
 export interface ProfileFormValues extends Profile {
@@ -23,42 +23,6 @@ interface ProfileEditFormProps {
   isUpdating: boolean;
   isUploading: boolean;
 }
-
-const ProfileValidationSchema = Yup.object().shape({
-  bio: Yup.string().required('Bio is required'),
-  skills: Yup.array().of(Yup.string()).min(1, 'Add at least one skill'),
-  education: Yup.array().of(
-    Yup.object().shape({
-      institution: Yup.string().required('Institution is required'),
-      degree: Yup.string().required('Degree is required'),
-      fieldOfStudy: Yup.string().required('Field of study is required'),
-      startDate: Yup.string().required('Start date is required'),
-      isCurrent: Yup.boolean().default(false),
-      endDate: Yup.string().when('isCurrent', {
-        is: false,
-        then: (schema) => schema.required('End date is required'),
-        otherwise: (schema) => schema.notRequired()
-      })
-    })
-  ),
-  experience: Yup.array().of(
-    Yup.object().shape({
-      company: Yup.string().required('Company is required'),
-      position: Yup.string().required('Position is required'),
-      description: Yup.string().required('Description is required'),
-      startDate: Yup.string().required('Start date is required'),
-      isCurrent: Yup.boolean().default(false),
-      endDate: Yup.string().when('isCurrent', {
-        is: false,
-        then: (schema) => schema.required('End date is required'),
-        otherwise: (schema) => schema.notRequired()
-      })
-    })
-  ),
-  linkedInUrl: Yup.string().url('Must be a valid URL'),
-  githubUrl: Yup.string().url('Must be a valid URL'),
-  portfolioUrl: Yup.string().url('Must be a valid URL'),
-});
 
 const ProfileEditForm = ({ 
   profile, 

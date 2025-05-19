@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowUpDown } from 'lucide-react';
-import { useJobsContext, SortOption } from '@/contexts/JobsContext';
+import { useJobsData } from '@/hooks/react-queries/job';
 import {
   Select,
   SelectContent,
@@ -9,9 +9,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { SortOption } from '@/contexts/JobsContext';
 
 const JobSorting: React.FC = () => {
-  const { sortBy, setSortBy } = useJobsContext();
+  const { sortBy, setSortBy } = useJobsData();
 
   const sortOptions = [
     { value: SortOption.RELEVANCE, label: 'Most Relevant' },

@@ -61,7 +61,7 @@ export const getCurrentCompany = async (req: RequestWithUser, res: Response, nex
 
 export const createCompany = async (req: RequestWithUser, res: Response, next: NextFunction) => {
   try {
-    const { name, description, logo, website, location, industry } = req.body;
+    const { name, description, logo, website, location, industry, foundedYear, size = null } = req.body;
     const company = await createNewCompany({
       name,
       description,
@@ -69,6 +69,8 @@ export const createCompany = async (req: RequestWithUser, res: Response, next: N
       website,
       location,
       industry,
+      foundedYear,
+      size,
       ownerId: req.user.userId
     });
 
@@ -81,7 +83,7 @@ export const createCompany = async (req: RequestWithUser, res: Response, next: N
 export const updateCompany = async (req: RequestWithUser, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const { name, description, logo, website, location, industry } = req.body;
+    const { name, description, logo, website, location, industry, foundedYear, size } = req.body;
 
     // First check if the company exists and if the user is the owner
     const existingCompany = await getExistingCompany(id);
@@ -96,7 +98,9 @@ export const updateCompany = async (req: RequestWithUser, res: Response, next: N
       logo,
       website,
       location,
-      industry
+      industry,
+      foundedYear,
+      size
     });
 
     res.status(200).json({ success: true, message: 'Company updated successfully', data: company });

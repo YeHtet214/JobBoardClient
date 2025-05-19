@@ -48,6 +48,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       error: null,
       errorInfo: null,
     });
+
+    window.location.reload();
   };
 
   render(): ReactNode {

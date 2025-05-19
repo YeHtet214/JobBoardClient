@@ -1,12 +1,12 @@
 import React from 'react';
-import { useJobsContext } from '@/contexts/JobsContext';
+import { useJobsData } from '@/hooks/react-queries/job';
 import JobCard from './JobCard';
 import { Job } from '@/types/job.types';
 import { History, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const RecentlyViewedJobs: React.FC = () => {
-  const { recentlyViewedJobs } = useJobsContext();
+  const { recentlyViewedJobs } = useJobsData();
 
   if (recentlyViewedJobs.length === 0) {
     return (

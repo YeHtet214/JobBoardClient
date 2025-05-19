@@ -84,7 +84,7 @@ const BasicInfoTab = ({ formik, isSaving, onTabChange }: BasicInfoTabProps) => {
             />
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <InputFieldWithLabel
               formik={true}
               name="newSkill"

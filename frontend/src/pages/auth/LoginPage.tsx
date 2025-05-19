@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/authContext';
 import { LoginRequest } from '@/types/auth.types';
-import * as Yup from 'yup';
 import { Formik, FormikHelpers } from 'formik';
 import { Form, InputFieldWithLabel, PasswordFieldWithLabel, SwitchFieldWithLabel, SubmitButton } from '@/components/forms';
 import AuthLayout from '@/components/layouts/AuthLayout';
+import { LoginSchema } from '@/schemas/validation/auth.schema';
 
 // Shadcn UI components with correct import paths
 import { Button } from "@/components/ui/button";
@@ -16,14 +16,7 @@ import { useToast } from "@/components/ui/use-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-// Login validation schema
-const loginSchema = Yup.object({
-  email: Yup.string()
-    .email('Invalid email address')
-    .required('Email is required'),
-  password: Yup.string()
-    .required('Password is required')
-});
+
 
 interface VerificationAlertType {
   handleResendVerification: () => void;
@@ -184,7 +177,7 @@ const LoginPage: React.FC = () => {
 
           <Formik
             initialValues={initialValues}
-            validationSchema={loginSchema}
+            validationSchema={LoginSchema}
             onSubmit={handleSubmit}
           >
             {({ isSubmitting }) => (

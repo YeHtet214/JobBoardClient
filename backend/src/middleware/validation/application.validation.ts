@@ -11,6 +11,32 @@ export const applicationValidation = {
       .isString().withMessage('Job ID must be a string')
       .trim()
       .escape(),
+    body('fullName')
+      .notEmpty().withMessage('Full name is required')
+      .isString().withMessage('Full name must be a string')
+      .trim()
+      .escape(),
+    body('email')
+      .notEmpty().withMessage('Email is required')
+      .isString().withMessage('Email must be a string')
+      .trim()
+      .escape(),
+    body('phone')
+      .notEmpty().withMessage('Phone is required')
+      .isString().withMessage('Phone must be a string')
+      .trim()
+      .escape(),
+    body('resume')
+      .optional()
+      .custom((value: any) => {
+        if (value && value.mimetype !== 'application/pdf') {
+          throw new Error('Resume must be a PDF file');
+        }
+        return true;
+      }),
+    body('useExistingResume')
+      .optional()
+      .isBoolean().withMessage('Use existing resume must be a boolean'),
     body('resumeUrl')
       .notEmpty().withMessage('Resume URL is required')
       .isURL().withMessage('Resume URL must be a valid URL')
@@ -37,7 +63,13 @@ export const applicationValidation = {
       .optional()
       .isString().withMessage('Cover letter must be a string')
       .trim()
+      .escape(),
+    body('status')
+      .optional()
+      .isString().withMessage('Status must be a string')
+      .trim()
       .escape()
+      .isIn(['PENDING', 'INTERVIEW', 'ACCEPTED', 'REJECTED']).withMessage('Status must be PENDING, INTERVIEW, ACCEPTED, or REJECTED')
   ],
 
    // Validation for getting an application by ID

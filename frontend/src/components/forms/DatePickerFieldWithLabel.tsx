@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { useField, useFormikContext } from 'formik';
 import { Label } from '@/components/ui/label';
 import { Calendar } from '@/components/ui/calendar';
@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 
 type DatePickerFieldWithLabelProps = {
   name: string;
-  label: string;
+  label: ReactNode;
   placeholder?: string;
   className?: string;
   disabled?: boolean;
@@ -56,7 +56,9 @@ const DatePickerFieldWithLabel: React.FC<DatePickerFieldWithLabelProps> = (props
       return (
         <div className="mb-4">
           <Label htmlFor={name} className="block text-sm font-medium mb-1">
-            {label} {required && <span className="text-red-500">*</span>}
+            <div className="relative inline-block">
+              {label} {required && <span className="text-red-500 absolute -right-2 top-1/2 transform -translate-y-1/2">*</span>}
+            </div>
           </Label>
           <Popover>
             <PopoverTrigger asChild>
@@ -98,7 +100,9 @@ const DatePickerFieldWithLabel: React.FC<DatePickerFieldWithLabelProps> = (props
       return (
         <div className="mb-4">
           <Label htmlFor={name} className="block text-sm font-medium mb-1">
-            {label} {required && <span className="text-red-500">*</span>}
+            <div className="relative inline-block">
+              {label} {required && <span className="text-red-500 absolute -right-2 top-1/2 transform -translate-y-1/2">*</span>}
+            </div>
           </Label>
           <Popover>
             <PopoverTrigger asChild>
@@ -131,7 +135,9 @@ const DatePickerFieldWithLabel: React.FC<DatePickerFieldWithLabelProps> = (props
     return (
       <div className="mb-4">
         <Label htmlFor={name} className="block text-sm font-medium mb-1">
-          {label} {required && <span className="text-red-500">*</span>}
+          <div className="relative inline-block">
+            {label} {required && <span className="text-red-500 absolute -right-2 top-1/2 transform -translate-y-1/2">*</span>}
+          </div>
         </Label>
         <Popover>
           <PopoverTrigger asChild>

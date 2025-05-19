@@ -10,20 +10,23 @@ import {
 } from "../controllers/job.controller.js";
 import { employerOnly } from "../middleware/role.middleware.js";
 import authorize from "../middleware/auth.middleware.js";
+import { applicationValidation, jobValidation } from "../middleware/validation/index.js";
+import { getAllApplicationsByJobId } from "../controllers/application.controller.js";
 
 const jobRouter = Router();
 
 // Public routes - anyone can view jobs
-jobRouter.get('/', getAllJobs as RequestHandler);
+jobRouter.get('/', jobValidation.getAll, getAllJobs);
 // The suggestions route must come before the :id route to avoid being treated as an ID parameter
-jobRouter.get('/suggestions', getSearchSuggestionsHandler as RequestHandler);
-jobRouter.get('/company/:companyId', getJobsByCompanyId as RequestHandler);
-// This route should be last among the GET routes with path parameters to avoid conflicts
-jobRouter.get('/:id', getJobById as RequestHandler);
+jobRouter.get('/suggestions', getSearchSuggestionsHandler);
+jobRouter.get('/company/:companyId', jobValidation.getByCompanyId, getJobsByCompanyId);
+
+jobRouter.get('/:id', jobValidation.getById, getJobById);
 
 // Protected routes - only authenticated employers can create/update/delete jobs
-jobRouter.post('/', authorize, employerOnly, createJobHandler as RequestHandler);
-jobRouter.put('/:id', authorize, employerOnly, updateJobHandler as RequestHandler);
-jobRouter.delete('/:id', authorize, employerOnly, deleteJobHandler as RequestHandler);
+jobRouter.get('/:id/applications', authorize, employerOnly, applicationValidation.getByJobId, getAllApplicationsByJobId)
+jobRouter.post('/', authorize, employerOnly, jobValidation.create, createJobHandler);
+jobRouter.put('/:id', authorize, employerOnly, jobValidation.update, updateJobHandler);
+jobRouter.delete('/:id', authorize, employerOnly, jobValidation.delete, deleteJobHandler);
 
 export default jobRouter;

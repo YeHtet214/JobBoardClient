@@ -1,21 +1,19 @@
+/* globals.css */
 @import "tailwindcss";
-
 @plugin "tailwindcss-animate";
-
 @custom-variant dark (&:is(.dark *));
 
-
-/* Commenting out conflicting CSS variables to allow Tailwind custom colors to work */
+/* Light Mode */
 :root {
   --radius: 0.625rem;
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(249, 3%, 14%);
+  --background: hsl(228, 100%, 97%); /* Matches --jobboard-light */
+  --foreground: hsl(249, 53%, 21%); /* Matches --jobboard-darkblue */
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(249, 3%, 14%);
+  --card-foreground: hsl(249, 53%, 21%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(249, 3%, 14%);
-  --primary: hsl(249, 53%, 21%);
-  --primary-foreground: hsl(249, 1%, 98%);
+  --popover-foreground: hsl(249, 53%, 21%);
+  --primary: hsl(228, 100%, 97%); /* --jobboard-light */
+  --primary-foreground: hsl(249, 53%, 21%); /* --jobboard-darkblue */
   --secondary: hsl(249, 1%, 97%);
   --secondary-foreground: hsl(249, 6%, 22%);
   --muted: hsl(249, 1%, 97%);
@@ -32,21 +30,134 @@
   --chart-4: hsl(84, 60%, 60%);
   --chart-5: hsl(70, 55%, 55%);
   --sidebar: hsl(249, 1%, 98%);
-  --sidebar-foreground: hsl(249, 3%, 14%);
+  --sidebar-foreground: hsl(249, 53%, 21%);
   --sidebar-primary: hsl(249, 6%, 22%);
   --sidebar-primary-foreground: hsl(249, 1%, 98%);
   --sidebar-accent: hsl(249, 1%, 97%);
   --sidebar-accent-foreground: hsl(249, 6%, 22%);
   --sidebar-border: hsl(249, 1%, 92%);
   --sidebar-ring: hsl(249, 5%, 71%);
+  --jobboard-light: hsl(228, 100%, 97%);
+  --jobboard-darkblue: hsl(249, 53%, 21%);
+  --jobboard-purple: hsl(248, 100%, 72%);
+  --jobboard-teal: hsl(171, 100%, 41%);
 }
 
-/* @layer base {
+/* Dark Mode */
+.dark {
+  --background: hsl(227, 31%, 12%); /* Matches --jobboard-dark */
+  --foreground: hsl(249, 53%, 85%); /* Matches --jobboard-darkblue */
+  --card: hsl(227, 31%, 15%);
+  --card-foreground: hsl(249, 53%, 85%);
+  --popover: hsl(227, 31%, 15%);
+  --popover-foreground: hsl(249, 53%, 85%);
+  --primary: hsl(227, 31%, 12%); /* --jobboard-dark */
+  --primary-foreground: hsl(249, 53%, 85%); /* --jobboard-darkblue */
+  --secondary: hsl(227, 30%, 20%);
+  --secondary-foreground: hsl(249, 53%, 85%);
+  --muted: hsl(227, 30%, 20%);
+  --muted-foreground: hsl(249, 20%, 65%);
+  --accent: hsl(227, 30%, 25%);
+  --accent-foreground: hsl(249, 53%, 85%);
+  --destructive: hsl(0, 61%, 48%);
+  --border: hsl(227, 30%, 25%);
+  --input: hsl(227, 30%, 25%);
+  --ring: hsl(249, 20%, 65%);
+  --chart-1: hsl(30, 60%, 60%);
+  --chart-2: hsl(184, 35%, 60%);
+  --chart-3: hsl(227, 50%, 50%);
+  --chart-4: hsl(84, 60%, 70%);
+  --chart-5: hsl(70, 55%, 65%);
+  --sidebar: hsl(227, 31%, 15%);
+  --sidebar-foreground: hsl(249, 53%, 85%);
+  --sidebar-primary: hsl(249, 20%, 65%);
+  --sidebar-primary-foreground: hsl(249, 53%, 85%);
+  --sidebar-accent: hsl(227, 30%, 20%);
+  --sidebar-accent-foreground: hsl(249, 53%, 85%);
+  --sidebar-border: hsl(227, 30%, 25%);
+  --sidebar-ring: hsl(249, 20%, 65%);
+  --jobboard-dark: hsl(227, 31%, 12%);
+  --jobboard-darkblue: hsl(249, 53%, 85%);
+  --jobboard-purple: hsl(248, 80%, 65%);
+  --jobboard-teal: hsl(171, 80%, 50%);
+}
+
+/* Theme Variables */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-jobboard-light: var(--jobboard-light);
+  --color-jobboard-dark: var(--jobboard-dark);
+  --color-jobboard-darkblue: var(--primary-foreground); /* Fixed */
+  --color-jobboard-purple: var(--jobboard-purple);
+  --color-jobboard-teal: var(--jobboard-teal);
+}
+
+/* Base Layer Styles */
+@layer base {
   * {
     @apply border-border outline-ring/50;
   }
-
   body {
     @apply bg-background text-foreground;
   }
-} */
+}
+
+/* Typography Styles */
+h1, h2, h3, h4, p {
+  @apply text-primary-foreground; /* Uses --jobboard-darkblue */
+}
+h1 {
+  @apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+}
+h2 {
+  @apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0;
+}
+h3 {
+  @apply scroll-m-20 text-2xl font-semibold tracking-tight;
+}
+h4 {
+  @apply scroll-m-20 text-xl font-semibold tracking-tight;
+}
+p {
+  @apply leading-7 [&:not(:first-child)]:mt-6;
+}
+blockquote {
+  @apply mt-6 border-l-2 pl-6 italic text-jobboard-purple;
+}
+ul {
+  @apply my-6 ml-6 list-disc [&>li]:mt-2;
+}

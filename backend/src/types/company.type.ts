@@ -1,21 +1,16 @@
 export interface CreateCompanyDto {
   name: string;
-  description?: string;
+  description: string;
   logo?: string;
   website?: string;
-  location?: string;
-  industry?: string;
+  location: string;
+  industry: string;
   ownerId: string;
+  foundedYear: string;
+  size?: string;
 }
 
-export interface UpdateCompanyDto {
-  name?: string;
-  description?: string;
-  logo?: string;
-  website?: string;
-  location?: string;
-  industry?: string;
-}
+export interface UpdateCompanyDto extends Partial<CreateCompanyDto> {}
 
 export interface CompanyResponse {
   id: string;

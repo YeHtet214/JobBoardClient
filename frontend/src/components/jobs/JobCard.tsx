@@ -1,16 +1,23 @@
 import React from 'react';
 import { Job } from '@/types/job.types';
 import { useNavigate } from 'react-router-dom';
-import { useJobsContext } from '@/contexts/JobsContext';
 import { MapPin, Clock, Briefcase, Calendar, Bookmark, BookmarkCheck } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useSaveJob, useRemoveSavedJob } from '@/hooks/react-queries/job';
+import { useSaveJob, useRemoveSavedJob, useJobsData } from '@/hooks/react-queries/job';
 import { JobSavedStatus } from '@/types/saved-job.types';
 import { useAuth } from '@/contexts/authContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '../ui/use-toast';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 interface JobCardProps {
   job: Job;
@@ -19,7 +26,7 @@ interface JobCardProps {
 }
 
 const JobCard: React.FC<JobCardProps> = ({ job, isCompact = false, savedStatus }) => {
-  const { handleJobView } = useJobsContext();
+  const { handleJobView } = useJobsData();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { currentUser, isAuthenticated } = useAuth();
@@ -67,12 +74,11 @@ const JobCard: React.FC<JobCardProps> = ({ job, isCompact = false, savedStatus }
   };
 
   return (
-    <div
-      className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 h-full flex flex-col cursor-pointer"
+    <Card 
+      className="h-full flex flex-col hover:shadow-md transition-all duration-200 cursor-pointer"
       onClick={handleCardClick}
     >
-      {/* Card Header */}
-      <div className="p-4 border-b border-gray-100 flex items-start gap-3 relative">
+      <CardHeader className="flex flex-row items-start gap-3 relative pb-3">
         {job.company?.logo ? (
           <img
             src={job.company.logo}
@@ -85,9 +91,9 @@ const JobCard: React.FC<JobCardProps> = ({ job, isCompact = false, savedStatus }
           </div>
         )}
 
-        <div className="flex-1 min-w-0 pr-10">
-          <h3 className="font-semibold text-jobboard-darkblue text-lg truncate">{job.title}</h3>
-          <p className="text-gray-600 text-sm truncate">{job.company?.name || 'Company Name'}</p>
+        <div className="flex-1 min-w-0 pr-10 space-y-0">
+          <CardTitle className="text-jobboard-darkblue text-lg truncate">{job.title}</CardTitle>
+          <CardDescription className="truncate">{job.company?.name || 'Company Name'}</CardDescription>
         </div>
 
         {isJobSeeker && (
@@ -115,10 +121,9 @@ const JobCard: React.FC<JobCardProps> = ({ job, isCompact = false, savedStatus }
             </TooltipProvider>
           </div>
         )}
-      </div>
+      </CardHeader>
 
-      {/* Card Body */}
-      <div className="p-4 flex-1 flex flex-col">
+      <CardContent className="flex-1 flex flex-col pt-0">
         {/* Job Details */}
         <div className="space-y-2 mb-4 text-sm">
           <div className="flex items-center text-gray-600">
@@ -154,10 +159,9 @@ const JobCard: React.FC<JobCardProps> = ({ job, isCompact = false, savedStatus }
           <Calendar className="w-3 h-3 mr-1" />
           <span>Posted {postedDate}</span>
         </div>
-      </div>
+      </CardContent>
 
-      {/* Card Footer */}
-      <div className="p-4 border-t border-gray-100 flex justify-between items-center">
+      <CardFooter className="justify-between items-center pt-3">
         <span className="text-green-600 font-medium text-sm">{formattedSalary}</span>
         <Button
           size="sm"
@@ -169,8 +173,8 @@ const JobCard: React.FC<JobCardProps> = ({ job, isCompact = false, savedStatus }
         >
           View Details
         </Button>
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 };
 

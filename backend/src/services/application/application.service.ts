@@ -2,6 +2,22 @@ import prisma from "../../prisma/client.js"
 import { CustomError } from "../../types/error.type.js";
 import { createApplicationDto, updateApplicationDto } from "../../types/application.type.js";
 
+export const fetchAllApplicationsByUserId = async (userId: string) => {
+    const applications = await prisma.jobApplication.findMany({
+        where: { applicantId: userId }, 
+        omit: { jobId: true },
+        include: { job: { include: { company: true } } }
+    });
+
+    if (!applications || applications.length === 0) {
+        const error = new Error('Applications not found') as CustomError;
+        error.status = 404;
+        throw error;
+    }
+
+    return applications;
+}
+
 export const fetchAllApplicationsByJobId = async (jobId: string) => {
     const applications = await prisma.jobApplication.findMany({
         where: { jobId }
@@ -88,9 +104,11 @@ export const updateApplicationById = async (applicationData: updateApplicationDt
         data: {
             resumeUrl: applicationData.resumeUrl,
             coverLetter: applicationData.coverLetter,
-            updatedAt: new Date()
+            status: applicationData.status
         }
     });
+
+    console.log("Updated data; ", updatedApplication)
 
     return updatedApplication;
 }

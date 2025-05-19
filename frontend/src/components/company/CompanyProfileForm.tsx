@@ -149,8 +149,6 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
     }
   };
 
-  const isSubmitting = createCompany.isPending || updateCompany.isPending;
-
   return (
     <Card>
       <CardHeader>
@@ -171,7 +169,7 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
           validateOnChange={false}
           validateOnBlur={true}
         >
-          {({ errors }) => (
+          {({ errors, isSubmitting }) => (
             <Form>
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid grid-cols-3 mb-8">

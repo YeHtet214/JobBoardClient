@@ -1,10 +1,10 @@
 import React from 'react';
-import { useJobsContext } from '@/contexts/JobsContext';
+import { useJobsData } from '@/hooks/react-queries/job';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Pagination: React.FC = () => {
-  const { currentPage, totalPages, handlePageChange, totalCount } = useJobsContext();
+  const { currentPage, totalPages, handlePageChange, totalCount } = useJobsData();
 
   // If there's only one page or no results, don't show pagination
   if (totalPages <= 1 || totalCount === 0) {
