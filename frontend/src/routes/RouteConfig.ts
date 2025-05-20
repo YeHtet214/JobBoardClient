@@ -1,4 +1,4 @@
-import ApplicationDetailPage from '@/pages/jobseeker/ApplicationDetailPage';
+// Direct imports for non-lazy loaded components
 import JobDetailPage from '@/pages/JobDetailPage';
 import React, { lazy } from 'react';
 
@@ -36,6 +36,7 @@ const CreateJobPage = lazy(() => import('@/pages/employer/CreateJobPage'));
 const EditJobPage = lazy(() => import('@/pages/employer/EditJobPage'));
 const EmployerJobsPage = lazy(() => import('@/pages/employer/EmployerJobsPage'));
 const EmployerApplicationListPage = lazy(() => import('@/pages/employer/EmployerApplicationListPage'));
+const EmployerApplicationDetailPage = lazy(() => import('@/pages/employer/EmployerApplicationDetailPage'));
 const CompanyProfileEditPage = lazy(() => import('@/pages/employer/CompanyProfileEditPage'));
 
 // Jobseeker pages
@@ -48,7 +49,7 @@ const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const ProfilePage = lazy(() => import('@/pages/jobseeker/ProfilePage'));
 const JobsPage = lazy(() => import('@/pages/JobsPage'));
 const ApplicationListPage = lazy(() => import('@/pages/ApplicationsListPage'));
-const ApplicationDetailPage = lazy(() => import('@/pages/jobseeker/ApplicationDetailPage'));
+const JobseekerApplicationDetailPage = lazy(() => import('@/pages/jobseeker/ApplicationDetailPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
 // Define routes
@@ -175,6 +176,13 @@ export const routes: RouteConfig[] = [
     meta: { title: 'All Applications', description: 'View and manage all job applications' }
   },
   {
+    path: '/employer/applications/:id',
+    element: EmployerApplicationDetailPage,
+    requiresAuth: true,
+    allowedRoles: ['EMPLOYER'],
+    meta: { title: 'Application Details', description: 'View and manage application details' }
+  },
+  {
     path: '/jobs/:id/apply',
     element: ApplyJobPage,
     requiresAuth: true,
@@ -190,7 +198,7 @@ export const routes: RouteConfig[] = [
   },
   {
     path: '/applications/:id',
-    element: ApplicationDetailPage,
+    element: JobseekerApplicationDetailPage,
     requiresAuth: true,
     allowedRoles: ['JOBSEEKER'],
     meta: { title: 'Application Details', description: 'View details of your job application' }

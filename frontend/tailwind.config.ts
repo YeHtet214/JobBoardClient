@@ -42,15 +42,6 @@ const config: Config =  {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Custom color palette with direct HEX values
-        darkblue: {
-          DEFAULT: "hsl(var(--darkblue))",
-          foreground: "hsl(var(--darkblue-foreground))",
-        },
-        'jobboard-darkblue': '#211951',
-        'jobboard-purple': '#836FFF',
-        'jobboard-teal': '#15F5BA',
-        'jobboard-light': '#F0F3FF',
       },
       borderRadius: {
         lg: "var(--radius)",

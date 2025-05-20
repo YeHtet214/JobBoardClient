@@ -37,10 +37,14 @@
   --sidebar-accent-foreground: hsl(249, 6%, 22%);
   --sidebar-border: hsl(249, 1%, 92%);
   --sidebar-ring: hsl(249, 5%, 71%);
-  --jobboard-light: hsl(228, 100%, 97%);
-  --jobboard-darkblue: hsl(249, 53%, 21%);
-  --jobboard-purple: hsl(248, 100%, 72%);
-  --jobboard-teal: hsl(171, 100%, 41%);
+
+  --jb-primary: #2563eb;
+  --jb-bg: #ffffff;
+  --jb-surface: #f8fafc;
+  --jb-text: #0f172a;
+  --jb-text-muted: #475569;
+  --jb-success: #10b981;
+  --jb-danger: #ef4444;
 }
 
 /* Dark Mode */
@@ -76,10 +80,14 @@
   --sidebar-accent-foreground: hsl(249, 53%, 85%);
   --sidebar-border: hsl(227, 30%, 25%);
   --sidebar-ring: hsl(249, 20%, 65%);
-  --jobboard-dark: hsl(227, 31%, 12%);
-  --jobboard-darkblue: hsl(249, 53%, 85%);
-  --jobboard-purple: hsl(248, 80%, 65%);
-  --jobboard-teal: hsl(171, 80%, 50%);
+
+  --jb-primary: #3b82f6;
+  --jb-bg: #0f172a;
+  --jb-surface: #1e293b;
+  --jb-text: #f8fafc;
+  --jb-text-muted: #94a3b8;
+  --jb-success: #22c55e;
+  --jb-danger: #f87171;
 }
 
 /* Theme Variables */
@@ -119,11 +127,14 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --color-jobboard-light: var(--jobboard-light);
-  --color-jobboard-dark: var(--jobboard-dark);
-  --color-jobboard-darkblue: var(--primary-foreground); /* Fixed */
-  --color-jobboard-purple: var(--jobboard-purple);
-  --color-jobboard-teal: var(--jobboard-teal);
+
+  --color-jb-primary: var(--jb-primary);
+  --color-jb-bg: var(--jb-bg);
+  --color-jb-surface: var(--jb-surface);
+  --color-jb-text: var(--jb-text);
+  --color-jb-text-muted: var(--jb-text-muted);
+  --color-jb-success: var(--jb-success);
+  --color-jb-danger: var(--jb-danger);
 }
 
 /* Base Layer Styles */
@@ -134,30 +145,4 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-/* Typography Styles */
-h1, h2, h3, h4, p {
-  @apply text-primary-foreground; /* Uses --jobboard-darkblue */
-}
-h1 {
-  @apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
-}
-h2 {
-  @apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0;
-}
-h3 {
-  @apply scroll-m-20 text-2xl font-semibold tracking-tight;
-}
-h4 {
-  @apply scroll-m-20 text-xl font-semibold tracking-tight;
-}
-p {
-  @apply leading-7 [&:not(:first-child)]:mt-6;
-}
-blockquote {
-  @apply mt-6 border-l-2 pl-6 italic text-jobboard-purple;
-}
-ul {
-  @apply my-6 ml-6 list-disc [&>li]:mt-2;
 }
