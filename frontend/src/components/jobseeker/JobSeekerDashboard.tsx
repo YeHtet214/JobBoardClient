@@ -120,33 +120,30 @@ const JobSeekerDashboard: React.FC = () => {
       title="Job Seeker Dashboard"
     >
       {/* Stats Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <DashboardStatCard
           title="Applications"
           value={dashboardData?.stats?.totalApplications || 0}
-          icon={<FileText className="h-6 w-6 text-jobboard-blue" />}
-          borderColorClass="border-l-jobboard-blue"
+          icon={<FileText className="h-6 w-6 text-jb-primary" />}
+          borderColorClass="border-l-jb-primary"
         />
-
         <DashboardStatCard
           title="Interviews"
           value={dashboardData?.stats?.interviews || 0}
-          icon={<Calendar className="h-6 w-6 text-jobboard-purple" />}
-          borderColorClass="border-l-jobboard-purple"
+          icon={<Calendar className="h-6 w-6 text-jb-secondary" />}
+          borderColorClass="border-l-jb-secondary"
         />
-
         <DashboardStatCard
           title="Offers"
           value={dashboardData?.stats?.offers || 0}
-          icon={<Briefcase className="h-6 w-6 text-jobboard-green" />}
-          borderColorClass="border-l-jobboard-green"
+          icon={<Briefcase className="h-6 w-6 text-jb-success" />}
+          borderColorClass="border-l-jb-success"
         />
-
         <DashboardStatCard
           title="Saved Jobs"
           value={savedJobs.length || 0}
-          icon={<Bookmark className="h-6 w-6 text-jobboard-red" />}
-          borderColorClass="border-l-jobboard-red"
+          icon={<Bookmark className="h-6 w-6 text-jb-danger" />}
+          borderColorClass="border-l-jb-danger"
         />
       </div>
 
@@ -155,22 +152,22 @@ const JobSeekerDashboard: React.FC = () => {
         {/* Tabs Section */}
         <div>
           <Tabs defaultValue="applications" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="applications" className="flex items-center">
-                <FileText className="h-4 w-4 mr-2" />
-                <span className="sm:block">Applications</span>
+            <TabsList className="grid grid-cols-2 w-full bg-jb-surface text-jb-text">
+              <TabsTrigger value="applications" className="flex items-center justify-center gap-2 py-2">
+                <FileText className="h-4 w-4" />
+                <span>Applications</span>
               </TabsTrigger>
-              <TabsTrigger value="saved" className="flex items-center">
-                <Bookmark className="h-4 w-4 mr-2" />
-                <span className="sm:block">Saved Jobs</span>
+              <TabsTrigger value="saved" className="flex items-center justify-center gap-2 py-2">
+                <Bookmark className="h-4 w-4" />
+                <span>Saved Jobs</span>
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="applications">
-              <Card>
+              <Card className="bg-jb-surface text-jb-text">
                 <CardHeader>
                   <CardTitle>Your Applications</CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-jb-text-muted">
                     Track the status of your job applications
                   </CardDescription>
                 </CardHeader>
@@ -182,7 +179,7 @@ const JobSeekerDashboard: React.FC = () => {
                 </CardContent>
                 {(dashboardData?.applications?.length ?? 0) > 0 && (
                   <CardFooter className="flex justify-center">
-                    <Button variant="outline" onClick={() => navigate('/applications')}>
+                    <Button variant="outline" className="text-jb-primary border-jb-primary hover:bg-jb-primary/10" onClick={() => navigate('/applications')}>
                       View All Applications
                     </Button>
                   </CardFooter>
@@ -191,10 +188,10 @@ const JobSeekerDashboard: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="saved">
-              <Card>
+              <Card className="bg-jb-surface text-jb-text">
                 <CardHeader>
                   <CardTitle>Saved Jobs</CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-jb-text-muted">
                     Jobs you've saved for later
                   </CardDescription>
                 </CardHeader>
@@ -206,7 +203,7 @@ const JobSeekerDashboard: React.FC = () => {
                 </CardContent>
                 {(savedJobs?.length ?? 0) > 0 && (
                   <CardFooter className="flex justify-center">
-                    <Button variant="outline" onClick={() => navigate('/saved-jobs')}>
+                    <Button variant="outline" className="text-jb-primary border-jb-primary hover:bg-jb-primary/10" onClick={() => navigate('/saved-jobs')}>
                       View All Saved Jobs
                     </Button>
                   </CardFooter>
@@ -217,7 +214,7 @@ const JobSeekerDashboard: React.FC = () => {
         </div>
 
         {/* Sidebar Section */}
-        <div>
+        <div className="space-y-6">
           <ActivityFeed
             activities={dashboardData?.recentActivity || []}
             title="Recent Activity"
@@ -225,17 +222,15 @@ const JobSeekerDashboard: React.FC = () => {
             getActivityIcon={getJobSeekerActivityIcon}
           />
 
-          <div className="mt-6">
-            <ProfileCompletionCard
-              title="Profile Completion"
-              description="Complete your profile to increase visibility"
-              completionPercentage={dashboardData?.stats?.profileCompletion || 0}
-              completionItems={completionItems}
-              profilePath="/profile"
-              buttonText="Complete Profile"
-              isJobSeeker={true}
-            />
-          </div>
+          <ProfileCompletionCard
+            title="Profile Completion"
+            description="Complete your profile to increase visibility"
+            completionPercentage={dashboardData?.stats?.profileCompletion || 0}
+            completionItems={completionItems}
+            profilePath="/profile"
+            buttonText="Complete Profile"
+            isJobSeeker={true}
+          />
         </div>
       </div>
     </DashboardContainer>

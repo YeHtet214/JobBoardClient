@@ -122,7 +122,8 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
         await updateCompany.mutateAsync({ id: company.id, data: values as UpdateCompanyDto });
         toast({
           title: "Success",
-          description: "Company profile has been updated successfully."
+          description: "Company profile has been updated successfully.",
+          variant: "success"
         });
         navigate('/dashboard');
       } else {
@@ -178,7 +179,7 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
                     <span className="hidden sm:inline">Basic Info</span>
                     <span className="sm:hidden">Basic</span>
                     {(errors.name || errors.description || errors.industry) && (
-                      <span className="ml-2 h-2 w-2 rounded-full bg-red-500"></span>
+                      <span className="ml-2 h-2 w-2 rounded-full bg-jb-text-primary"></span>
                     )}
                   </TabsTrigger>
                   <TabsTrigger value="details" className="text-base">
@@ -186,7 +187,7 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
                     <span className="hidden sm:inline">Company Details</span>
                     <span className="sm:hidden">Details</span>
                     {(errors.location || errors.website || errors.foundedYear || errors.size) && (
-                      <span className="ml-2 h-2 w-2 rounded-full bg-red-500"></span>
+                      <span className="ml-2 h-2 w-2 rounded-full bg-jb-text-primary"></span>
                     )}
                   </TabsTrigger>
                   <TabsTrigger value="branding" className="text-base">
@@ -194,7 +195,7 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
                     <span className="hidden sm:inline">Branding</span>
                     <span className="sm:hidden">Brand</span>
                     {errors.logo && (
-                      <span className="ml-2 h-2 w-2 rounded-full bg-red-500"></span>
+                      <span className="ml-2 h-2 w-2 rounded-full bg-jb-text-primary"></span>
                     )}
                   </TabsTrigger>
                 </TabsList>
@@ -223,7 +224,7 @@ const CompanyProfileForm = ({ company, isNewCompany }: CompanyProfileFormProps) 
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-red-500 hover:bg-jobboard-darkblue/90"
+                  className="bg-jb-primary text-white hover:bg-jb-primary/90"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (

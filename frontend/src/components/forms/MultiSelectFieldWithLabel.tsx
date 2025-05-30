@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useField, useFormikContext } from 'formik';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -66,6 +66,12 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
       const selectedValues = field.value as string[] || [];
       const hasError = meta.touched && meta.error;
 
+      document.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter') {
+          handleCreateOption();
+        }
+      });
+
       const handleSelect = (value: string) => {
         const newValues = selectedValues.includes(value)
           ? selectedValues.filter(v => v !== value)
@@ -123,7 +129,7 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
 
       return (
         <div className={`mb-4 ${className}`}>
-          <Label htmlFor={name} className="block text-sm font-medium mb-1">
+          <Label htmlFor={name} className="block text-sm font-medium mb-1 text-muted-foreground">
             {label} {required && <span className="text-red-500">*</span>}
           </Label>
 
@@ -137,7 +143,7 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
                 variant="outline"
                 role="combobox"
                 aria-expanded={open}
-                className={`w-full justify-between h-auto min-h-10 ${hasError ? 'border-red-500' : ''
+                className={`w-full justify-between h-auto min-h-10 ${hasError ? 'border-jb-danger' : ''
                   }`}
                 disabled={disabled}
                 onClick={() => setOpen(!open)}
@@ -182,7 +188,7 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
                   {allowCreation ? (
                     <Button
                       variant="ghost"
-                      className="w-full justify-start text-left font-normal py-1.5"
+                      className="w-full justify-start text-left font-normal"
                       onClick={handleCreateOption}
                     >
                       {creationLabel} "{search}"
@@ -236,7 +242,7 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
       console.warn(`MultiSelectField with name "${name}" is marked as a Formik field but no Formik context was found.`);
       return (
         <div className={`mb-4 ${className}`}>
-          <Label htmlFor={name} className="block text-sm font-medium mb-1">
+          <Label htmlFor={name} className="block text-sm font-medium mb-1 text-muted-foreground">
             {label} {required && <span className="text-red-500">*</span>}
           </Label>
 
@@ -318,21 +324,21 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
 
     return (
       <div className={`mb-4 ${className}`}>
-        <Label htmlFor={name} className="block text-sm font-medium mb-1">
+        {/* <Label htmlFor={name} className="block text-sm font-medium mb-1 text-muted-foreground">
           {label} {required && <span className="text-red-500">*</span>}
         </Label>
 
         {description && (
           <p className="text-sm text-muted-foreground mb-2">{description}</p>
-        )}
+        )} */}
 
-        <Popover open={open} onOpenChange={setOpen}>
+        {/* <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               role="combobox"
               aria-expanded={open}
-              className={`w-full justify-between h-auto min-h-10 ${hasError ? 'border-red-500' : ''
+              className={`w-full justify-between h-auto min-h-10 ${hasError ? 'border-jb-danger' : ''
                 }`}
               disabled={disabled}
               onClick={() => setOpen(!open)}
@@ -419,7 +425,8 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
               )}
             </Command>
           </PopoverContent>
-        </Popover>
+        </Popover> */}
+        <h1>This is the testing text</h1>
 
         {hasError && (
           <p className="mt-1 text-sm text-red-600">{errors[name]?.message}</p>

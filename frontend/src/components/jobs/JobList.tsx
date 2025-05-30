@@ -1,7 +1,7 @@
 import React from 'react';
 import JobCard from './JobCard';
 import Pagination from './Pagination';
-import { Job } from '@/types/job.types';
+import { Job, JobFilterType } from '@/types/job.types';
 import { AlertCircle, Search } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import JobSorting from './JobSorting';
@@ -11,6 +11,8 @@ import { useBatchJobSavedStatus, useJobsData } from '@/hooks/react-queries/job';
 const JobList: React.FC = () => {
   const { jobs, isLoading, error, keyword, location, jobTypes, experienceLevel, totalCount } = useJobsData();
   const { isAuthenticated, currentUser } = useAuth();
+
+  console.log("JObs in list: ",jobs);
 
   // Check if user is a job seeker for saved job functionality
   const isJobSeeker = currentUser?.role === 'JOBSEEKER';

@@ -22,6 +22,7 @@ class JobService extends ApiService {
   };
 
   public async getAllJobs(params?: JobSearchParams): Promise<JobsResponse> {
+    console.log("Params: ", params)
     const queryParams = this.createQueryParams(params || {});
     const url = `${this.endpoints.ALL}?${queryParams.toString()}`;
     const response = await this.get<JobsResponse>(url);

@@ -37,14 +37,18 @@
   --sidebar-accent-foreground: hsl(249, 6%, 22%);
   --sidebar-border: hsl(249, 1%, 92%);
   --sidebar-ring: hsl(249, 5%, 71%);
+  --font-sans: "Inter", "var(--font-sans)", ...defaultTheme.fontFamily.sans;
 
   --jb-primary: #2563eb;
+  --jb-accent: #8b5cf6;
+  --jb-info: #0ea5e9;
+  --jb-warning: #f59e0b;
+  --jb-success: #10b981;
+  --jb-danger: #ef4444;
   --jb-bg: #ffffff;
   --jb-surface: #f8fafc;
   --jb-text: #0f172a;
   --jb-text-muted: #475569;
-  --jb-success: #10b981;
-  --jb-danger: #ef4444;
 }
 
 /* Dark Mode */
@@ -82,12 +86,15 @@
   --sidebar-ring: hsl(249, 20%, 65%);
 
   --jb-primary: #3b82f6;
+  --jb-accent: #a78bfa;
+  --jb-info: #38bdf8;
+  --jb-warning: #facc15;
+  --jb-success: #22c55e;
+  --jb-danger: #f87171;
   --jb-bg: #0f172a;
   --jb-surface: #1e293b;
   --jb-text: #f8fafc;
   --jb-text-muted: #94a3b8;
-  --jb-success: #22c55e;
-  --jb-danger: #f87171;
 }
 
 /* Theme Variables */
@@ -129,12 +136,15 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   --color-jb-primary: var(--jb-primary);
+  --color-jb-accent: var(--jb-accent);
+  --color-jb-info: var(--jb-info);
+  --color-jb-warning: var(--jb-warning);
+  --color-jb-success: var(--jb-success);
+  --color-jb-danger: var(--jb-danger);
   --color-jb-bg: var(--jb-bg);
   --color-jb-surface: var(--jb-surface);
   --color-jb-text: var(--jb-text);
   --color-jb-text-muted: var(--jb-text-muted);
-  --color-jb-success: var(--jb-success);
-  --color-jb-danger: var(--jb-danger);
 }
 
 /* Base Layer Styles */

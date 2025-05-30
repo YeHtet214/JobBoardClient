@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react";
+
 export type JobType = 'FULL_TIME' | 'PART_TIME' | 'CONTRACT';
 
 export interface Job {
@@ -49,4 +51,18 @@ export interface CreateJobDto {
 
 export interface UpdateJobDto extends Partial<CreateJobDto> {
   isActive?: boolean;
+}
+
+export interface JobFilterType {
+  keyword: string;
+  location: string;
+  jobTypes: string[];
+  experienceLevel: string;
+}
+
+export interface JobFilterProps extends JobFilterType {
+  setKeyword?: Dispatch<SetStateAction<string>>;
+  setLocation?: Dispatch<SetStateAction<string>>;
+  setJobTypes?: Dispatch<SetStateAction<string[]>>;
+  setExperienceLevel?: Dispatch<SetStateAction<string>>;
 }

@@ -40,17 +40,14 @@ const ProfilePage = () => {
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
   const { mutate: uploadResume, isPending: isUploading } = useUploadResume();
 
-  // Redirect non-jobseekers
   useEffect(() => {
     if (currentUser?.role !== 'JOBSEEKER') {
       navigate('/');
     }
   }, [currentUser, navigate]);
 
-  // Reset edit mode when profile changes
   useEffect(() => {
     setEditMode(false);
-    console.log("Profile changed: ", profile);
   }, [profile]);
 
   const handleSubmit = async (values: ProfileFormValues) => {
@@ -77,24 +74,23 @@ const ProfilePage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-jb-bg text-jb-text">
         <LoadingSpinner />
       </div>
     );
   }
 
-  // No profile exists yet
   if (!profile?.id) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="container mx-auto max-w-5xl py-10 px-4 sm:px-6"
+        className="container mx-auto max-w-5xl py-10 px-4 sm:px-6 text-jb-text"
       >
-        <h1 className="text-3xl font-bold mb-4 text-jobboard-darkblue">Profile</h1>
+        <h1 className="text-3xl font-bold mb-4 text-jb-text">Profile</h1>
         <ProfileOverview enterEditMode={enterEditMode} />
-        
+
         {editMode && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
@@ -102,7 +98,7 @@ const ProfilePage = () => {
             transition={{ duration: 0.5 }}
             className="mt-8"
           >
-            <Card className="border shadow-md">
+            <Card className="border border-jb-primary/20 shadow-md bg-jb-surface">
               <CardContent className="pt-6">
                 <ProfileEditForm
                   profile={initialProfile}
@@ -122,56 +118,54 @@ const ProfilePage = () => {
     );
   }
 
-  // Profile exists - Display mode
   if (!editMode) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="container mx-auto max-w-5xl py-10 px-4 sm:px-6"
+        className="container mx-auto max-w-5xl py-10 px-4 sm:px-6 text-jb-text"
       >
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-jobboard-darkblue">Profile</h1>
+          <h1 className="text-3xl font-bold text-jb-text">Profile</h1>
           <Button
             onClick={enterEditMode}
             variant="outline"
-            className="flex items-center gap-2 border-jobboard-darkblue text-jobboard-darkblue hover:bg-jobboard-darkblue/10"
+            className="flex items-center gap-2 border-jb-primary text-jb-text hover:bg-jb-primary/10"
           >
             <Pencil className="h-4 w-4" />
             <span>Edit Profile</span>
           </Button>
         </div>
 
-        <ProfileTabs 
-          profile={profile} 
-          viewTab={viewTab} 
-          setViewTab={setViewTab} 
+        <ProfileTabs
+          profile={profile}
+          viewTab={viewTab}
+          setViewTab={setViewTab}
         />
       </motion.div>
     );
   }
 
-  // Edit mode
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="container mx-auto max-w-5xl py-10 px-4 sm:px-6"
+      className="container mx-auto max-w-5xl py-10 px-4 sm:px-6 text-jb-text"
     >
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-jobboard-darkblue">Edit Profile</h1>
+        <h1 className="text-3xl font-bold">Edit Profile</h1>
         <Button
           onClick={() => setEditMode(false)}
           variant="outline"
-          className="border-gray-300"
+          className="border-jb-muted text-jb-text hover:bg-jb-muted/10"
         >
           Cancel
         </Button>
       </div>
 
-      <Card className="border shadow-md">
+      <Card className="border border-jb-primary/20 shadow-md bg-jb-surface">
         <CardContent className="pt-6">
           <ProfileEditForm
             profile={profile || initialProfile}

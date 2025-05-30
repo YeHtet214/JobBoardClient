@@ -39,19 +39,19 @@ const TextareaField: React.FC<TextareaFieldProps> = (props) => {
 
     return (
       <div className="mb-4">
-        <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
-          {label} {required && <span className="text-red-500">*</span>}
+        <label htmlFor={name} className="block text-sm font-medium mb-1 text-muted-foreground">
+          {label} {required && <span className="text-jb-danger">*</span>}
         </label>
         <textarea
           id={name}
           placeholder={placeholder}
           rows={rows}
           disabled={disabled}
-          className={`mt-1 block w-full px-3 py-2 border ${hasError ? 'border-red-500' : 'border-gray-300'
-            } rounded-md shadow-sm focus:outline-none focus:ring-jobboard-darkblue focus:border-jobboard-darkblue ${className}`}
+          className={`mt-1 block w-full px-3 py-2 border ${hasError ? 'border-jb-danger' : 'border-jb-border'
+            } rounded-md shadow-sm focus:outline-none focus:ring-jb-primary focus:border-jb-primary ${className}`}
           {...field}
         />
-        {hasError && <p className="mt-1 text-sm text-red-600">{meta.error}</p>}
+        {hasError && <p className="mt-1 text-sm text-jb-danger">{meta.error}</p>}
       </div>
     );
   } else {
@@ -61,8 +61,8 @@ const TextareaField: React.FC<TextareaFieldProps> = (props) => {
 
     return (
       <div className="mb-4">
-        <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
-          {label} {required && <span className="text-red-500">*</span>}
+        <label htmlFor={name} className="block text-sm font-medium mb-1 text-muted-foreground">
+          {label} {required && <span className="text-jb-danger">*</span>}
         </label>
         <textarea
           id={name}
@@ -73,10 +73,10 @@ const TextareaField: React.FC<TextareaFieldProps> = (props) => {
           onBlur={onBlur}
           rows={rows}
           disabled={disabled}
-          className={`mt-1 block w-full px-3 py-2 border ${hasError ? 'border-red-500' : 'border-gray-300'
-            } rounded-md shadow-sm focus:outline-none focus:ring-jobboard-darkblue focus:border-jobboard-darkblue ${className}`}
+          className={`mt-1 block w-full px-3 py-2 border ${hasError ? 'border-jb-danger' : 'border-jb-border'
+            } rounded-md shadow-sm focus:outline-none focus:ring-jb-primary focus:border-jb-primary ${className}`}
         />
-        {hasError && <p className="mt-1 text-sm text-red-600">{errors[name]?.message}</p>}
+        {hasError && <p className="mt-1 text-sm text-jb-danger">{errors[name]?.message}</p>}
       </div>
     );
   }

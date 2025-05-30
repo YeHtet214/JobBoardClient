@@ -1,13 +1,15 @@
 import prisma from "../../prisma/client.js";
 import { BadRequestError, NotFoundError, ForbiddenError } from "../../middleware/errorHandler.js";
-import { CreateJobDto, JobType } from "../../types/job.type.js";
+import { CreateJobDto } from "../../types/job.type.js";
+import { JobType } from "@prisma/client";
 import { fetchUserById } from "../user.service.js";
+import { Prisma } from "@prisma/client";
 
 // Define search params interface to match frontend
 export interface JobSearchParams {
     keyword?: string;
     location?: string;
-    jobTypes?: string[];
+    jobTypes?: JobType[];
     experienceLevel?: string;
     page?: number;
     limit?: number;
@@ -29,69 +31,55 @@ export const fetchAllJobs = async (params?: JobSearchParams) => {
     // Calculate pagination
     const skip = (page - 1) * limit;
 
-    // Build the where clause for filtering
-    const where: any = {
+    const filters: Prisma.JobWhereInput = {
         isActive: true,
+        ...(keyword && {
+            OR: [
+                { title: { contains: keyword, mode: 'insensitive' } },
+                { description: { contains: keyword, mode: 'insensitive' } },
+            ],
+        }),
+        ...(location && {
+            location: { contains: location, mode: 'insensitive' },
+        }),
+        ...(jobTypes.length > 0 && {
+            type: { in: jobTypes },
+        }),
+        ...(experienceLevel && {
+            experienceLevel,
+        }),
     };
 
-    // Add keyword search (search in title and description)
-    if (keyword) {
-        where.OR = [
-            { title: { contains: keyword, mode: 'insensitive' } },
-            { description: { contains: keyword, mode: 'insensitive' } },
-        ];
-    }
+    const orderBy: Prisma.JobOrderByWithRelationInput = (() => {
+        switch (sortBy) {
+            case 'date_desc':
+                return { createdAt: 'desc' };
+            case 'date_asc':
+                return { createdAt: 'asc' };
+            case 'salary_desc':
+                return { salaryMax: 'desc' };
+            case 'salary_asc':
+                return { salaryMin: 'asc' };
+            case 'relevance':
+            default:
+                return { createdAt: 'desc' };
+        }
+    })();
 
-    // Add location filter
-    if (location) {
-        where.location = { contains: location, mode: 'insensitive' };
-    }
+    console.log("ORder by: ", orderBy);
 
-    // Add job types filter
-    if (jobTypes.length > 0) {
-        where.type = { in: jobTypes };
-    }
-
-    // Add experience level filter
-    if (experienceLevel) {
-        where.experienceLevel = experienceLevel;
-    }
-
-    // Determine sort order based on sortBy parameter
-    let orderBy: any = {};
-    switch (sortBy) {
-        case 'date_desc':
-            orderBy = { createdAt: 'desc' };
-            break;
-        case 'date_asc':
-            orderBy = { createdAt: 'asc' };
-            break;
-        case 'salary_desc':
-            orderBy = { salaryMax: 'desc' };
-            break;
-        case 'salary_asc':
-            orderBy = { salaryMin: 'asc' };
-            break;
-        case 'relevance':
-            // For relevance, we'll keep the default ordering
-            // In a real implementation, this would use a more sophisticated
-            // relevance algorithm based on the search term
-            orderBy = { createdAt: 'desc' };
-            break;
-        default:
-            orderBy = { createdAt: 'desc' };
-    }
-
-    // Get total count for pagination
-    const totalCount = await prisma.job.count({ where });
+    // Count query
+    const totalCount = await prisma.job.count({
+        where: filters,
+    });
 
     // Calculate total pages
     const totalPages = Math.ceil(totalCount / limit);
 
     // Fetch jobs with pagination, sorting, and filtering
     const jobs = await prisma.job.findMany({
-        where,
-        orderBy,
+        where: filters,
+        orderBy: orderBy,
         skip,
         take: limit,
         include: {
@@ -111,6 +99,8 @@ export const fetchAllJobs = async (params?: JobSearchParams) => {
             }
         }
     });
+
+    console.log("returned jobs: ", jobs);
 
     // Return in the format expected by the frontend
     return {
@@ -285,8 +275,8 @@ export const getSearchSuggestions = async (
             });
 
             // Extract skills that match the term
-            const skillSuggestions = skillsMatches.flatMap(job => 
-                job.requiredSkills.filter(skill => 
+            const skillSuggestions = skillsMatches.flatMap(job =>
+                job.requiredSkills.filter(skill =>
                     skill.toLowerCase().includes(term.toLowerCase())
                 )
             );
@@ -376,7 +366,7 @@ export const createJob = async (jobData: Partial<CreateJobDto> & { postedById: s
         where: { ownerId: jobData.postedById },
         select: { id: true }
     });
-    
+
     if (!userCompany) {
         throw new BadRequestError("You need to create a company before posting a job");
     }

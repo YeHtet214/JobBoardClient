@@ -36,14 +36,14 @@ const SavedJobsList: React.FC<SavedJobsListProps> = ({
           {savedJobs.map((savedJob) => (
             <div
               key={savedJob.id}
-              className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+              className="p-4 border rounded-lg hover:bg-jb-text-muted/10 transition-colors"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium text-sm truncate">{savedJob.job.title}</h4>
-                  <p className="text-xs text-gray-500 mt-1">{savedJob.job.company?.name}</p>
+                  <p className="text-xs text-jb-text-muted mt-1">{savedJob.job.company?.name}</p>
                   <div className="flex items-center mt-2">
-                    <span className="text-xs text-gray-500">Saved {formatDate(savedJob.createdAt)}</span>
+                    <span className="text-xs text-jb-text-muted">Saved {formatDate(savedJob.createdAt)}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -88,7 +88,7 @@ const SavedJobsList: React.FC<SavedJobsListProps> = ({
         </div>
       ) : (
         <div className="text-center py-10">
-          <p className="text-gray-500 mb-4">{emptyStateMessage}</p>
+          <p className="text-jb-text-muted mb-4">{emptyStateMessage}</p>
           <Button onClick={() => navigate('/jobs')}>Browse Jobs</Button>
         </div>
       )}

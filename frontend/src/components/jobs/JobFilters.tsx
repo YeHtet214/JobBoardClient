@@ -2,7 +2,6 @@ import React from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Sidebar from '../layouts/Sidebar';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import {
@@ -14,20 +13,17 @@ import {
 } from '@/components/ui/select';
 import { Scroll, X } from 'lucide-react';
 import { Form, InputFieldWithLabel } from '@/components/forms';
-import { Formik } from 'formik';
+import { Formik, FormikProps } from 'formik';
 import { JobFilterSchema } from '@/schemas/validation/job.schema';
 import { useJobsData } from '@/hooks/react-queries/job';
+import { JobFilterType } from '@/types/job.types';
 
 const JobFilters: React.FC = () => {
   const {
     keyword,
-    setKeyword,
     location,
-    setLocation,
     jobTypes,
-    handleJobTypeChange,
     experienceLevel,
-    setExperienceLevel,
     handleSearch,
     resetFilters
   } = useJobsData();
@@ -42,33 +38,38 @@ const JobFilters: React.FC = () => {
 
   const experienceLevelOptions = [
     { value: 'ANY', label: 'Any Experience' },
-    { value: 'ENTRY', label: 'Entry Level' },
-    { value: 'MID', label: 'Mid Level' },
+    { value: 'ENTRY_LEVEL', label: 'Entry Level' },
+    { value: 'MID_LEVEL', label: 'Mid Level' },
     { value: 'SENIOR', label: 'Senior Level' },
     { value: 'EXECUTIVE', label: 'Executive' }
   ];
 
-  const initialValues = {
+  const initialValues: Record<string, string | string[]> = {
     keyword: keyword || '',
     location: location || '',
     jobTypes: jobTypes || [],
     experienceLevel: experienceLevel || ''
   };
 
+  const handleOnChange = (values: FormikProps<any> | typeof initialValues) => {
+    // Extract values from either Formik props or directly from values
+    const formValues = 'values' in values ? values.values : values;
+
+    console.log("FOrm values; ", formValues)
+    
+    const updateParamsProps: JobFilterType = {
+      keyword: formValues.keyword as string || '',
+      location: formValues.location as string || '',
+      experienceLevel: formValues.experienceLevel as string || '',
+      jobTypes: formValues.jobTypes as string[] || []
+    };
+  
+    handleSearch(updateParamsProps);
+  };
+
   // Create an adapter function to handle Formik submission
   const handleFormikSubmit = (values: typeof initialValues) => {
-    // Update context state with form values
-    setKeyword(values.keyword);
-    setLocation(values.location);
-    // For job types and experience level, only update if different
-    // to avoid unnecessary re-renders
-    if (values.experienceLevel !== experienceLevel) {
-      setExperienceLevel(values.experienceLevel);
-    }
-
-    // Create a synthetic event to pass to handleSearch
-    const syntheticEvent = { preventDefault: () => { } } as React.FormEvent;
-    handleSearch(syntheticEvent);
+    handleOnChange(values);
   };
 
   return (
@@ -80,48 +81,38 @@ const JobFilters: React.FC = () => {
           onSubmit={handleFormikSubmit}
           enableReinitialize
         >
-          {({ errors, isSubmitting }) => (
+          {(formikProps) => (
             <Form>
               <div className="space-y-4">
-                <div>
-                  <Label htmlFor="keyword" className="text-sm font-medium text-gray-700">
-                    Keyword
-                  </Label>
-                  <Input
-                    id="keyword"
-                    value={keyword}
-                    onChange={(e) => setKeyword(e.target.value)}
-                    placeholder="Job title or keyword"
-                    className="mt-1 w-full"
-                  />
-                </div>
-                {/* <InputFieldWithLabel
+                <InputFieldWithLabel
                   name="keyword"
                   label="Keyword"
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
+                  value={formikProps.values.keyword as string}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    formikProps.setFieldValue('keyword', value);
+                    handleOnChange({
+                      ...formikProps.values,
+                      keyword: value
+                    });
+                  }}
                   placeholder="Job title or keyword"
-                /> */}
+                />
 
-                <div>
-                  <Label htmlFor="location" className="text-sm font-medium text-gray-700">
-                    Location
-                  </Label>
-                  <Input
-                    id="location"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="City, state, or remote"
-                    className="mt-1 w-full"
-                  />
-                </div>
-                {/* <InputFieldWithLabel
+                <InputFieldWithLabel
                   name="location"
                   label="Location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
+                  value={formikProps.values.location as string}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    formikProps.setFieldValue('location', value);
+                    handleOnChange({
+                      ...formikProps.values,
+                      location: value
+                    });
+                  }}
                   placeholder="City, state, or remote"
-                /> */}
+                />
 
                 <div>
                   <Label className="text-sm font-medium text-gray-700 mb-2 block">
@@ -133,7 +124,18 @@ const JobFilters: React.FC = () => {
                         <Checkbox
                           id={`job-type-${option.value}`}
                           checked={jobTypes.includes(option.value)}
-                          onCheckedChange={() => handleJobTypeChange(option.value)}
+                          // onCheckedChange={() => handleJobTypeChange(option.value)}
+                          onCheckedChange={(checked: boolean) => {
+                            const updatedJobTypes = checked
+                              ? [...jobTypes, option.value]  // Add to array if checked
+                              : jobTypes.filter(type => type !== option.value);  // Remove if unchecked
+                              
+                            formikProps.setFieldValue('jobTypes', updatedJobTypes);
+                            handleOnChange({
+                                ...formikProps.values,
+                                jobTypes: updatedJobTypes
+                              });
+                          }}
                         />
                         <Label
                           htmlFor={`job-type-${option.value}`}
@@ -151,8 +153,14 @@ const JobFilters: React.FC = () => {
                     Experience Level
                   </Label>
                   <Select
-                    value={experienceLevel || "ANY"}
-                    onValueChange={setExperienceLevel}
+                    value={formikProps.values.experienceLevel as string || "ANY"}
+                    onValueChange={(value) => {
+                      formikProps.setFieldValue('experienceLevel', value);
+                      handleOnChange({
+                        ...formikProps.values,
+                        experienceLevel: value
+                      })
+                    }}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select experience level" />
@@ -171,7 +179,7 @@ const JobFilters: React.FC = () => {
               <div className="flex flex-col space-y-2">
                 <Button
                   type="submit"
-                  className="w-full bg-jobboard-purple hover:bg-jobboard-purple/90 text-white"
+                  className="w-full bg-jb-primary hover:bg-jb-primary/90 text-white"
                 >
                   Apply Filters
                 </Button>
@@ -179,7 +187,10 @@ const JobFilters: React.FC = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={resetFilters}
+                  onClick={() => {
+                    resetFilters()
+                    formikProps.resetForm()
+                  }}
                   className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 flex items-center justify-center"
                 >
                   <X className="h-4 w-4 mr-2" />

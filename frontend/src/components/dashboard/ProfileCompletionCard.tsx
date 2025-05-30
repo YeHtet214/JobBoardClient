@@ -51,11 +51,11 @@ const ProfileCompletionCard: React.FC<ProfileCompletionCardProps> = ({
 
           <ul className="space-y-3">
             {completionItems.map((item, index) => (
-              <li key={index} className={`flex items-center text-sm ${!item.completed ? 'text-gray-500' : ''}`}>
+              <li key={index} className={`flex items-center text-sm ${!item.completed ? 'text-jb-text-muted' : ''}`}>
                 {item.completed ? (
-                  <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                  <CheckCircle className="h-4 w-4 text-jb-success mr-2" />
                 ) : (
-                  <div className="h-4 w-4 border border-gray-300 rounded-full mr-2"></div>
+                  <div className="h-4 w-4 border border-jb-text-muted rounded-full mr-2"></div>
                 )}
                 <span>{item.text}</span>
               </li>
@@ -63,7 +63,7 @@ const ProfileCompletionCard: React.FC<ProfileCompletionCardProps> = ({
           </ul>
 
           <Button
-            className="w-full bg-jobboard-darkblue hover:bg-jobboard-darkblue/90"
+            className="w-full bg-jb-primary text-white hover:bg-jb-primary/90"
             onClick={() => navigate(profilePath)}
           >
             {isJobSeeker ? (

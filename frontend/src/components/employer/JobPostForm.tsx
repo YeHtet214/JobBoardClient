@@ -226,7 +226,7 @@ const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
                 required
               />
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                 <SelectFieldWithLabel
                   formik={true}
                   name="experienceLevel"
@@ -256,7 +256,7 @@ const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
               </Button>
               <Button
                 type="submit"
-                className="bg-jobboard-darkblue hover:bg-jobboard-darkblue/90"
+                className="bg-jb-primary text-white hover:bg-jb-primary/90"
                 disabled={isSubmitting || formikSubmitting}
               >
                 {isSubmitting || formikSubmitting ? (

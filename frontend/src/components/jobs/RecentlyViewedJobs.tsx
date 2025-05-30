@@ -6,7 +6,7 @@ import { History, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const RecentlyViewedJobs: React.FC = () => {
-  const { recentlyViewedJobs } = useJobsData();
+  const { recentlyViewedJobs } = useJobsData({ keyword: '', location: '', jobTypes: [], experienceLevel: 'ANY' });
 
   if (recentlyViewedJobs.length === 0) {
     return (

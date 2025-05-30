@@ -83,6 +83,7 @@ const EmployerDashboard: React.FC = () => {
           toast({
             title: "Status updated",
             description: `Application status updated to ${status.toLowerCase()}.`,
+            variant: "default"
           });
         },
         onError: () => {
@@ -116,150 +117,147 @@ const EmployerDashboard: React.FC = () => {
 
   return (
     <DashboardContainer
-      isLoading={isLoading}
-      error={error}
-      refetch={refetch}
-      title="Employer Dashboard"
-    >
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <DashboardStatCard
-          title="Active Jobs"
-          value={stats?.activeJobs || 0}
-          icon={<Briefcase className="h-6 w-6 text-jobboard-blue" />}
-          borderColorClass="border-l-jobboard-blue"
-        />
-        
-        <DashboardStatCard
-          title="Total Applications"
-          value={stats?.totalApplications || 0}
-          icon={<FileText className="h-6 w-6 text-jobboard-purple" />}
-          borderColorClass="border-l-jobboard-purple"
-        />
-        
-        <DashboardStatCard
-          title="Interview Invitations"
-          value={stats?.interviewInvitations || 0}
-          icon={<UserCheck className="h-6 w-6 text-jobboard-green" />}
-          borderColorClass="border-l-jobboard-green"
-        />
-        
-        <DashboardStatCard
-          title="Reviewing"
-          value={stats?.reviewingApplications || 0}
-          icon={<Plus className="h-6 w-6 text-jobboard-red" />}
-          borderColorClass="border-l-jobboard-red"
-        />
-      </div>
+  isLoading={isLoading}
+  error={error}
+  refetch={refetch}
+  title="Employer Dashboard"
+>
+  {/* Stats Cards */}
+  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <DashboardStatCard
+      title="Active Jobs"
+      value={stats?.activeJobs || 0}
+      icon={<Briefcase className="h-6 w-6 text-jb-primary" />}
+      borderColorClass="border-l-jb-primary"
+    />
+    <DashboardStatCard
+      title="Total Applications"
+      value={stats?.totalApplications || 0}
+      icon={<FileText className="h-6 w-6 text-jb-accent" />}
+      borderColorClass="border-l-jb-accent"
+    />
+    <DashboardStatCard
+      title="Interview Invitations"
+      value={stats?.interviewInvitations || 0}
+      icon={<UserCheck className="h-6 w-6 text-jb-success" />}
+      borderColorClass="border-l-jb-success"
+    />
+    <DashboardStatCard
+      title="Reviewing"
+      value={stats?.reviewingApplications || 0}
+      icon={<Plus className="h-6 w-6 text-jb-danger" />}
+      borderColorClass="border-l-jb-danger"
+    />
+  </div>
 
-      {/* Main Content */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Tabs Section */}
-        <div>
-          <Tabs defaultValue="jobs" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="jobs" className="flex items-center">
-                <Briefcase className="h-4 w-4 mr-2" />
-                <span className="sm:block">Posted Jobs</span>
-              </TabsTrigger>
-              <TabsTrigger value="applications" className="flex items-center">
-                <FileText className="h-4 w-4 mr-2" />
-                <span className="sm:block">Applications</span>
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="jobs">
-              <Card>
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <CardTitle>Your Job Postings</CardTitle>
-                      <CardDescription>
-                        Manage your active and past job postings
-                      </CardDescription>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      className="bg-jobboard-darkblue hover:bg-jobboard-darkblue/90"
-                      onClick={() => navigate('/employer/jobs/create')}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      New Job
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <PostedJobsList
-                    postedJobs={postedJobs || []}
-                    onDeleteJob={handleDeleteJob}
-                  />
-                </CardContent>
-                {postedJobs?.length > 0 && (
-                  <CardFooter className="flex justify-center">
-                    <Button variant="outline" onClick={() => navigate('/employer/jobs')}>
-                      View All Jobs
-                    </Button>
-                  </CardFooter>
-                )}
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="applications">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Received Applications</CardTitle>
+  {/* Main Content */}
+  <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+    {/* Tabs Section */}
+    <div className="md:col-span-3">
+      <Tabs defaultValue="jobs" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 bg-jb-surface text-jb-text">
+          <TabsTrigger value="jobs" className="flex items-center">
+            <Briefcase className="h-4 w-4 mr-2" />
+            <span className="sm:block">Posted Jobs</span>
+          </TabsTrigger>
+          <TabsTrigger value="applications" className="flex items-center">
+            <FileText className="h-4 w-4 mr-2" />
+            <span className="sm:block">Applications</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="jobs">
+          <Card className="bg-jb-surface text-jb-text">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Your Job Postings</CardTitle>
                   <CardDescription>
-                    Applications received for your job postings
+                    Manage your active and past job postings
                   </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ReceivedApplicationsList
-                    applications={applications || []}
-                    onUpdateApplicationStatus={handleUpdateApplicationStatus}
-                  />
-                </CardContent>
-                {applications?.length > 0 && (
-                  <CardFooter className="flex justify-center">
-                    <Button variant="outline" onClick={() => navigate('/employer/applications')}>
-                      View All Applications
-                    </Button>
-                  </CardFooter>
-                )}
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
+                </div>
+                <Button
+                  size="sm"
+                  className="bg-jb-primary hover:bg-jb-primary/90 text-white"
+                  onClick={() => navigate('/employer/jobs/create')}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Job
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <PostedJobsList postedJobs={postedJobs || []} onDeleteJob={handleDeleteJob} />
+            </CardContent>
+            {postedJobs?.length > 0 && (
+              <CardFooter className="flex justify-center">
+                <Button variant="outline" onClick={() => navigate('/employer/jobs')}>
+                  View All Jobs
+                </Button>
+              </CardFooter>
+            )}
+          </Card>
+        </TabsContent>
 
-        {/* Sidebar Section */}
-        <div>
-          <ActivityFeed
-            activities={recentActivity || []}
-            title="Recent Activity"
-            description="Recent activity on your job postings"
-            getActivityIcon={getEmployerActivityIcon}
-          />
+        <TabsContent value="applications">
+          <Card className="bg-jb-surface text-jb-text">
+            <CardHeader>
+              <CardTitle>Received Applications</CardTitle>
+              <CardDescription>
+                Applications received for your job postings
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ReceivedApplicationsList
+                applications={applications || []}
+                onUpdateApplicationStatus={handleUpdateApplicationStatus}
+              />
+            </CardContent>
+            {applications?.length > 0 && (
+              <CardFooter className="flex justify-center">
+                <Button variant="outline" onClick={() => navigate('/employer/applications')}>
+                  View All Applications
+                </Button>
+              </CardFooter>
+            )}
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
 
-          <div className="mt-6">
-            <ProfileCompletionCard
-              title="Company Profile"
-              description={companyProfileComplete 
-                ? "Your company profile looks great!" 
-                : "Complete your company profile to attract more applicants"}
-              completionPercentage={companyProfilePercentage}
-              completionItems={[
-                { completed: true, text: "Basic company information added" },
-                { completed: true, text: "Company location set" },
-                { completed: companyProfileComplete, text: "Add company logo" },
-                { completed: companyProfileComplete, text: "Complete company description" }
-              ]}
-              profilePath="/company/profile"
-              buttonText={companyProfileComplete ? "Update Company Profile" : "Complete Company Profile"}
-              isJobSeeker={false}
-            />
-          </div>
-        </div>
+    {/* Sidebar Section */}
+    <div className="md:col-span-2">
+      <ActivityFeed
+        activities={recentActivity || []}
+        title="Recent Activity"
+        description="Recent activity on your job postings"
+        getActivityIcon={getEmployerActivityIcon}
+      />
+
+      <div className="mt-6">
+        <ProfileCompletionCard
+          title="Company Profile"
+          description={
+            companyProfileComplete
+              ? "Your company profile looks great!"
+              : "Complete your company profile to attract more applicants"
+          }
+          completionPercentage={companyProfilePercentage}
+          completionItems={[
+            { completed: true, text: "Basic company information added" },
+            { completed: true, text: "Company location set" },
+            { completed: companyProfileComplete, text: "Add company logo" },
+            { completed: companyProfileComplete, text: "Complete company description" }
+          ]}
+          profilePath="/company/profile"
+          buttonText={companyProfileComplete ? "Update Company Profile" : "Complete Company Profile"}
+          isJobSeeker={false}
+        />
       </div>
-    </DashboardContainer>
+    </div>
+  </div>
+</DashboardContainer>
+
   );
 };
 

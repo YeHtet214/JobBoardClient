@@ -429,7 +429,7 @@ const Header: React.FC = () => {
                         Profile
                       </Link>
                     )}
-                    <Link
+                    {/* <Link
                       to="/settings"
                       className={`flex items-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
                         isActivePage === 'settings' ? 'text-jb-primary bg-jb-highlight font-semibold' : 'hover:text-jb-primary'
@@ -437,7 +437,7 @@ const Header: React.FC = () => {
                     >
                       <Settings className="h-4 w-4" />
                       Settings
-                    </Link>
+                    </Link> */}
                     <Button
                       variant="ghost"
                       onClick={handleLogout}

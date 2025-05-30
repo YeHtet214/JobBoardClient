@@ -21,7 +21,7 @@ const DashboardStatCard: React.FC<DashboardStatCardProps> = ({
 }) => {
   return (
     <Card className={`border-l-4 ${borderColorClass}`}>
-      <CardContent className="p-6">
+      <CardContent className="">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-500">{title}</p>

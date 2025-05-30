@@ -38,7 +38,7 @@ const CompanyProfilePage = () => {
       </h1>
 
       {isNewCompany && (
-        <Card className="mb-8 border-l-4 border-l-jobboard-purple">
+        <Card className="mb-8 border-l-4 border-l-jb-primary">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
               <Info className="h-6 w-6 text-jobboard-purple flex-shrink-0 mt-1" />

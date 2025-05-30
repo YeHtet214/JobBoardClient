@@ -38,47 +38,61 @@ const ReceivedApplicationsList: React.FC<ReceivedApplicationsListProps> = ({
           {applications.map((application) => (
             <div
               key={application.id}
-              className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+              className="p-4 border rounded-lg hover:bg-jb-text-muted/10 transition-colors"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-medium text-sm truncate">{application.applicantName}</h4>
-                    {/* Display 'New' badge based on some condition if isNew doesn't exist */}
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="font-medium text-sm text-jb-text truncate">
+                      {application.applicantName}
+                    </h4>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() =>
+                          navigate(`/employer/applications/${application.id}`)
+                        }
+                      >
+                        View
+                      </Button>
+
+                      {onUpdateApplicationStatus && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size="sm" variant="secondary">
+                              Update Status
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-jb-surface text-jb-text">
+                            {statusOptions.map((option) => (
+                              <DropdownMenuItem
+                                key={option.value}
+                                disabled={application.status === option.value}
+                                onClick={() =>
+                                  onUpdateApplicationStatus(application, option.value)
+                                }
+                              >
+                                {option.label}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">Applied for: {application.jobTitle}</p>
+
+                  <p className="text-xs text-jb-text-muted mt-1">
+                    Applied for: {application.jobTitle}
+                  </p>
+
                   <div className="flex items-center gap-3 mt-2">
-                    <span className="text-xs text-gray-500">Received {formatDate(application.applied)}</span>
+                    <span className="text-xs text-jb-text-muted">
+                      Received {formatDate(application.applied)}
+                    </span>
                     {getEmployerStatusBadge(application.status)}
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => navigate(`/employer/applications/${application.id}`)}
-                  >
-                    View
-                  </Button>
-                  
-                  {onUpdateApplicationStatus && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size="sm" variant="secondary">Update Status</Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {statusOptions.map((option) => (
-                          <DropdownMenuItem 
-                            key={option.value}
-                            disabled={application.status === option.value}
-                            onClick={() => onUpdateApplicationStatus(application, option.value)}
-                          >
-                            {option.label}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
                 </div>
               </div>
             </div>
@@ -86,10 +100,10 @@ const ReceivedApplicationsList: React.FC<ReceivedApplicationsListProps> = ({
         </div>
       ) : (
         <div className="text-center py-10">
-          <p className="text-gray-500 mb-4">{emptyStateMessage}</p>
-          <Button 
+          <p className="text-jb-text-muted mb-4">{emptyStateMessage}</p>
+          <Button
             onClick={() => navigate('/employer/jobs/create')}
-            className="bg-jobboard-darkblue hover:bg-jobboard-darkblue/90"
+            className="bg-jb-primary hover:bg-jb-primary/90 text-white"
           >
             Post a Job
           </Button>

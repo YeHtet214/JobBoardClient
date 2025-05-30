@@ -56,8 +56,8 @@ const SelectFieldWithLabel: React.FC<SelectFieldWithLabelProps> = (props) => {
 
       return (
         <div className="mb-4">
-          <Label htmlFor={name} className="block text-sm font-medium mb-1">
-            {label} {required && <span className="text-red-500">*</span>}
+          <Label htmlFor={name} className="block text-sm font-medium mb-1 text-jb-text-muted-foregrund">
+            {label} {required && <span className="text-jb-danger">*</span>}
           </Label>
           <Select
             disabled={disabled}
@@ -73,7 +73,9 @@ const SelectFieldWithLabel: React.FC<SelectFieldWithLabelProps> = (props) => {
           >
             <SelectTrigger 
               id={name}
-              className={`w-full ${hasError ? 'border-red-500' : ''} ${className}`}
+              className={`w-full ${
+                hasError ? 'border-jb-danger' : 'border-jb-border'
+            } rounded-md shadow-sm focus:outline-none focus:ring-jb-primary focus:border-jb-primary ${className}`}
             >
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
@@ -86,7 +88,7 @@ const SelectFieldWithLabel: React.FC<SelectFieldWithLabelProps> = (props) => {
             </SelectContent>
           </Select>
           {hasError && (
-            <p className="mt-1 text-sm text-red-600">{meta.error}</p>
+            <p className="mt-1 text-sm text-jb-danger">{meta.error}</p>
           )}
         </div>
       );
@@ -133,7 +135,9 @@ const SelectFieldWithLabel: React.FC<SelectFieldWithLabelProps> = (props) => {
         >
           <SelectTrigger 
             id={name}
-            className={`w-full ${hasError ? 'border-red-500' : ''} ${className}`}
+            className={`w-full ${
+              hasError ? 'border-jb-danger' : 'border-jb-border'
+          } rounded-md shadow-sm focus:outline-none focus:ring-jb-primary focus:border-jb-primary ${className}`}
           >
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>
@@ -146,7 +150,7 @@ const SelectFieldWithLabel: React.FC<SelectFieldWithLabelProps> = (props) => {
           </SelectContent>
         </Select>
         {hasError && (
-          <p className="mt-1 text-sm text-red-600">{errors[name]?.message}</p>
+          <p className="mt-1 text-sm text-jb-danger">{errors[name]?.message}</p>
         )}
       </div>
     );

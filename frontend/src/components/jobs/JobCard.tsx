@@ -26,7 +26,7 @@ interface JobCardProps {
 }
 
 const JobCard: React.FC<JobCardProps> = ({ job, isCompact = false, savedStatus }) => {
-  const { handleJobView } = useJobsData();
+  const { handleJobView } = useJobsData({ keyword: '', location: '', jobTypes: [], experienceLevel: 'ANY' });
   const navigate = useNavigate();
   const { toast } = useToast();
   const { currentUser, isAuthenticated } = useAuth();

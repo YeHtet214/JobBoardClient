@@ -158,7 +158,7 @@ type UseToast = {
   toast: (props: Toast) => {
     id: string
     dismiss: () => void
-    update: (props: Toast) => void
+    update: (props: ToasterToast) => void
   }
   dismiss: (toastId?: string) => void
   toasts: ToasterToast[]

@@ -1,4 +1,4 @@
-export type JobType = 'FULL_TIME' | 'PART_TIME' | 'CONTRACT';
+export type JobType = 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERNSHIP' | 'REMOTE';
 
 export interface CreateJobDto {
   title: string;

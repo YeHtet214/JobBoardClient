@@ -55,7 +55,7 @@ const DatePickerFieldWithLabel: React.FC<DatePickerFieldWithLabelProps> = (props
 
       return (
         <div className="mb-4">
-          <Label htmlFor={name} className="block text-sm font-medium mb-1">
+          <Label htmlFor={name} className="block text-sm font-medium mb-1 text-muted-foreground">
             <div className="relative inline-block">
               {label} {required && <span className="text-red-500 absolute -right-2 top-1/2 transform -translate-y-1/2">*</span>}
             </div>
@@ -99,7 +99,7 @@ const DatePickerFieldWithLabel: React.FC<DatePickerFieldWithLabelProps> = (props
       console.warn(`DatePickerField with name "${name}" is marked as a Formik field but no Formik context was found.`);
       return (
         <div className="mb-4">
-          <Label htmlFor={name} className="block text-sm font-medium mb-1">
+          <Label htmlFor={name} className="block text-sm font-medium mb-1 text-muted-foreground">
             <div className="relative inline-block">
               {label} {required && <span className="text-red-500 absolute -right-2 top-1/2 transform -translate-y-1/2">*</span>}
             </div>
