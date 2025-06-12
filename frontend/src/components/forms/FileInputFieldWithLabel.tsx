@@ -192,7 +192,7 @@ const FileInputFieldWithLabel: React.FC<FileInputFieldWithLabelProps> = (props) 
   if ('formik' in props && props.formik && !formikContext) {
     console.warn(`FileInputField with name "${name}" is marked as a Formik field but no Formik context was found.`);
     return (
-      <div className={`mb-4 ${className}`}>
+      <div className={`mb-4 ${className} !d-inline-block `}>
         <Label htmlFor={name} className="block text-sm font-medium mb-1">
           {label} {required && <span className="text-red-500">*</span>}
         </Label>
@@ -206,7 +206,7 @@ const FileInputFieldWithLabel: React.FC<FileInputFieldWithLabelProps> = (props) 
             type="button"
             variant="outline"
             disabled={disabled}
-            className="flex-none"
+            className="flex-none border-2 !border-blue-500 !d-inline-block"
           >
             <Upload className="h-4 w-4 mr-2" />
             Select File
@@ -254,7 +254,7 @@ const FileInputFieldWithLabel: React.FC<FileInputFieldWithLabelProps> = (props) 
             variant="ghost"
             onClick={clearFile}
             disabled={disabled}
-            className="p-1 h-auto"
+            className="p-1 h-auto "
             size="sm"
           >
             <X className="h-4 w-4 text-gray-500" />

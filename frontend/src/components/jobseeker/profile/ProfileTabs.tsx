@@ -1,16 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, BookOpen, Building, Link, Calendar, MapPin, GraduationCap, Award } from 'lucide-react';
+import { User, BookOpen, Building, Link } from 'lucide-react';
 import { Profile } from '@/types/profile.types';
 import { useAuth } from '@/contexts/authContext';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 // Import section components
 import BasicInfoSection from './BasicInfoSection';
@@ -29,36 +20,38 @@ const ProfileTabs = ({ profile, viewTab, setViewTab }: ProfileTabsProps) => {
 
   return (
     <Tabs value={viewTab} onValueChange={setViewTab} className="w-full">
-      <TabsList className="w-full mb-8 bg-white border">
-        <TabsTrigger 
-          value="overview" 
-          className="text-xs sm:text-sm md:text-base flex-1 whitespace-nowrap data-[state=active]:bg-jobboard-purple/10 data-[state=active]:text-jobboard-darkblue"
-        >
-          <User className="h-3 w-3 hidden sm:inline-block sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-          <span>Overview</span>
-        </TabsTrigger>
-        <TabsTrigger 
-          value="education" 
-          className="text-xs sm:text-sm md:text-base flex-1 whitespace-nowrap data-[state=active]:bg-jobboard-purple/10 data-[state=active]:text-jobboard-darkblue"
-        >
-          <BookOpen className="h-3 w-3 hidden sm:inline-block sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-          <span>Education</span>
-        </TabsTrigger>
-        <TabsTrigger 
-          value="experience" 
-          className="text-xs sm:text-sm md:text-base flex-1 whitespace-nowrap data-[state=active]:bg-jobboard-purple/10 data-[state=active]:text-jobboard-darkblue"
-        >
-          <Building className="h-3 w-3 hidden sm:inline-block sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-          <span>Experience</span>
-        </TabsTrigger>
-        <TabsTrigger 
-          value="links" 
-          className="text-xs sm:text-sm md:text-base flex-1 whitespace-nowrap data-[state=active]:bg-jobboard-purple/10 data-[state=active]:text-jobboard-darkblue"
-        >
-          <Link className="h-3 w-3 hidden sm:inline-block sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-          <span>Links & Resume</span>
-        </TabsTrigger>
-      </TabsList>
+      <div className="overflow-x-auto pb-1">
+        <TabsList className="w-full mb-6 bg-background border border-border min-w-max md:w-auto">
+          <TabsTrigger 
+            value="overview" 
+            className="text-xs sm:text-sm md:text-base flex-1 whitespace-nowrap data-[state=active]:bg-accent/50 data-[state=active]:text-foreground data-[state=active]:shadow-sm px-2 sm:px-4"
+          >
+            <User className="inline-block h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span>Overview</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            value="education" 
+            className="text-xs sm:text-sm md:text-base flex-1 whitespace-nowrap data-[state=active]:bg-accent/50 data-[state=active]:text-foreground data-[state=active]:shadow-sm px-2 sm:px-4"
+          >
+            <BookOpen className="inline-block h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span>Education</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            value="experience" 
+            className="text-xs sm:text-sm md:text-base flex-1 whitespace-nowrap data-[state=active]:bg-accent/50 data-[state=active]:text-foreground data-[state=active]:shadow-sm px-2 sm:px-4"
+          >
+            <Building className="inline-block h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span>Experience</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            value="links" 
+            className="text-xs sm:text-sm md:text-base flex-1 whitespace-nowrap data-[state=active]:bg-accent/50 data-[state=active]:text-foreground data-[state=active]:shadow-sm px-2 sm:px-4"
+          >
+            <Link className="inline-block h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span>Links & Resume</span>
+          </TabsTrigger>
+        </TabsList>
+      </div>
 
       <TabsContent value="overview" className="mt-0">
         <BasicInfoSection profile={profile} currentUser={currentUser} />

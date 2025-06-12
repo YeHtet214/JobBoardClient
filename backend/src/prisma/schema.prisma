@@ -48,6 +48,7 @@ model Profile {
   education   Json     // Stores Education[] as JSON
   experience  Json     // Stores Experience[] as JSON
   resumeUrl   String?  // URL to the user's uploaded resume
+  profileImageURL String?
   linkedInUrl String?
   githubUrl   String?
   portfolioUrl String?
@@ -122,6 +123,8 @@ model JobApplication {
   applicant    User              @relation(fields: [applicantId], references: [id], onDelete: Cascade)
   applicantId  String
   resumeUrl    String?
+  acceptTerms  Boolean
+  additionalInfo String?
   coverLetter  String?
   status       ApplicationStatus @default(PENDING)
   createdAt    DateTime          @default(now())

@@ -9,6 +9,8 @@ interface PersonalInfoTabProps {
 
 const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ formik }) => {
 
+  const { values } = formik
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Personal Information</h3>
@@ -24,7 +26,11 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ formik }) => {
             label="Full Name"
             type="text"
             required={true}
-            formik={true}
+            // formik={true}
+            value={values.fullName}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            // errors={formik.errors}
             placeholder="Enter your full name"
           />
         </div>
@@ -36,7 +42,11 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ formik }) => {
             label="Email Address"
             type="email"
             required={true}
-            formik={true}
+            // formik={true}
+            value={values.email}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            // errors={formik.errors}
             placeholder="Enter your email address"
           />
         </div>
@@ -48,7 +58,11 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ formik }) => {
             label="Phone Number"
             type="tel"
             required={true}
-            formik={true}
+            // formik={true}
+            value={values.phone}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            // errors={formik.errors}
             placeholder="Enter your phone number"
           />
         </div>

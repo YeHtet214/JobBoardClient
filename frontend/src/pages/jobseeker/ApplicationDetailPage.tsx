@@ -13,6 +13,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useToast } from '@/components/ui/use-toast';
 import { useApplicationById, useWithdrawApplication } from '@/hooks/react-queries/application/useApplicationQueries';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { useEffect } from 'react';
+import CancelConfirmAlert from '@/components/common/CancelConfirmAlert';
 
 const statusIconMap = {
   PENDING: <Clock className="h-5 w-5 text-yellow-500" />,
@@ -49,14 +51,13 @@ const ApplicationDetailPage = () => {
   const handleWithdraw = async () => {
     if (!application || !id) return;
     
-    if (window.confirm('Are you sure you want to withdraw this application? This action cannot be undone.')) {
       try {
         withdrawApplication(id);
         toast({
           title: 'Application Withdrawn',
           description: 'Your application has been successfully withdrawn',
         });
-        navigate('/dashboard/applications');
+        navigate('/applications');
       } catch (err) {
         console.error('Failed to withdraw application:', err);
         toast({
@@ -65,8 +66,11 @@ const ApplicationDetailPage = () => {
           description: 'Failed to withdraw application. Please try again.',
         });
       }
-    }
   };
+
+  useEffect(() => {
+    console.log("Application: ", application)
+  }, [application])
 
   if (isLoading) {
     return (
@@ -195,28 +199,36 @@ const ApplicationDetailPage = () => {
                   )} */}
 
                   {application.resumeUrl && (
-                    <div>
-                      <h3 className="font-medium mb-2">Resume</h3>
-                      <div className="flex items-center gap-2">
+                    <div className="overflow-hidden">
+                      <h3 className="font-medium mb-2 flex items-center gap-2">
                         <FileText className="h-5 w-5 text-muted-foreground" />
-                        <span>{application.resumeUrl}</span>
-                        <Button variant="outline" size="sm" asChild>
-                          <a href={application.resumeUrl} target="_blank" rel="noopener noreferrer">
-                            View
-                          </a>
-                        </Button>
-                      </div>
+                        <span>Resume</span> 
+                      </h3>
+                      <iframe
+                        src={application.resumeUrl}
+                        width="100%"
+                        height="500px"
+                        title="Resume Preview"
+                        style={{ border: '1px solid #ccc', borderRadius: '8px' }}
+                      />
                     </div>
                   )}
                 </CardContent>
                 <CardFooter className="flex justify-between border-t p-6">
-                  <Button variant="outline" onClick={() => navigate('/dashboard/applications')}>
+                  <Button variant="outline" onClick={() => navigate('/applications')}>
                     Back to Applications
                   </Button>
                   {application.status === 'PENDING' && (
-                    <Button variant="destructive" onClick={handleWithdraw}>
-                      Withdraw Application
-                    </Button>
+                    // <Button variant="destructive" onClick={handleWithdraw}>
+                    //   Withdraw Application
+                    // </Button>
+                    <CancelConfirmAlert 
+                        buttonContent="Withdraw Application"
+                        alertTitle="Withdraw Application" 
+                        alertDescription="Are you sure you want to withdraw your application for {application.job?.title} at {application.job?.company?.name}? This action cannot be undone." 
+                        cancelItem={application} 
+                        onWithdraw={handleWithdraw} 
+                    />
                   )}
                 </CardFooter>
               </Card>

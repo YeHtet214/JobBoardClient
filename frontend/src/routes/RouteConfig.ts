@@ -197,7 +197,7 @@ export const routes: RouteConfig[] = [
     meta: { title: 'My Applications', description: 'View and manage your job applications' }
   },
   {
-    path: '/applications/:id',
+    path: '/jobseeker/applications/:id',
     element: JobseekerApplicationDetailPage,
     requiresAuth: true,
     allowedRoles: ['JOBSEEKER'],

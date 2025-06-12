@@ -15,7 +15,7 @@ interface ProfileOverviewProps {
 const ProfileOverview = ({ enterEditMode }: ProfileOverviewProps) => {
   return (
     <Card className="border shadow-md bg-white overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-jobboard-purple/10 to-jobboard-darkblue/10 pb-8">
+      <CardHeader className="bg-gradient-to-r from-jb-primary/10 to-jb-primary/10 pb-8">
         <CardTitle className="text-2xl text-jobboard-darkblue">Create Your Professional Profile</CardTitle>
         <CardDescription className="text-gray-600">
           Complete your profile to increase your chances of landing the perfect job

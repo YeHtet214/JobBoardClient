@@ -1,7 +1,8 @@
 import { FormikProps } from 'formik';
 import { FieldArray } from 'formik';
 import { Badge } from '@/components/ui/badge';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Upload, User as UserIcon } from 'lucide-react';
+import { useRef, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -19,10 +20,56 @@ interface BasicInfoTabProps {
   formik: FormikProps<ProfileFormValues>;
   isSaving: boolean;
   onTabChange: (tab: string) => void;
+  onProfileImageUpload: (file: File) => Promise<void>;
+  profileImageURL?: string;
 }
 
-const BasicInfoTab = ({ formik, isSaving, onTabChange }: BasicInfoTabProps) => {
+const BasicInfoTab = ({
+  formik,
+  isSaving,
+  onTabChange,
+  onProfileImageUpload,
+  profileImageURL
+}: BasicInfoTabProps) => {
   const { values, setFieldValue } = formik;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  console.log("PROFILE IMAGE URL ", profileImageURL)
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file');
+      return;
+    }
+
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size should be less than 5MB');
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      await onProfileImageUpload(file);
+    } catch (error) {
+      console.error('Error uploading profile image:', error);
+    } finally {
+      setIsUploading(false);
+      // Reset the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
 
   // Function to handle adding a new skill
   const handleAddSkill = () => {
@@ -42,12 +89,53 @@ const BasicInfoTab = ({ formik, isSaving, onTabChange }: BasicInfoTabProps) => {
   return (
     <Card className="border-none shadow-none">
       <CardHeader className="px-0 md:px-6">
-        <CardTitle className="text-xl md:text-2xl text-jobboard-darkblue">Basic Information</CardTitle>
-        <CardDescription className="text-gray-500">
+        <CardTitle className="text-xl md:text-2xl text-jb-primary">Basic Information</CardTitle>
+        <CardDescription className="text-muted-foreground">
           Tell us about yourself
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6 px-0 md:px-6">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="relative group">
+            <div className="w-24 h-24 rounded-full bg-accent flex items-center justify-center overflow-hidden border-2 border-border">
+              {profileImageURL ? (
+                <img
+                  src={profileImageURL}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <UserIcon className="h-12 w-12 text-muted-foreground/50" />
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={triggerFileInput}
+              disabled={isUploading}
+              className="absolute -bottom-2 -right-2 bg-background p-1.5 rounded-full shadow-md border border-border text-foreground hover:bg-accent/50 transition-colors"
+            >
+              {isUploading ? (
+                <LoadingSpinner className="h-4 w-4" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              accept="image/*"
+              className="hidden"
+              disabled={isUploading}
+            />
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">
+              JPG, GIF or PNG. Max size of 5MB.
+            </p>
+          </div>
+        </div>
+        <div className="border-t border-gray-200 my-6"></div>
         <TextareaField
           formik={true}
           name="bio"

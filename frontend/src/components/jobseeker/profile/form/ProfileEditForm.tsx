@@ -19,6 +19,7 @@ interface ProfileEditFormProps {
   setActiveTab: (tab: string) => void;
   handleSubmit: (values: ProfileFormValues) => Promise<void>;
   handleResumeUpload: (file: File) => Promise<void>;
+  handleProfileImageUpload: (file: File) => Promise<void>;
   isCreating: boolean;
   isUpdating: boolean;
   isUploading: boolean;
@@ -30,6 +31,7 @@ const ProfileEditForm = ({
   setActiveTab, 
   handleSubmit, 
   handleResumeUpload,
+  handleProfileImageUpload,
   isCreating,
   isUpdating,
   isUploading
@@ -81,6 +83,8 @@ const ProfileEditForm = ({
                 formik={formik}
                 isSaving={isCreating || isUpdating}
                 onTabChange={setActiveTab}
+                onProfileImageUpload={handleProfileImageUpload}
+                profileImageURL={profile.profileImageURL}
               />
             </TabsContent>
 

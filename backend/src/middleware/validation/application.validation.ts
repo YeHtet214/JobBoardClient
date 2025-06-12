@@ -45,6 +45,14 @@ export const applicationValidation = {
       .notEmpty().withMessage('Cover letter is required')
       .isString().withMessage('Cover letter must be a string')
       .trim()
+      .escape(),
+    body('acceptTerms')
+      .notEmpty().withMessage('Accept terms is required')
+      .isBoolean().withMessage('Accept terms must be a boolean'),
+    body('additionalInfo')
+      .optional()
+      .isString().withMessage('Additional info must be a string')
+      .trim()
       .escape()
   ],
   

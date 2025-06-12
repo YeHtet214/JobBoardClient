@@ -1,10 +1,10 @@
 import React from 'react';
 import { FormikProps } from 'formik';
-import { ApplicationFormValues } from '@/types/application.types';
+import { CreateApplicationDto } from '@/types/application.types';
 import { FileInputFieldWithLabel, TextareaField } from '@/components/forms';
 
 interface ResumeTabProps {
-  formik: FormikProps<ApplicationFormValues>;
+  formik: FormikProps<CreateApplicationDto>;
 }
 
 const ResumeTab: React.FC<ResumeTabProps> = ({ formik }) => {

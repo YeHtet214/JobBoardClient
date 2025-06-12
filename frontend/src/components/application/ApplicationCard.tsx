@@ -115,7 +115,7 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({ application }) => {
         <div className="text-xs text-gray-500">
           Last updated: {new Date(application.updatedAt).toLocaleDateString()}
         </div>
-        <Button variant="outline" size="sm" className="text-xs" onClick={() => navigate(`/applications/${application.id}`)}>
+        <Button variant="outline" size="sm" className="text-xs" onClick={() => navigate(`/jobseeker/applications/${application.id}`)}>
           View Details
         </Button>
       </CardFooter>

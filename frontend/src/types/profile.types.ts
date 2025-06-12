@@ -5,6 +5,7 @@ export interface Profile {
   skills: string[];
   education: Education[];
   experience: Experience[];
+  profileImageURL?: string;
   resumeUrl?: string;
   linkedInUrl?: string;
   githubUrl?: string;
@@ -41,6 +42,7 @@ export interface CreateProfileDto {
   education: Education[];
   experience: Experience[];
   resumeUrl?: string;
+  profileImageURL?: string;
   linkedInUrl?: string;
   githubUrl?: string;
   portfolioUrl?: string;

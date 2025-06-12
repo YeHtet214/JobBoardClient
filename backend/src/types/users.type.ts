@@ -8,12 +8,26 @@ export interface UploadedFile {
   size: number;
 }
 
+// Define the user type
+export interface AuthenticatedUser {
+  userId: string;
+  [key: string]: any;
+}
+
+// Extend the Express namespace to include our custom user type
+declare global {
+  namespace Express {
+    interface User extends AuthenticatedUser {}
+    
+    interface Request {
+      user?: User;
+    }
+  }
+}
+
 // Update the interface to use proper generic parameters from Express Request
 export interface RequestWithUser extends Request {
-  user: {
-    userId: string;
-    [key: string]: any;
-  };
+  user: AuthenticatedUser;
   file?: any; // For single file uploads
   files?: any[]; // For multiple file uploads
 }

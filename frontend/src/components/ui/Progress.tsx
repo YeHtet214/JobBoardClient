@@ -7,7 +7,7 @@ const Progress = ({ value }: { value: number }) => {
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
             <div 
-                className="h-full bg-jobboard-purple rounded-full" 
+                className="h-full bg-jb-primary rounded-full" 
                 style={{ width: `${value}%` }}
             ></div>
             </div>

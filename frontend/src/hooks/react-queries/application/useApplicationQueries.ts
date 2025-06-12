@@ -5,7 +5,7 @@ import { useToast } from '@/components/ui/use-toast';
 
 export const useMyApplications = (userId: string) => {
   return useQuery({
-    queryKey: ['myApplications', userId],
+    queryKey: ['myApplications'],
     queryFn: () => ApplicationService.getMyApplications(userId),
   });
 };
@@ -31,8 +31,10 @@ export const useCreateApplication = () => {
   const { toast } = useToast();
   
   return useMutation({
-    mutationFn: (applicationData: CreateApplicationDto) => 
-      ApplicationService.createApplication(applicationData),
+    mutationFn: (applicationData: CreateApplicationDto) => {
+      console.log("application craete data in query: ", applicationData);
+      return ApplicationService.createApplication(applicationData)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myApplications'] });
       toast({

@@ -9,6 +9,9 @@ import {
   getCompanyByOwnerId
 } from '../services/company.service.js';
 import { ForbiddenError } from '../middleware/errorHandler.js';
+import { matchedData } from 'express-validator';
+import { mediaUploadToCloudinary } from '../services/uploadCloud.service.js';
+import { CreateCompanyDto } from '../types/company.type.js';
 
 export const getAllCompanies = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -61,17 +64,14 @@ export const getCurrentCompany = async (req: RequestWithUser, res: Response, nex
 
 export const createCompany = async (req: RequestWithUser, res: Response, next: NextFunction) => {
   try {
-    const { name, description, logo, website, location, industry, foundedYear, size = null } = req.body;
+    const userId = req.user.userId;
+    const validatedData = matchedData(req, { locations: ['body'] }) as CreateCompanyDto;
+    const logoURL = await mediaUploadToCloudinary(req.file);
+
     const company = await createNewCompany({
-      name,
-      description,
-      logo,
-      website,
-      location,
-      industry,
-      foundedYear,
-      size,
-      ownerId: req.user.userId
+      ...validatedData,
+      logo: logoURL,
+      ownerId: userId
     });
 
     res.status(201).json({ success: true, message: 'Company created successfully', data: company });
@@ -83,24 +83,20 @@ export const createCompany = async (req: RequestWithUser, res: Response, next: N
 export const updateCompany = async (req: RequestWithUser, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const { name, description, logo, website, location, industry, foundedYear, size } = req.body;
+    const userId = req.user.userId;
+    const validatedData = matchedData(req, { locations: ['body'] }) as CreateCompanyDto;
+    const logoURL = await mediaUploadToCloudinary(req.file);
 
     // First check if the company exists and if the user is the owner
     const existingCompany = await getExistingCompany(id);
 
-    if (existingCompany.ownerId !== req.user.userId) {
+    if (existingCompany.ownerId !== userId) {
       throw new ForbiddenError("You don't have permission to update this company");
     }
 
     const company = await updateExistingCompany(id, {
-      name,
-      description,
-      logo,
-      website,
-      location,
-      industry,
-      foundedYear,
-      size
+      ...validatedData,
+      logo: logoURL,
     });
 
     res.status(200).json({ success: true, message: 'Company updated successfully', data: company });
@@ -112,11 +108,12 @@ export const updateCompany = async (req: RequestWithUser, res: Response, next: N
 export const deleteCompany = async (req: RequestWithUser, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
+    const userId = req.user.userId;
 
     // First check if the company exists and if the user is the owner
     const existingCompany = await getExistingCompany(id);
 
-    if (existingCompany.ownerId !== req.user.userId) {
+    if (existingCompany.ownerId !== userId) {
       throw new ForbiddenError("You don't have permission to delete this company");
     }
 

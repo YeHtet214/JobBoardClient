@@ -4,7 +4,7 @@ import { createApplicationDto, updateApplicationDto } from "../../types/applicat
 
 export const fetchAllApplicationsByUserId = async (userId: string) => {
     const applications = await prisma.jobApplication.findMany({
-        where: { applicantId: userId }, 
+        where: { applicantId: userId },
         omit: { jobId: true },
         include: { job: { include: { company: true } } }
     });
@@ -34,7 +34,8 @@ export const fetchAllApplicationsByJobId = async (jobId: string) => {
 
 export const fetchApplicationById = async (id: string) => {
     const application = await prisma.jobApplication.findUnique({
-        where: { id }
+        where: { id },
+        include: { job: { include: { company: true } } }
     });
 
     if (!application) {
@@ -48,6 +49,8 @@ export const fetchApplicationById = async (id: string) => {
 
 export const postNewApplication = async (applicationData: createApplicationDto) => {
     // Check if job exists
+    console.log(applicationData)
+    console.log("Job ID: ", applicationData.jobId)
     const job = await prisma.job.findUnique({
         where: { id: applicationData.jobId }
     });
@@ -66,11 +69,16 @@ export const postNewApplication = async (applicationData: createApplicationDto) 
         }
     });
 
+    console.log("Existing Application: ", applicationData.applicantId)
+
     if (existingApplication) {
         const error = new Error('You have already applied for this job') as CustomError;
         error.status = 400;
         throw error;
     }
+
+    console.log("Job: ", job)
+    console.log("Application Data: ", applicationData)
 
     // Create new application
     const newApplication = await prisma.jobApplication.create({
@@ -79,9 +87,13 @@ export const postNewApplication = async (applicationData: createApplicationDto) 
             applicantId: applicationData.applicantId,
             resumeUrl: applicationData.resumeUrl,
             coverLetter: applicationData.coverLetter,
+            additionalInfo: applicationData.additionalInfo,
+            acceptTerms: true,
             status: 'PENDING'
         }
     });
+
+    console.log("New Application: ", newApplication)
 
     return newApplication;
 }

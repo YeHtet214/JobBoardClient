@@ -6,6 +6,8 @@ export interface Application {
   applicantId: string;
   coverLetter?: string;
   resumeUrl?: string;
+  acceptTerms: boolean;
+  additionalInfo?: string;
   status: ApplicationStatus;
   createdAt: string;
   updatedAt: string;

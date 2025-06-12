@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { InputFieldWithLabel } from '@/components/forms';
+import { FileInputFieldWithLabel, InputFieldWithLabel } from '@/components/forms';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { ProfileFormValues } from './ProfileEditForm';
 
@@ -35,6 +35,7 @@ const LinksTab = ({
   const [resumeUploadError, setResumeUploadError] = useState<string | null>(null);
 
   const handleResumeFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("Resume File Change: ", e.target.files)
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       
@@ -145,9 +146,9 @@ const LinksTab = ({
                 <Upload className="h-12 w-12 text-gray-300 mb-2" />
                 <p className="mb-4 text-center">Upload your resume (PDF, DOC, or DOCX up to 5MB)</p>
                 
-                <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
-                  <div className="flex-1">
-                    <input
+                <div className="flex flex-col justify-center sm:flex-row space-3 w-full max-w-md">
+                  <div className="">
+                    {/* <input
                       type="file"
                       id="resumeUpload"
                       className="hidden"
@@ -159,7 +160,16 @@ const LinksTab = ({
                       className="w-full px-4 py-2 bg-white border rounded-md shadow-sm text-sm font-medium hover:bg-gray-50 focus:outline-none cursor-pointer flex items-center justify-center"
                     >
                       Select File
-                    </label>
+                    </label> */}
+                    <FileInputFieldWithLabel
+                      name="resume"
+                      label=""
+                      description=""
+                      accept=".pdf,.doc,.docx"
+                      required={false}
+                      formik={true}
+                    />
+                      
                   </div>
                   
                   {resumeFile && (

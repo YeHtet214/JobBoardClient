@@ -27,21 +27,13 @@ export interface CreateProfileDto {
   education: Education[];
   experience: Experience[];
   resumeUrl?: string;
+  profileImageURL?: string;
   linkedInUrl?: string;
   githubUrl?: string;
   portfolioUrl?: string;
 }
 
-export interface UpdateProfileDto {
-  bio?: string;
-  skills?: string[];
-  education?: Education[];
-  experience?: Experience[];
-  resumeUrl?: string;
-  linkedInUrl?: string;
-  githubUrl?: string;
-  portfolioUrl?: string;
-}
+export interface UpdateProfileDto extends Partial<CreateProfileDto> {}
 
 export interface ProfileResponse {
   id: string;

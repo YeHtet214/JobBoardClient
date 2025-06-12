@@ -6,6 +6,7 @@ export interface createApplicationDto {
     resumeUrl: string;
     coverLetter: string;
     applicantId: string;
+    additionalInfo: string;
 }
 
 export interface updateApplicationDto {
@@ -13,6 +14,7 @@ export interface updateApplicationDto {
     resumeUrl?: string;
     coverLetter?: string;
     status?: ApplicationStatus;
+    additionalInfo?: string;
 }
 
 export interface applicationResponse {

@@ -7,7 +7,7 @@ import { Profile } from '@/types/profile.types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { useProfile, useCreateProfile, useUpdateProfile, useUploadResume } from '@/hooks/react-queries/profile/useProfileQueries';
+import { useProfile, useCreateProfile, useUpdateProfile, useUploadResume, useUploadProfileImage } from '@/hooks/react-queries/profile/useProfileQueries';
 
 import ProfileOverview from '@/components/jobseeker/profile/ProfileOverview';
 import ProfileTabs from '@/components/jobseeker/profile/ProfileTabs';
@@ -39,6 +39,7 @@ const ProfilePage = () => {
   const { mutate: createProfile, isPending: isCreating } = useCreateProfile();
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
   const { mutate: uploadResume, isPending: isUploading } = useUploadResume();
+  const { mutate: uploadProfileImage } = useUploadProfileImage();
 
   useEffect(() => {
     if (currentUser?.role !== 'JOBSEEKER') {
@@ -65,6 +66,10 @@ const ProfilePage = () => {
 
   const handleResumeUpload = async (file: File) => {
     await uploadResume(file);
+  };
+
+  const handleProfileImageUpload = async (file: File) => {
+    await uploadProfileImage(file);
   };
 
   const enterEditMode = () => {
@@ -106,6 +111,7 @@ const ProfilePage = () => {
                   setActiveTab={setActiveTab}
                   handleSubmit={handleSubmit}
                   handleResumeUpload={handleResumeUpload}
+                  handleProfileImageUpload={handleProfileImageUpload}
                   isCreating={isCreating}
                   isUpdating={isUpdating}
                   isUploading={isUploading}
@@ -173,6 +179,7 @@ const ProfilePage = () => {
             setActiveTab={setActiveTab}
             handleSubmit={handleSubmit}
             handleResumeUpload={handleResumeUpload}
+            handleProfileImageUpload={handleProfileImageUpload}
             isCreating={isCreating}
             isUpdating={isUpdating}
             isUploading={isUploading}

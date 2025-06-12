@@ -18,6 +18,7 @@ import errorHandler from './middleware/error.middleware.js';
 
 // Import Passport config
 import './config/passport.config.js';
+import multer from 'multer'; 
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true
-}));
+}));      
 
 // Initialize rate limiter
 const limiter = rateLimit({

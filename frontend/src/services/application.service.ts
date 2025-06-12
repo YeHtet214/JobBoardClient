@@ -25,7 +25,15 @@ class ApplicationService extends ApiService {
   }
 
   public async createApplication(applicationData: CreateApplicationDto): Promise<Application> {
-    const response = await this.post<Application>(this.endpoints.JOB_APPLICATIONS(applicationData.jobId), applicationData);
+    const formData = new FormData();
+
+    for (const [key, value] of Object.entries(applicationData)) {
+      formData.append(key, value);
+    }
+
+    console.log(formData.getAll('resume'));
+
+    const response = await this.post<Application>(this.endpoints.JOB_APPLICATIONS(applicationData.jobId), formData);
     return response.data.data;
   }
 

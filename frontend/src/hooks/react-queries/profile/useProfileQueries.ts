@@ -8,6 +8,7 @@ export const profileKeys = {
   all: ['profile'] as const,
   details: () => [...profileKeys.all, 'details'] as const,
   resume: () => [...profileKeys.all, 'resume'] as const,
+  profileImage: () => [...profileKeys.all, 'profile-image'] as const,
 };
 
 /**
@@ -132,13 +133,49 @@ export const useUploadResume = () => {
 };
 
 /**
- * @deprecated Use individual hooks instead: useProfile, useCreateProfile, useUpdateProfile, useUploadResume
+ * Hook for uploading a profile image
+ * 
+ * @returns Mutation for uploading a profile image
+ */
+export const useUploadProfileImage = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: (file: File) => profileService.uploadProfileImage(file),
+    onSuccess: (imageUrl) => {
+      // Update the profile with the new image URL
+      queryClient.setQueryData<Profile | null>(profileKeys.details(), (oldData) => {
+        if (!oldData) return null;
+        return { ...oldData, profileImageUrl: imageUrl };
+      });
+
+      toast({
+        title: "Success",
+        description: "Profile image uploaded successfully",
+        variant: "default",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to upload profile image. Please try again.",
+        variant: "destructive",
+      });
+      console.error('Error uploading profile image:', error);
+    }
+  });
+};
+
+/**
+ * @deprecated Use individual hooks instead: useProfile, useCreateProfile, useUpdateProfile, useUploadResume, useUploadProfileImage
  */
 export const useProfileQuery = <T = Profile>() => {
   const { data: profile, isLoading, error, refetch } = useProfile();
   const createProfileMutation = useCreateProfile();
   const updateProfileMutation = useUpdateProfile();
   const uploadResumeMutation = useUploadResume();
+  const uploadProfileImageMutation = useUploadProfileImage();
 
   return {
     profile,
@@ -148,8 +185,10 @@ export const useProfileQuery = <T = Profile>() => {
     createProfile: createProfileMutation.mutate,
     updateProfile: updateProfileMutation.mutate,
     uploadResume: uploadResumeMutation.mutate,
+    uploadProfileImage: uploadProfileImageMutation.mutate,
     isCreating: createProfileMutation.isPending,
     isUpdating: updateProfileMutation.isPending,
     isUploading: uploadResumeMutation.isPending,
+    isUploadingImage: uploadProfileImageMutation.isPending,
   };
 };

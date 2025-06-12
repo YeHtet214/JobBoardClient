@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { formatDate, getJobSeekerStatusBadge } from '@/utils/dashboard.utils';
 import { JobApplication } from '@/types/dashboard.types';
+import CancelConfirmAlert from '../common/CancelConfirmAlert';
 
 interface ApplicationsTableProps {
   applications: JobApplication[];
@@ -54,31 +55,37 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
                     </Button>
                     
                     {onWithdrawApplication && (
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button size="sm" variant="ghost" className="text-red-500 hover:text-red-700">
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Withdraw Application</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to withdraw your application for {application.jobTitle} at {application.companyName}?
-                              This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => onWithdrawApplication(application)}
-                              className="bg-red-500 hover:bg-red-600"
-                            >
-                              Withdraw
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                      // <AlertDialog>
+                      //   <AlertDialogTrigger asChild>
+                      //     <Button size="sm" variant="ghost" className="text-jb-danger hover:text-jb-danger/80">
+                      //       <X className="h-4 w-4" />
+                      //     </Button>
+                      //   </AlertDialogTrigger>
+                      //   <AlertDialogContent>
+                      //     <AlertDialogHeader>
+                      //       <AlertDialogTitle>Withdraw Application</AlertDialogTitle>
+                      //       <AlertDialogDescription>
+                      //         Are you sure you want to withdraw your application for {application.jobTitle} at {application.companyName}?
+                      //         This action cannot be undone.
+                      //       </AlertDialogDescription>
+                      //     </AlertDialogHeader>
+                      //     <AlertDialogFooter>
+                      //       <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      //       <AlertDialogAction
+                      //         onClick={() => onWithdrawApplication(application)}
+                      //         className="bg-jb-danger hover:bg-jb-danger/80"
+                      //       >
+                      //         Withdraw
+                      //       </AlertDialogAction>
+                      //     </AlertDialogFooter>
+                      //   </AlertDialogContent>
+                      // </AlertDialog>
+                      <CancelConfirmAlert 
+                          alertTitle="Withdraw Application" 
+                          alertDescription="Are you sure you want to withdraw your application for {application.jobTitle} at {application.companyName}? This action cannot be undone." 
+                          cancelItem={application} 
+                          onWithdraw={onWithdrawApplication} 
+                      />
                     )}
                   </div>
                 </div>
@@ -92,7 +99,7 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
         </div>
       ) : (
         <div className="text-center py-10">
-          <p className="text-gray-500 mb-4">{emptyStateMessage}</p>
+          <p className="text-jb-text-muted mb-4">{emptyStateMessage}</p>
           <Button onClick={() => navigate('/jobs')}>Browse Jobs</Button>
         </div>
       )}

@@ -18,6 +18,8 @@ interface UploadedFile {
 export const fetchProfile = async (userId: string) => {
     const profile = await prisma.profile.findUnique({ where: { userId } });
 
+    console.log("PROFILE FETCHING: ", profile);
+
     if (profile) {
         // Convert JSON back to typed arrays when returning
         return {
@@ -47,6 +49,7 @@ export const createNewProfile = async (profileData: CreateProfileDto) => {
                 education: profileData.education as any,
                 experience: profileData.experience as any,
                 resumeUrl: profileData.resumeUrl,
+                profileImageURL: profileData.profileImageURL,
                 linkedInUrl: profileData.linkedInUrl,
                 githubUrl: profileData.githubUrl,
                 portfolioUrl: profileData.portfolioUrl
@@ -76,6 +79,9 @@ export const updateExistingProfile = async (userId: string, data: UpdateProfileD
             throw error;
         }
 
+        console.log("IMAGE URL : ", data['profileImageURL'])
+        console.log("IMAGE URL IN AS OBJECT: ", data);
+
         // Prepare update data with proper handling of JSON fields
         const updateData: any = {};
         
@@ -85,9 +91,12 @@ export const updateExistingProfile = async (userId: string, data: UpdateProfileD
         if (data.education !== undefined) updateData.education = data.education as any;
         if (data.experience !== undefined) updateData.experience = data.experience as any;
         if (data.resumeUrl !== undefined) updateData.resumeUrl = data.resumeUrl;
+        if (data.profileImageURL !== undefined) updateData.profileImageURL = data.profileImageURL;
         if (data.linkedInUrl !== undefined) updateData.linkedInUrl = data.linkedInUrl;
         if (data.githubUrl !== undefined) updateData.githubUrl = data.githubUrl;
         if (data.portfolioUrl !== undefined) updateData.portfolioUrl = data.portfolioUrl;
+
+        console.log("The PROFILE data to be updated: ", updateData);
 
         const profile = await prisma.profile.update({
             where: { userId },

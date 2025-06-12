@@ -42,14 +42,14 @@ const ApplyJobPage: React.FC = () => {
         return;
     }
 
-    const resumeFile = profile?.resumeUrl ? new File([profile.resumeUrl], 'resume.pdf') : null;
+    // const resumeFile = profile?.resumeUrl ? new File([profile.resumeUrl], 'resume.pdf') : null;
 
     const initialValues: CreateApplicationDto = {
         jobId: jobId,
         fullName: currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : '',
         email: currentUser?.email || '',
         phone: '',
-        resume: resumeFile,
+        resume: null,
         useExistingResume: false,
         coverLetter: '',
         availability: '',

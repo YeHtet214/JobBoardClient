@@ -10,11 +10,12 @@ import {
     fetchAllApplicationsByUserId
 } from "../services/application/application.service.js";
 import { matchedData } from "express-validator";
+import { resumeUploadToFirebase } from "../services/uploadCloud.service.js";
 
 export const getAllApplicationsByUserId = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
         const validatedData = matchedData(req, { locations: ['params', 'body'] });
-        const userId = validatedData.userId;
+        const userId = req.user.userId;
 
         const applications = await fetchAllApplicationsByUserId(userId);
 
@@ -67,17 +68,15 @@ export const createNewApplication = async (req: RequestWithUser, res: Response, 
     try {
         // Get validated data
         const validatedData = matchedData(req, { locations: ['params', 'body'] });
+        const file = req.file;
+        const userId = req.user.userId;
+        const resumeURL = await resumeUploadToFirebase(file, userId);
+        const applicantId = req.user.userId;
 
-        console.log("validatedData", validatedData);
+        console.log("Resume URL from firebase : ", resumeURL)
+        console.log("Validated Data: ", validatedData)
 
-        const applicationData: createApplicationDto = {
-            jobId: validatedData.jobId,
-            resumeUrl: validatedData.resumeUrl,
-            coverLetter: validatedData.coverLetter,
-            applicantId: req.user.userId
-        }
-
-        const application = await postNewApplication(applicationData);
+        const application = await postNewApplication({ ...validatedData, resumeUrl: resumeURL, applicantId } as createApplicationDto);
 
         res.status(201).json({
             success: true,
@@ -93,6 +92,8 @@ export const updateApplication = async (req: RequestWithUser, res: Response, nex
     try {
         // Get validated data
         const validatedData = matchedData(req, { locations: ['params', 'body'] });
+        const resumeUrl = await resumeUploadToFirebase(req.file, req.user.userId);
+        const applicantId = req.user.userId;
 
         console.log("Validated Data: ", validatedData)
         console.log("body: ", req.body);
@@ -104,7 +105,7 @@ export const updateApplication = async (req: RequestWithUser, res: Response, nex
             status: validatedData.status
         }
 
-        const application = await updateApplicationById(applicationData);
+        const application = await updateApplicationById({ ...applicationData, applicantId } as updateApplicationDto);
 
         res.status(200).json({
             success: true,
