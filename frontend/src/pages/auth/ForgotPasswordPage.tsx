@@ -135,7 +135,7 @@ const ForgotPasswordPage: React.FC = () => {
         <CardFooter className="flex justify-center border-t p-4">
           <p className="text-sm text-muted-foreground">
             Remember your password?{' '}
-            <Link to="/login" className="font-medium text-primary hover:underline">
+            <Link to="/login" className="font-medium text-jb-primary hover:underline">
               Back to login
             </Link>
           </p>
