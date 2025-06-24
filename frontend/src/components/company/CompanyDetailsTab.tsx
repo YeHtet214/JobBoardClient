@@ -1,5 +1,5 @@
 import { MapPin, Globe, Calendar, Users } from 'lucide-react';
-import { DatePickerFieldWithLabel, InputFieldWithLabel, SelectFieldWithLabel } from '../forms';
+import { InputFieldWithLabel, SelectFieldWithLabel } from '../forms';
 
 // Company size options
 const sizeOptions = [

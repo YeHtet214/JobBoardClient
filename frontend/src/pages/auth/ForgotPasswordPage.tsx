@@ -107,7 +107,6 @@ const ForgotPasswordPage: React.FC = () => {
                     formik={true}
                     name="email"
                     label="Email"
-                    type="email"
                     placeholder="name@example.com"
                     autoComplete="email"
                     required

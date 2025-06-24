@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import { useField, useFormikContext } from 'formik';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -263,58 +263,58 @@ const MultiSelectFieldWithLabel: React.FC<MultiSelectFieldWithLabelProps> = (pro
     }
   } else {
     // Non-Formik version
-    const { value, onChange, onBlur, errors } = props;
-    const selectedValues = value || [];
+    const { errors } = props;
+    // const selectedValues = value || [];
     const hasError = errors && errors[name];
 
-    const handleSelect = (value: string) => {
-      const newValues = selectedValues.includes(value)
-        ? selectedValues.filter(v => v !== value)
-        : [...selectedValues, value];
+    // const handleSelect = (value: string) => {
+    //   const newValues = selectedValues.includes(value)
+    //     ? selectedValues.filter(v => v !== value)
+    //     : [...selectedValues, value];
 
-      // Check if we're over the max items limit
-      if (maxItems && !selectedValues.includes(value) && selectedValues.length >= maxItems) {
-        return;
-      }
+    //   // Check if we're over the max items limit
+    //   if (maxItems && !selectedValues.includes(value) && selectedValues.length >= maxItems) {
+    //     return;
+    //   }
 
-      onChange(newValues);
-      if (onBlur) onBlur();
+    //   onChange(newValues);
+    //   if (onBlur) onBlur();
 
-      if (allowCreation && value === search && !options.find(o => o.value === search)) {
-        setSearch('');
-      }
-    };
+    //   if (allowCreation && value === search && !options.find(o => o.value === search)) {
+    //     setSearch('');
+    //   }
+    // };
 
-    const handleRemove = (value: string, e?: React.MouseEvent) => {
-      e?.stopPropagation();
-      const newValues = selectedValues.filter(v => v !== value);
-      onChange(newValues);
-      if (onBlur) onBlur();
-    };
+    // const handleRemove = (value: string, e?: React.MouseEvent) => {
+    //   e?.stopPropagation();
+    //   const newValues = selectedValues.filter(v => v !== value);
+    //   onChange(newValues);
+    //   if (onBlur) onBlur();
+    // };
 
-    const handleCreateOption = () => {
-      if (!search || selectedValues.includes(search) || options.find(o => o.value === search)) {
-        return;
-      }
+    // const handleCreateOption = () => {
+    //   if (!search || selectedValues.includes(search) || options.find(o => o.value === search)) {
+    //     return;
+    //   }
 
-      // Check if we're over the max items limit
-      if (maxItems && selectedValues.length >= maxItems) {
-        return;
-      }
+    //   // Check if we're over the max items limit
+    //   if (maxItems && selectedValues.length >= maxItems) {
+    //     return;
+    //   }
 
-      onChange([...selectedValues, search]);
-      if (onBlur) onBlur();
-      setSearch('');
-      setOpen(false);
-    };
+    //   onChange([...selectedValues, search]);
+    //   if (onBlur) onBlur();
+    //   setSearch('');
+    //   setOpen(false);
+    // };
 
     // Filter options based on search
-    const filteredOptions = options.filter(option =>
-      option.label.toLowerCase().includes(search.toLowerCase())
-    );
+    // const filteredOptions = options.filter(option =>
+    //   option.label.toLowerCase().includes(search.toLowerCase())
+    // );
 
     // Check if current search could be a new option
-    const canCreateOption =
+    // const canCreateOption =
       allowCreation &&
       search &&
       !options.find(option =>

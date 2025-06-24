@@ -42,7 +42,7 @@ export const useSavedJobs = () => {
 export const useBatchJobSavedStatus = (jobIds: string[] = []) => {
   const uniqueJobIds = [...new Set(jobIds)].filter(Boolean);
   
-  return useQuery<Record<string, JobSavedStatus>>({
+  return useQuery<Record<string, JobSavedStatus> | Error>({
     queryKey: savedJobKeys.batch(uniqueJobIds),
     queryFn: async () => {
       try {

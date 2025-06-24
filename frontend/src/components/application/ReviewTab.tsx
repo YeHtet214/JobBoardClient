@@ -1,29 +1,28 @@
 import React from 'react';
 import { FormikProps } from 'formik';
-import { ApplicationFormValues } from '@/types/application.types';
-import { 
-  Card, 
+import { CreateApplicationDto } from '@/types/application.types';
+import {
+  Card,
   CardContent,
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { 
-  User, 
-  FileText, 
-  MessageSquare, 
-  HelpCircle, 
-  ClipboardList 
+import {
+  User,
+  FileText,
+  MessageSquare,
+  HelpCircle,
+  ClipboardList
 } from 'lucide-react';
 import { CheckboxField } from '../forms';
 
 interface ReviewTabProps {
-  formik: FormikProps<ApplicationFormValues>;
+  formik: FormikProps<CreateApplicationDto>;
   jobTitle?: string;
   companyName?: string;
 }
 
 const ReviewTab: React.FC<ReviewTabProps> = ({ formik, jobTitle, companyName }) => {
-  const { values } = formik;
 
   return (
     <div className="space-y-4">
@@ -44,16 +43,16 @@ const ReviewTab: React.FC<ReviewTabProps> = ({ formik, jobTitle, companyName }) 
           <CardContent className="text-sm space-y-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div>
-                <span className="text-gray-500">Full Name:</span> 
-                <span className="ml-1 font-medium">{values.fullName}</span>
+                <span className="text-gray-500">Full Name:</span>
+                <span className="ml-1 font-medium">{formik.values.fullName}</span>
               </div>
               <div>
-                <span className="text-gray-500">Email:</span> 
-                <span className="ml-1 font-medium">{values.email}</span>
+                <span className="text-gray-500">Email:</span>
+                <span className="ml-1 font-medium">{formik.values.email}</span>
               </div>
               <div>
-                <span className="text-gray-500">Phone:</span> 
-                <span className="ml-1 font-medium">{values.phone}</span>
+                <span className="text-gray-500">Phone:</span>
+                <span className="ml-1 font-medium">{formik.values.phone}</span>
               </div>
             </div>
           </CardContent>
@@ -68,12 +67,12 @@ const ReviewTab: React.FC<ReviewTabProps> = ({ formik, jobTitle, companyName }) 
             </CardTitle>
           </CardHeader>
           <CardContent className="text-sm">
-            {values.useExistingResume ? (
+            {formik.values.useExistingResume ? (
               <div className="text-sm">Using resume from your profile</div>
-            ) : values.resume ? (
+            ) : formik.values.resume ? (
               <div className="text-sm">
-                <span className="text-gray-500">Resume File:</span> 
-                <span className="ml-1 font-medium">{values.resume.name}</span>
+                <span className="text-gray-500">Resume File:</span>
+                <span className="ml-1 font-medium">{formik.values.resume.name}</span>
               </div>
             ) : (
               <div className="text-sm text-yellow-600">No resume uploaded</div>
@@ -91,7 +90,7 @@ const ReviewTab: React.FC<ReviewTabProps> = ({ formik, jobTitle, companyName }) 
           </CardHeader>
           <CardContent className="text-sm">
             <div className="max-h-32 overflow-y-auto p-2 bg-gray-50 rounded-md">
-              {values.coverLetter || (
+              {formik.values.coverLetter || (
                 <span className="text-yellow-600">No cover letter provided</span>
               )}
             </div>
@@ -108,18 +107,18 @@ const ReviewTab: React.FC<ReviewTabProps> = ({ formik, jobTitle, companyName }) 
           </CardHeader>
           <CardContent className="text-sm space-y-2">
             <div>
-              <span className="text-gray-500">Availability:</span> 
-              <span className="ml-1 font-medium">{values.availability}</span>
+              <span className="text-gray-500">Availability:</span>
+              <span className="ml-1 font-medium">{formik.values.availability}</span>
             </div>
             <div>
-              <span className="text-gray-500">Expected Salary:</span> 
-              <span className="ml-1 font-medium">{values.expectedSalary}</span>
+              <span className="text-gray-500">Expected Salary:</span>
+              <span className="ml-1 font-medium">{formik.values.expectedSalary}</span>
             </div>
-            {values.additionalInfo && (
+            {formik.values.additionalInfo && (
               <div>
                 <span className="text-gray-500">Additional Information:</span>
                 <div className="mt-1 p-2 bg-gray-50 rounded-md">
-                  {values.additionalInfo}
+                  {formik.values.additionalInfo}
                 </div>
               </div>
             )}
@@ -136,11 +135,11 @@ const ReviewTab: React.FC<ReviewTabProps> = ({ formik, jobTitle, companyName }) 
           </CardHeader>
           <CardContent className="text-sm space-y-2">
             <div>
-              <span className="text-gray-500">Position:</span> 
+              <span className="text-gray-500">Position:</span>
               <span className="ml-1 font-medium">{jobTitle || 'Unknown Position'}</span>
             </div>
             <div>
-              <span className="text-gray-500">Company:</span> 
+              <span className="text-gray-500">Company:</span>
               <span className="ml-1 font-medium">{companyName || 'Unknown Company'}</span>
             </div>
           </CardContent>
@@ -148,13 +147,13 @@ const ReviewTab: React.FC<ReviewTabProps> = ({ formik, jobTitle, companyName }) 
 
         {/* Terms and Conditions */}
         <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <CheckboxField
-                name="acceptTerms"
-                label="I confirm that all the information provided is accurate and complete"
-                formik={true}
-              />
-            </div>
+          <div className="flex items-center space-x-2">
+            <CheckboxField
+              name="acceptTerms"
+              label="I confirm that all the information provided is accurate and complete"
+              formik={true}
+            />
+          </div>
         </div>
       </div>
     </div>

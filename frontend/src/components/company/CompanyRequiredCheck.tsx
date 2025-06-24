@@ -14,7 +14,7 @@ interface CompanyRequiredCheckProps {
  */
 const CompanyRequiredCheck = ({ children }: CompanyRequiredCheckProps) => {
   const navigate = useNavigate();
-  const { data: company, isLoading, isError } = useMyCompany();
+  const { data: company, isLoading } = useMyCompany();
 
   useEffect(() => {
     if (!isLoading && !company) {

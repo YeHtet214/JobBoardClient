@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Scroll, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Form, InputFieldWithLabel } from '@/components/forms';
 import { Formik, FormikProps } from 'formik';
 import { JobFilterSchema } from '@/schemas/validation/job.schema';

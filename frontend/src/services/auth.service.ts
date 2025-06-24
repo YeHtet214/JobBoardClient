@@ -1,5 +1,6 @@
 import { ApiService } from '@/services/api.service';
-import { User, LoginRequest, RegisterRequest, AuthResponse, VerifiedEmailResponse } from '@/types/auth.types';
+import { LoginRequest, RegisterRequest, AuthResponse, VerifiedEmailResponse } from '@/types/auth.types';
+import { User } from '@/types/user.types';
 import { isTokenExpired } from '@/utils/jwt';
 
 class AuthService extends ApiService {

@@ -1,7 +1,7 @@
 import React from 'react';
 import JobCard from './JobCard';
 import Pagination from './Pagination';
-import { Job, JobFilterType } from '@/types/job.types';
+import { Job } from '@/types/job.types';
 import { AlertCircle, Search } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import JobSorting from './JobSorting';
@@ -18,12 +18,12 @@ const JobList: React.FC = () => {
   const isJobSeeker = currentUser?.role === 'JOBSEEKER';
   
   // Get all job IDs for batch checking saved status
-  const jobIds = jobs.map(job => job.id);
+  const jobIds = new Set(jobs.map((job: Job) => job.id));
   
   // Use the batch hook to check if jobs are saved in a single request
   const { data: savedJobsStatus = {} } = useBatchJobSavedStatus(
-    isAuthenticated && isJobSeeker ? jobIds : []
-  );
+    isAuthenticated && isJobSeeker ? [...jobIds] : []
+  )
 
   // Check if any filters are applied
   const hasFilters = keyword || location || jobTypes.length > 0 || experienceLevel !== 'ANY';
@@ -98,8 +98,7 @@ const JobList: React.FC = () => {
           <JobCard 
             key={job.id} 
             job={job}
-            isCompact={false}
-            savedStatus={isJobSeeker && isAuthenticated ? savedJobsStatus[job.id] : undefined}
+            savedStatus={(savedJobsStatus instanceof Error) ? { isSaved: false, savedJobId: null } : (savedJobsStatus[job.id]) ? { isSaved: true, savedJobId: savedJobsStatus[job.id].savedJobId } : { isSaved: false, savedJobId: null } }
           />
         ))}
       </div>

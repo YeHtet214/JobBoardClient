@@ -1,4 +1,4 @@
-import { User, UserRole } from './user.types';
+import { User, UserRole } from '@/types/user.types';
 
 export interface LoginRequest {
   email: string;

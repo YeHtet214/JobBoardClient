@@ -85,7 +85,6 @@ const EducationTab = ({ formik, isSaving, onTabChange }: EducationTabProps) => {
                         formik={true}
                         name={`education.${index}.startDate`}
                         label="Start Date"
-                        type="text"
                         placeholder="YYYY-MM-DD"
                       />
                       
@@ -93,7 +92,6 @@ const EducationTab = ({ formik, isSaving, onTabChange }: EducationTabProps) => {
                         formik={true}
                         name={`education.${index}.endDate`}
                         label="End Date"
-                        type="text"
                         placeholder="YYYY-MM-DD"
                       />
 

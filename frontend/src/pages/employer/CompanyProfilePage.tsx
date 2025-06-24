@@ -12,7 +12,7 @@ const CompanyProfilePage = () => {
   const navigate = useNavigate();
 
   // Fetch company data
-  const { data: company, isLoading, isError } = useMyCompany();
+  const { data: company, isLoading } = useMyCompany();
 
   // Redirect if not employer
   useEffect(() => {

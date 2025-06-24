@@ -1,14 +1,6 @@
-import React from 'react';
-import { FormikProps } from 'formik';
-import { ApplicationFormValues } from '@/types/application.types';
 import { InputFieldWithLabel, TextareaField } from '../forms';
 
-interface QuestionsTabProps {
-  formik: FormikProps<ApplicationFormValues>;
-}
-
-const QuestionsTab: React.FC<QuestionsTabProps> = ({ formik }) => {
-  const { values } = formik;
+const QuestionsTab = () => {
 
   return (
     <div className="space-y-4">
@@ -23,7 +15,6 @@ const QuestionsTab: React.FC<QuestionsTabProps> = ({ formik }) => {
           <InputFieldWithLabel
             name="availability"
             label="When can you start?"
-            type="text"
             required={true}
             formik={true}
             placeholder="e.g., Immediately, 2 weeks, after June 15th, etc."
@@ -35,7 +26,6 @@ const QuestionsTab: React.FC<QuestionsTabProps> = ({ formik }) => {
           <InputFieldWithLabel
             name="expectedSalary"
             label="What is your expected salary?"
-            type="text"
             required={true}
             formik={true}
             placeholder="e.g., $70,000 - $80,000 per year"

@@ -14,8 +14,8 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
 import { Job, JobType } from '@/types/job.types';
-import { useJobsContext } from '@/contexts/JobsContext';
 import useFeaturedJobs from '@/hooks/react-queries/job/useFeaturedJobs';
+import { useJobsData } from '@/hooks';
 
 // Mapping for job type display and styles
 const jobTypeConfig: Record<JobType, { label: string; className: string }> = {
@@ -48,7 +48,7 @@ const FeaturedJobsSection: React.FC<FeaturedJobsSectionProps> = ({
   staggerContainer,
   cardVariants,
 }) => {
-  const { handleJobView } = useJobsContext();
+  const { handleJobView } = useJobsData();
   const { data: featuredJobs, isLoading } = useFeaturedJobs();
 
   useEffect(() => {

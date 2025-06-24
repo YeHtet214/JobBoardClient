@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode, useState } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 import { Job } from '@/types/job.types';
 import { useSearchParams } from 'react-router-dom';
 import { useJobsData } from '@/hooks/react-queries/job';
@@ -28,16 +28,6 @@ interface JobsContextType {
   experienceLevel: string;
   // Sort state
   sortBy: SortOption;
-  // Methods
-  setKeyword: (keyword: string) => void;
-  setLocation: (location: string) => void;
-  handleJobTypeChange: (type: string) => void;
-  setExperienceLevel: (level: string) => void;
-  setSortBy: (option: SortOption) => void;
-  handleSearch: (e: React.FormEvent) => void;
-  handleJobView: (job: Job) => void;
-  handlePageChange: (page: number) => void;
-  resetFilters: () => void;
 }
 
 const JobsContext = createContext<JobsContextType | undefined>(undefined);
@@ -56,7 +46,7 @@ export const JobsProvider: React.FC<JobsProviderProps> = ({ children }) => {
     initialJobTypes: searchParams.getAll('jobTypes') || [],
     initialExperienceLevel: searchParams.get('experienceLevel') || 'ANY',
     initialPage: parseInt(searchParams.get('page') || '1', 10),
-    initialSortBy: (searchParams.get('sortBy') as SortOption) || SortOption.NEWEST
+    initialSortBy: (searchParams.get('sortBy') as SortOption) || SortOption.NEWEST,
   });
 
   // The context now simply passes through all the functionality from the hook

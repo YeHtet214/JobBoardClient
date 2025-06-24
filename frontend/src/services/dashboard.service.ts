@@ -3,7 +3,6 @@ import {
   JobSeekerDashboardData, 
   EmployerDashboardData, 
   JobApplication, 
-  RecentActivity,
   PostedJob,
   ReceivedApplication,
   EmployerActivity,

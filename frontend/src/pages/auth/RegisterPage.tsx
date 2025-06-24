@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/authContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserRole } from '@/types/user.types';
-import * as Yup from 'yup';
 import { Formik, FormikHelpers } from 'formik';
 import { 
   Form, 
@@ -23,7 +22,7 @@ import { Separator } from "@/components/ui/separator";
 
 // Password regex pattern
 // At least 8 characters, 1 uppercase, 1 lowercase, 1 number, and 1 special character
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+// const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 const RegisterPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
@@ -136,7 +135,6 @@ const RegisterPage: React.FC = () => {
                             formik={true}
                             name="email"
                             label="Email"
-                            type="email"
                             placeholder="name@example.com"
                             autoComplete="email"
                             required

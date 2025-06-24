@@ -1,6 +1,6 @@
 import authService from '@/services/auth.service';
 import userService from '@/services/user.service';
-import { User } from '@/types/auth.types';
+import { User } from '@/types/user.types';
 import { useQuery } from '@tanstack/react-query';
 
 

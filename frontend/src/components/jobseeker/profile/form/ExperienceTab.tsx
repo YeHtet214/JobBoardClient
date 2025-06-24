@@ -85,7 +85,6 @@ const ExperienceTab = ({ formik, isSaving, onTabChange }: ExperienceTabProps) =>
                         formik={true}
                         name={`experience.${index}.startDate`}
                         label="Start Date"
-                        type="text"
                         placeholder="YYYY-MM-DD"
                       />
                       
@@ -93,7 +92,6 @@ const ExperienceTab = ({ formik, isSaving, onTabChange }: ExperienceTabProps) =>
                         formik={true}
                         name={`experience.${index}.endDate`}
                         label="End Date"
-                        type="text"
                         placeholder="YYYY-MM-DD"
                       />
 

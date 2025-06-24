@@ -177,7 +177,6 @@ const BasicInfoTab = ({
               formik={true}
               name="newSkill"
               label=""
-              type="text"
               placeholder="Add a skill..."
               className="flex-1"
             />

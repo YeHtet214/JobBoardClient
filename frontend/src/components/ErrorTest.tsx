@@ -37,7 +37,7 @@ const ErrorTest: React.FC = () => {
   // This will cause a render error
   const handleRenderError = () => {
     // @ts-ignore - Intentionally causing an error
-    const obj = null;
+    let obj = null as any;
     obj.nonExistentMethod();
   };
 

@@ -21,13 +21,12 @@ import {
 
 interface JobCardProps {
   job: Job;
-  isCompact?: boolean;
   savedStatus?: JobSavedStatus;
 }
 
-const JobCard: React.FC<JobCardProps> = ({ job, isCompact = false, savedStatus }) => {
-  const { handleJobView } = useJobsData({ keyword: '', location: '', jobTypes: [], experienceLevel: 'ANY' });
-  const navigate = useNavigate();
+const JobCard: React.FC<JobCardProps> = ({ job, savedStatus }) => {
+  const { handleJobView } = useJobsData();
+  const navigate = useNavigate(); 
   const { toast } = useToast();
   const { currentUser, isAuthenticated } = useAuth();
   const isJobSeeker = currentUser?.role === 'JOBSEEKER';

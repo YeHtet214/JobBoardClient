@@ -15,7 +15,6 @@ import {
     ReviewTab
 } from '@/components/application';
 import ApplicationSchema from '@/schemas/validation/application.schema';
-import { useProfile } from '@/hooks/react-queries/profile';
 import { useAuth } from '@/contexts/authContext';
 import { useCreateApplication } from '@/hooks/react-queries/application/useApplicationQueries';
 
@@ -34,7 +33,6 @@ const ApplyJobPage: React.FC = () => {
 
     const jobId = useParams<{ id: string }>().id;
     const { data: job } = useJob(jobId || '');
-    const { data: profile } = useProfile();
     const { currentUser } = useAuth();
 
     if (!jobId) {
@@ -128,17 +126,17 @@ const ApplyJobPage: React.FC = () => {
 
                                     {/* Personal Info Tab */}
                                     <TabsContent value="personal">
-                                        <PersonalInfoTab formik={formik} />
+                                        <PersonalInfoTab />
                                     </TabsContent>
 
                                     {/* Resume Tab */}
                                     <TabsContent value="resume">
-                                        <ResumeTab formik={formik} />
+                                        <ResumeTab />
                                     </TabsContent>
 
                                     {/* Additional Questions Tab */}
                                     <TabsContent value="questions">
-                                        <QuestionsTab formik={formik} />
+                                        <QuestionsTab />
                                     </TabsContent>
 
                                     {/* Review & Submit Tab */}

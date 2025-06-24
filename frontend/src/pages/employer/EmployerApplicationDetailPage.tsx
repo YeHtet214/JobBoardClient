@@ -23,7 +23,6 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
@@ -41,7 +40,7 @@ import {
   useUpdateApplication 
 } from '@/hooks/react-queries/application/useApplicationQueries';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import { Application, ApplicationStatus } from '@/types/application.types';
+import { ApplicationStatus } from '@/types/application.types';
 
 // Status display maps
 const statusIconMap = {

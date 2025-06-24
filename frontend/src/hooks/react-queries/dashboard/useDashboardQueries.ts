@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstac
 import DashboardService from '@/services/dashboard.service';
 import JobService from '@/services/job.service';
 import {
-  ReceivedApplication,
   JobSeekerDashboardData,
   EmployerDashboardData
 } from '@/types/dashboard.types';
@@ -33,6 +32,7 @@ export const useJobSeekerDashboard = (options?: Omit<UseQueryOptions<JobSeekerDa
         throw error;
       }
     },
+    ...options,
   });
 };
 

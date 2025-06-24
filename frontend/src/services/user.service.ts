@@ -1,5 +1,5 @@
 import { ApiService } from './api.service';
-import { User } from '../types/auth.types';
+import { User } from '@/types/user.types';
 
 class UserService extends ApiService {
   private endpoints = {

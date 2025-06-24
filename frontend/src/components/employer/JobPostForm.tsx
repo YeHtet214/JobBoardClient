@@ -47,9 +47,10 @@ const experienceLevelOptions = [
 const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [skillInput, setSkillInput] = useState('');
   const [skills, setSkills] = useState<string[]>(job?.requiredSkills || []);
   const formikRef = useRef<any>(null);
+
+  useEffect(() => setSkills(job?.requiredSkills || []), [job]);
 
   // React Query mutations
   const createJob = useCreateJob();
@@ -69,18 +70,18 @@ const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
   };
 
   // Handle skill input
-  const handleAddSkill = () => {
-    if (skillInput.trim() && !skills.includes(skillInput.trim())) {
-      const newSkills = [...skills, skillInput.trim()];
-      setSkills(newSkills);
-      setSkillInput('');
-    }
-  };
+  // const handleAddSkill = () => {
+  //   if (skillInput.trim() && !skills.includes(skillInput.trim())) {
+  //     const newSkills = [...skills, skillInput.trim()];
+  //     setSkills(newSkills);
+  //     setSkillInput('');
+  //   }
+  // };
 
-  const handleRemoveSkill = (skillToRemove: string) => {
-    const newSkills = skills.filter(skill => skill !== skillToRemove);
-    setSkills(newSkills);
-  };
+  // const handleRemoveSkill = (skillToRemove: string) => {
+  //   const newSkills = skills.filter(skill => skill !== skillToRemove);
+  //   setSkills(newSkills);
+  // };
 
   // Use useEffect to update Formik values when skills change
   useEffect(() => {
@@ -197,7 +198,6 @@ const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
                   formik={true}
                   name="salaryMin"
                   label="Minimum Salary"
-                  type="number"
                   placeholder="e.g. 50000"
                   required
                   disabled={isSubmitting || formikSubmitting}
@@ -207,7 +207,6 @@ const JobPostForm = ({ job, isEditing = false }: JobPostFormProps) => {
                   formik={true}
                   name="salaryMax"
                   label="Maximum Salary"
-                  type="number"
                   placeholder="e.g. 80000"
                   required
                   disabled={isSubmitting || formikSubmitting}

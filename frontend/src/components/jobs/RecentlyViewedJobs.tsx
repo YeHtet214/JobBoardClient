@@ -6,7 +6,7 @@ import { History, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const RecentlyViewedJobs: React.FC = () => {
-  const { recentlyViewedJobs } = useJobsData({ keyword: '', location: '', jobTypes: [], experienceLevel: 'ANY' });
+  const { recentlyViewedJobs } = useJobsData();
 
   if (recentlyViewedJobs.length === 0) {
     return (
@@ -26,7 +26,7 @@ const RecentlyViewedJobs: React.FC = () => {
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {displayJobs.map((job: Job, index: number) => (
-          <JobCard key={`recent-${job.id}-${index}`} job={job} isCompact={true} />
+          <JobCard key={`recent-${job.id}-${index}`} job={job} />
         ))}
       </div>
       

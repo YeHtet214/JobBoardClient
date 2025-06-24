@@ -20,7 +20,6 @@ const BrandingTab = () => {
             </span>
           )}
           placeholder="https://example.com/your-logo.png"
-          type="url"
         />
         <p className="text-sm text-gray-500 mt-2">
           Please provide a URL to your company logo. For best results, use a square image

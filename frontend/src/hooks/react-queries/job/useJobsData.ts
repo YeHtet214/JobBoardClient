@@ -202,7 +202,6 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Job, JobFilterType } from '@/types/job.types';
 import { useJobs } from './useJobQueries';
 import { SortOption } from '@/contexts/JobsContext';
-import useDebounce from '@/hooks/useDebounce';
 import { useSearchParams } from 'react-router-dom';
 
 interface UseJobsDataParams {
@@ -261,8 +260,8 @@ export const useJobsData = ({
   const ITEMS_PER_PAGE = 10;
 
   // Debounced versions of the filter states for smoother search experience
-  const debouncedKeyword = useDebounce(keyword, 500);
-  const debouncedLocation = useDebounce(location, 500);
+  // const debouncedKeyword = useDebounce(keyword, 500);
+  // const debouncedLocation = useDebounce(location, 500);
 
 
   // 🔧 FIX 1: Memoize the filters object to prevent unnecessary re-renders
@@ -296,7 +295,7 @@ export const useJobsData = ({
   }, [refetch]);
 
   // Extract values from the response
-  const jobs = data?.jobs || [];
+  const jobs: Job[] = data?.jobs || [];
   const totalPages = data?.totalPages || 0;
 
   // Update total count when data changes
@@ -321,24 +320,6 @@ export const useJobsData = ({
 
     setSearchParams(params);
   }
-
-  // 🔧 FIX 3: Separate URL updates from refetch logic to prevent infinite loop
-  // useEffect(() => {
-  //   const params = new URLSearchParams();
-
-  //   if (debouncedKeyword) params.append('keyword', debouncedKeyword);
-  //   if (debouncedLocation) params.append('location', debouncedLocation);
-  //   if (experienceLevel && experienceLevel !== 'ANY') params.append('experienceLevel', experienceLevel);
-  //   if (currentPage > 1) params.append('page', currentPage.toString());
-  //   if (sortBy !== SortOption.NEWEST) params.append('sortBy', sortBy);
-
-  //   jobTypes.forEach(type => params.append('jobTypes', type));
-
-  //   setSearchParams(params, { replace: true });
-  // }, [debouncedKeyword, debouncedLocation, jobTypes, experienceLevel, currentPage, sortBy, setSearchParams]);
-
-  // 🔧 FIX 4: Remove the refetch from URL effect - React Query will auto-refetch when filters change
-  // The memoized filters object will trigger React Query's refetch automatically
 
   // Load recently viewed jobs from localStorage
   useEffect(() => {

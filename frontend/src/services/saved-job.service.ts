@@ -45,7 +45,7 @@ class SavedJobService extends ApiService {
    * @param jobIds - Array of job IDs to check
    * @returns Map of job IDs to their saved status
    */
-  public async areJobsSaved(jobIds: string[]): Promise<Record<string, JobSavedStatus>> {
+  public async areJobsSaved(jobIds: string[]): Promise<Record<string, JobSavedStatus> | Error> {
     if (!jobIds.length) return {};
 
     try {
@@ -55,8 +55,9 @@ class SavedJobService extends ApiService {
       );
       return response.data.data;
 
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to check if job saved:`, error);
+      return error;
     }
   }
 

@@ -6,7 +6,6 @@ import { Input } from '../ui/input';
 type InputFieldWithLabelProps = {
     name: string;
     label: ReactNode; // Accepts both string and JSX/HTML content
-    type?: 'text' | 'email' | 'password' | 'number' | 'tel';
     placeholder?: string;
     className?: string;
     disabled?: boolean;
@@ -27,7 +26,6 @@ const InputFieldWithLabel: React.FC<InputFieldWithLabelProps> = (props) => {
     const { 
         label, 
         name, 
-        type = 'text', 
         placeholder = '', 
         className = '',
         disabled = false,
@@ -51,7 +49,6 @@ const InputFieldWithLabel: React.FC<InputFieldWithLabelProps> = (props) => {
                         {label} {required && <span className="text-jb-danger">*</span>}
                     </label>
                     <Input
-                        type={type}
                         id={name}
                         placeholder={placeholder}
                         disabled={disabled}
@@ -78,7 +75,6 @@ const InputFieldWithLabel: React.FC<InputFieldWithLabelProps> = (props) => {
                         </div>
                     </Label>
                     <Input
-                        type={type}
                         id={name}
                         placeholder={placeholder}
                         disabled={disabled}
@@ -102,7 +98,6 @@ const InputFieldWithLabel: React.FC<InputFieldWithLabelProps> = (props) => {
                     </div>
                 </Label>
                 <Input
-                    type={type}
                     id={name}
                     placeholder={placeholder}
                     value={value}

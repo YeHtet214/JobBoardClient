@@ -170,7 +170,7 @@ export const useUploadProfileImage = () => {
 /**
  * @deprecated Use individual hooks instead: useProfile, useCreateProfile, useUpdateProfile, useUploadResume, useUploadProfileImage
  */
-export const useProfileQuery = <T = Profile>() => {
+export const useProfileQuery = () => {
   const { data: profile, isLoading, error, refetch } = useProfile();
   const createProfileMutation = useCreateProfile();
   const updateProfileMutation = useUpdateProfile();

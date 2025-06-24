@@ -1,15 +1,7 @@
 import React from 'react';
-import { FormikProps } from 'formik';
-import { CreateApplicationDto } from '@/types/application.types';
 import { InputFieldWithLabel } from '../forms';
 
-interface PersonalInfoTabProps {
-  formik: FormikProps<CreateApplicationDto>;
-}
-
-const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ formik }) => {
-
-  const { values } = formik
+const PersonalInfoTab: React.FC = () => {
 
   return (
     <div className="space-y-4">
@@ -24,13 +16,8 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ formik }) => {
           <InputFieldWithLabel
             name="fullName"
             label="Full Name"
-            type="text"
             required={true}
-            // formik={true}
-            value={values.fullName}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            // errors={formik.errors}
+            formik={true}
             placeholder="Enter your full name"
           />
         </div>
@@ -40,13 +27,8 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ formik }) => {
           <InputFieldWithLabel
             name="email"
             label="Email Address"
-            type="email"
             required={true}
-            // formik={true}
-            value={values.email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            // errors={formik.errors}
+            formik={true}
             placeholder="Enter your email address"
           />
         </div>
@@ -56,13 +38,8 @@ const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({ formik }) => {
           <InputFieldWithLabel
             name="phone"
             label="Phone Number"
-            type="tel"
             required={true}
-            // formik={true}
-            value={values.phone}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            // errors={formik.errors}
+            formik={true}
             placeholder="Enter your phone number"
           />
         </div>

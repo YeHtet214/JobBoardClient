@@ -1,15 +1,7 @@
 import React from 'react';
-import { FormikProps } from 'formik';
-import { CreateApplicationDto } from '@/types/application.types';
 import { FileInputFieldWithLabel, TextareaField } from '@/components/forms';
 
-interface ResumeTabProps {
-  formik: FormikProps<CreateApplicationDto>;
-}
-
-const ResumeTab: React.FC<ResumeTabProps> = ({ formik }) => {
-  // We reference formik.values to keep TypeScript happy
-  const { values } = formik;
+const ResumeTab: React.FC = () => {
 
   return (
     <div className="space-y-6">

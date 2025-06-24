@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Formik, FormikHelpers, Field, ErrorMessage } from 'formik';
-import { Form } from '@/components/forms/components';
+import { Form } from '@/components/forms/';
 import AuthLayout from '@/components/layouts/AuthLayout';
 
 // Shadcn UI components

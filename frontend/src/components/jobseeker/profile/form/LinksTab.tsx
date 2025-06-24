@@ -34,28 +34,28 @@ const LinksTab = ({
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [resumeUploadError, setResumeUploadError] = useState<string | null>(null);
 
-  const handleResumeFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("Resume File Change: ", e.target.files)
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
+  // const handleResumeFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   console.log("Resume File Change: ", e.target.files)
+  //   if (e.target.files && e.target.files[0]) {
+  //     const file = e.target.files[0];
       
-      // Check file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setResumeUploadError('File size exceeds the 5MB limit');
-        return;
-      }
+  //     // Check file size (max 5MB)
+  //     if (file.size > 5 * 1024 * 1024) {
+  //       setResumeUploadError('File size exceeds the 5MB limit');
+  //       return;
+  //     }
 
-      // Check file type
-      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-      if (!allowedTypes.includes(file.type)) {
-        setResumeUploadError('Only PDF, DOC, and DOCX files are allowed');
-        return;
-      }
+  //     // Check file type
+  //     const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+  //     if (!allowedTypes.includes(file.type)) {
+  //       setResumeUploadError('Only PDF, DOC, and DOCX files are allowed');
+  //       return;
+  //     }
 
-      setResumeFile(file);
-      setResumeUploadError(null);
-    }
-  };
+  //     setResumeFile(file);
+  //     setResumeUploadError(null);
+  //   }
+  // };
 
   const handleUploadClick = async () => {
     if (resumeFile) {

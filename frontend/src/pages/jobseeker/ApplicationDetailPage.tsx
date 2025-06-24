@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { CalendarDays, Building, User, MapPin, Clock, FileText, PenSquare, MailOpen, Calendar, CheckCircle2, XCircle, Clock3 } from 'lucide-react';
+import { CalendarDays, Building, User, MapPin, Clock, FileText, PenSquare, MailOpen, Calendar, CheckCircle2, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 import { useToast } from '@/components/ui/use-toast';
