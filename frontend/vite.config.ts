@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/job-board",
+  base: "/Job-Board",
   server: {
     watch: {
       usePolling: true
