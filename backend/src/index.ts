@@ -63,6 +63,12 @@ app.use('/api/saved-jobs', savedJobRouter);
 
 app.use(errorHandler);
 
-app.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000');
-});
+// Export the app for vercel
+export default app;
+
+// Only run the server if not in production mode
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(3000, () => {
+    console.log('Server is running on http://localhost:3000');
+  })
+}
